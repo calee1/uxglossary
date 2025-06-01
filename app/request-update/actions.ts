@@ -1,8 +1,5 @@
 "use server"
 
-import fs from "fs"
-import path from "path"
-
 interface RequestState {
   success?: boolean
   error?: string
@@ -35,48 +32,10 @@ export async function submitUpdateRequest(prevState: RequestState | null, formDa
       return { error: "Please enter a valid email address." }
     }
 
-    console.log("Validation passed, proceeding with CSV backup...")
+    console.log("Validation passed, proceeding with email...")
 
-    // Prepare CSV data for backup
+    // Skip CSV backup in serverless environment - just send email
     const timestamp = new Date().toISOString()
-    const csvRow = [
-      timestamp,
-      escapeCSVField(name),
-      escapeCSVField(email),
-      escapeCSVField(requestType),
-      escapeCSVField(updateRequest),
-      escapeCSVField(source || ""),
-      "pending", // status
-    ].join(",")
-
-    let csvSuccess = false
-    let csvError = null
-    try {
-      // Try to save to CSV - this might fail in some hosting environments
-      const dataDir = path.resolve(process.cwd(), "data")
-
-      // Check if we can write to the filesystem
-      if (!fs.existsSync(dataDir)) {
-        console.log("Creating data directory...")
-        fs.mkdirSync(dataDir, { recursive: true })
-      }
-
-      const requestsPath = path.resolve(dataDir, "update-requests.csv")
-      if (!fs.existsSync(requestsPath)) {
-        console.log("Creating CSV file with headers...")
-        const headers = "timestamp,name,email,request_type,update_request,source,status\n"
-        fs.writeFileSync(requestsPath, headers)
-      }
-
-      console.log("Appending to CSV file...")
-      fs.appendFileSync(requestsPath, csvRow + "\n")
-      console.log("CSV backup successful")
-      csvSuccess = true
-    } catch (error) {
-      csvError = error
-      console.error("CSV backup failed:", error)
-      // Don't fail the entire process if CSV fails - continue with email
-    }
 
     // Send email notification
     console.log("Attempting to send email...")
@@ -96,25 +55,16 @@ export async function submitUpdateRequest(prevState: RequestState | null, formDa
     } catch (error) {
       emailError = error
       console.error("Email sending failed:", error)
+      return { error: `Email delivery failed: ${error.message}` }
     }
 
-    // Check if at least one method succeeded
-    if (!csvSuccess && emailError) {
-      return {
-        error: `Both backup methods failed. CSV: ${csvError?.message || "Unknown error"}. Email: ${emailError.message}`,
-      }
-    }
+    // Provide feedback about what happened
+    let debugInfo = `Email delivery: ✅ Success\n`
+    debugInfo += `Email ID: ${emailResult?.id || "No ID returned"}\n`
+    debugInfo += `Sent to: calee607@gmail.com\n`
+    debugInfo += `From: ${name} (${email})\n`
 
-    // Provide detailed feedback about what happened
-    let debugInfo = `CSV backup: ${csvSuccess ? "✅ Success" : "❌ Failed - " + (csvError?.message || "Unknown error")}\n`
-    debugInfo += `Email delivery: ${emailError ? "❌ Failed - " + emailError.message : "✅ Success"}\n`
-    debugInfo += `API Key format: ${process.env.RESEND_API_KEY ? `Present (${process.env.RESEND_API_KEY.substring(0, 8)}...)` : "Missing"}\n`
-
-    if (emailResult?.id) {
-      debugInfo += `Email ID: ${emailResult.id}\n`
-    }
-
-    console.log("Form submission completed with debug info:", debugInfo)
+    console.log("Form submission completed successfully:", debugInfo)
 
     return {
       success: true,
@@ -131,15 +81,6 @@ export async function submitUpdateRequest(prevState: RequestState | null, formDa
 
     return { error: "An unexpected error occurred. Please try again later." }
   }
-}
-
-// Helper function to escape CSV fields
-function escapeCSVField(field: string): string {
-  if (!field) return ""
-  if (field.includes(",") || field.includes('"') || field.includes("\n")) {
-    return `"${field.replace(/"/g, '""')}"`
-  }
-  return field
 }
 
 // Email sending function
@@ -190,21 +131,22 @@ async function sendEmailNotification({
     
     <hr>
     <p style="color: #666; font-size: 12px;">
-      This email was automatically generated from the UX Glossary request form.
+      This email was automatically generated from the UX Glossary request form.<br>
+      Reply to this email to respond directly to the submitter.
     </p>
   `
 
-  // Use a more generic from address that's likely to work
+  // Send to your verified email address (calee607@gmail.com) with reply-to set to submitter
   const emailPayload = {
-    from: "UX Glossary <onboarding@resend.dev>", // Using Resend's default domain
-    to: "cal@calee.me",
-    reply_to: email,
+    from: "UX Glossary <onboarding@resend.dev>",
+    to: "calee607@gmail.com", // Your verified email address
+    reply_to: email, // Submitter's email for easy replies
     subject: subject,
     html: htmlContent,
   }
 
   console.log("Sending email via Resend API...")
-  console.log("Using from address:", emailPayload.from)
+  console.log("Sending to verified address:", emailPayload.to)
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
