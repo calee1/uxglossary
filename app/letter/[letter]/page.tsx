@@ -45,9 +45,15 @@ export default async function LetterPage({ params }: LetterPageProps) {
             </Link>
           </span>
         </div>
-        <Link href="/request-update" className="text-blue-500 hover:underline mt-2 md:mt-0">
-          Request an Update
-        </Link>
+        <div className="flex items-center gap-3 mt-2 md:mt-0">
+          <Link href="/request-update" className="text-blue-500 hover:underline">
+            Request an Update
+          </Link>
+          <span className="text-gray-300">|</span>
+          <Link href="/admin" className="text-blue-500 hover:underline">
+            Admin
+          </Link>
+        </div>
       </div>
 
       {/* Letter navigation */}
