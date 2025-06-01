@@ -50,15 +50,17 @@ export async function submitUpdateRequest(prevState: RequestState | null, formDa
     ].join(",")
 
     let csvSuccess = false
+    let csvError = null
     try {
-      // Ensure data directory exists
+      // Try to save to CSV - this might fail in some hosting environments
       const dataDir = path.resolve(process.cwd(), "data")
+
+      // Check if we can write to the filesystem
       if (!fs.existsSync(dataDir)) {
         console.log("Creating data directory...")
         fs.mkdirSync(dataDir, { recursive: true })
       }
 
-      // Check if requests file exists, create with headers if not
       const requestsPath = path.resolve(dataDir, "update-requests.csv")
       if (!fs.existsSync(requestsPath)) {
         console.log("Creating CSV file with headers...")
@@ -66,13 +68,14 @@ export async function submitUpdateRequest(prevState: RequestState | null, formDa
         fs.writeFileSync(requestsPath, headers)
       }
 
-      // Append the new request to CSV for backup
       console.log("Appending to CSV file...")
       fs.appendFileSync(requestsPath, csvRow + "\n")
       console.log("CSV backup successful")
       csvSuccess = true
-    } catch (csvError) {
-      console.error("CSV backup failed:", csvError)
+    } catch (error) {
+      csvError = error
+      console.error("CSV backup failed:", error)
+      // Don't fail the entire process if CSV fails - continue with email
     }
 
     // Send email notification
@@ -89,19 +92,26 @@ export async function submitUpdateRequest(prevState: RequestState | null, formDa
         source,
         timestamp,
       })
-      console.log("Email function completed:", emailResult)
+      console.log("Email function completed successfully:", emailResult)
     } catch (error) {
       emailError = error
       console.error("Email sending failed:", error)
     }
 
-    // Provide detailed feedback about what happened
-    let debugInfo = `CSV backup: ${csvSuccess ? "Success" : "Failed"}\n`
-    debugInfo += `Email attempt: ${emailError ? "Failed - " + emailError.message : "Completed"}\n`
-    debugInfo += `API Key present: ${!!process.env.RESEND_API_KEY}\n`
+    // Check if at least one method succeeded
+    if (!csvSuccess && emailError) {
+      return {
+        error: `Both backup methods failed. CSV: ${csvError?.message || "Unknown error"}. Email: ${emailError.message}`,
+      }
+    }
 
-    if (emailResult) {
-      debugInfo += `Email ID: ${emailResult.id || "No ID returned"}\n`
+    // Provide detailed feedback about what happened
+    let debugInfo = `CSV backup: ${csvSuccess ? "✅ Success" : "❌ Failed - " + (csvError?.message || "Unknown error")}\n`
+    debugInfo += `Email delivery: ${emailError ? "❌ Failed - " + emailError.message : "✅ Success"}\n`
+    debugInfo += `API Key format: ${process.env.RESEND_API_KEY ? `Present (${process.env.RESEND_API_KEY.substring(0, 8)}...)` : "Missing"}\n`
+
+    if (emailResult?.id) {
+      debugInfo += `Email ID: ${emailResult.id}\n`
     }
 
     console.log("Form submission completed with debug info:", debugInfo)
@@ -116,7 +126,7 @@ export async function submitUpdateRequest(prevState: RequestState | null, formDa
     if (error instanceof Error) {
       console.error("Error message:", error.message)
       console.error("Error stack:", error.stack)
-      return { error: `Error: ${error.message}` }
+      return { error: `Unexpected error: ${error.message}` }
     }
 
     return { error: "An unexpected error occurred. Please try again later." }
@@ -150,6 +160,15 @@ async function sendEmailNotification({
 }) {
   console.log("Preparing email content...")
 
+  // Check API key first
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY environment variable is not set")
+  }
+
+  if (!process.env.RESEND_API_KEY.startsWith("re_")) {
+    throw new Error("RESEND_API_KEY appears to be invalid (should start with 're_')")
+  }
+
   // Format the email content
   const subject = `UX Glossary Update Request - ${requestType}`
   const htmlContent = `
@@ -175,26 +194,17 @@ async function sendEmailNotification({
     </p>
   `
 
+  // Use a more generic from address that's likely to work
   const emailPayload = {
-    from: "UX Glossary <noreply@calee.me>",
+    from: "UX Glossary <onboarding@resend.dev>", // Using Resend's default domain
     to: "cal@calee.me",
     reply_to: email,
     subject: subject,
     html: htmlContent,
   }
 
-  console.log("Email payload prepared")
-  console.log("RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY)
-  console.log("API Key length:", process.env.RESEND_API_KEY?.length || 0)
-
-  // Check if Resend API key is available
-  if (!process.env.RESEND_API_KEY) {
-    console.log("No RESEND_API_KEY found - email will not be sent")
-    throw new Error("RESEND_API_KEY environment variable is not set")
-  }
-
   console.log("Sending email via Resend API...")
-  console.log("Payload:", JSON.stringify(emailPayload, null, 2))
+  console.log("Using from address:", emailPayload.from)
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -206,7 +216,6 @@ async function sendEmailNotification({
   })
 
   console.log("Resend API response status:", response.status)
-  console.log("Response headers:", Object.fromEntries(response.headers.entries()))
 
   const responseText = await response.text()
   console.log("Raw response:", responseText)
