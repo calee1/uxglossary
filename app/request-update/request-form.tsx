@@ -82,7 +82,7 @@ export function RequestForm() {
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
           <p className="text-green-800 font-medium">✓ Request submitted successfully!</p>
           <p className="text-green-700 text-sm mt-1">
-            Thank you for your contribution. We'll review your request and get back to you soon.
+            Thank you for your contribution. Your request has been sent to cal@calee.me and we'll review it soon.
           </p>
         </div>
       )}

@@ -22,7 +22,7 @@ export default function RequestUpdatePage() {
       <div className="mt-8 p-4 bg-blue-50 rounded-lg">
         <h3 className="font-semibold text-blue-800 mb-2">What happens next?</h3>
         <ul className="text-sm text-blue-700 space-y-1">
-          <li>• Your request will be reviewed by our team</li>
+          <li>• Your request will be emailed to cal@calee.me for review</li>
           <li>• We'll contact you if we need clarification</li>
           <li>• Updates are typically processed within 5-7 business days</li>
           <li>• You'll receive a confirmation email once changes are made</li>
