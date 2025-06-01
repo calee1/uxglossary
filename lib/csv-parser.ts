@@ -1,0 +1,111 @@
+import fs from "fs"
+import path from "path"
+
+export interface GlossaryItem {
+  letter: string
+  term: string
+  definition: string
+}
+
+export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
+  try {
+    // Use path.resolve to ensure we're getting the correct absolute path
+    const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
+
+    // Check if file exists before trying to read it
+    if (!fs.existsSync(csvPath)) {
+      console.warn(`Glossary CSV file not found at: ${csvPath}`)
+      // Create the directory if it doesn't exist
+      const dataDir = path.resolve(process.cwd(), "data")
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true })
+      }
+
+      // Create a default CSV file with headers and sample data
+      const defaultCsvContent = `letter,term,definition
+A,Algorithm,"A step-by-step procedure for solving a problem or completing a task"
+A,API,"Application Programming Interface - a set of protocols and tools for building software applications"
+B,Backend,"The server-side of an application that handles data storage, security, and business logic"
+B,Bootstrap,"A popular CSS framework for developing responsive and mobile-first websites"
+C,Cache,"A temporary storage location that stores frequently accessed data for quick retrieval"
+C,CSS,"Cascading Style Sheets - a language used to describe the presentation of web pages"
+D,Database,"An organized collection of structured information stored electronically"
+D,DOM,"Document Object Model - a programming interface for web documents"
+E,Encryption,"The process of converting information into a secret code to prevent unauthorized access"
+E,Event,"An action or occurrence that can be detected and handled by a program"`
+
+      fs.writeFileSync(csvPath, defaultCsvContent)
+      console.log(`Created default glossary CSV file at: ${csvPath}`)
+    }
+
+    const csvContent = fs.readFileSync(csvPath, "utf-8")
+
+    // Rest of the function remains the same
+    const lines = csvContent.trim().split("\n")
+    const headers = lines[0].split(",")
+
+    const items: GlossaryItem[] = []
+
+    for (let i = 1; i < lines.length; i++) {
+      const values = parseCSVLine(lines[i])
+      if (values.length >= 3) {
+        items.push({
+          letter: values[0].trim(),
+          term: values[1].trim(),
+          definition: values[2].trim(),
+        })
+      }
+    }
+
+    // Group items by letter
+    const groupedItems: Record<string, GlossaryItem[]> = {}
+
+    items.forEach((item) => {
+      const letter = item.letter.toUpperCase()
+      if (!groupedItems[letter]) {
+        groupedItems[letter] = []
+      }
+      groupedItems[letter].push(item)
+    })
+
+    // Sort items within each letter group
+    Object.keys(groupedItems).forEach((letter) => {
+      groupedItems[letter].sort((a, b) => a.term.localeCompare(b.term))
+    })
+
+    return groupedItems
+  } catch (error) {
+    console.error("Error loading glossary data:", error)
+    // Return empty object instead of throwing an error
+    return {}
+  }
+}
+
+// Get data for a specific letter
+export async function loadLetterData(letter: string): Promise<GlossaryItem[]> {
+  const allData = await loadGlossaryData()
+  return allData[letter.toUpperCase()] || []
+}
+
+// Simple CSV line parser that handles quoted fields
+function parseCSVLine(line: string): string[] {
+  const result: string[] = []
+  let current = ""
+  let inQuotes = false
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i]
+
+    if (char === '"') {
+      inQuotes = !inQuotes
+    } else if (char === "," && !inQuotes) {
+      result.push(current)
+      current = ""
+    } else {
+      current += char
+    }
+  }
+
+  result.push(current)
+  return result
+}
