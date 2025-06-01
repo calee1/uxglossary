@@ -6,6 +6,7 @@ import path from "path"
 interface RequestState {
   success?: boolean
   error?: string
+  debug?: string
 }
 
 export async function submitUpdateRequest(prevState: RequestState | null, formData: FormData): Promise<RequestState> {
@@ -48,6 +49,7 @@ export async function submitUpdateRequest(prevState: RequestState | null, formDa
       "pending", // status
     ].join(",")
 
+    let csvSuccess = false
     try {
       // Ensure data directory exists
       const dataDir = path.resolve(process.cwd(), "data")
@@ -68,15 +70,18 @@ export async function submitUpdateRequest(prevState: RequestState | null, formDa
       console.log("Appending to CSV file...")
       fs.appendFileSync(requestsPath, csvRow + "\n")
       console.log("CSV backup successful")
+      csvSuccess = true
     } catch (csvError) {
       console.error("CSV backup failed:", csvError)
-      // Continue anyway - CSV failure shouldn't stop email
     }
 
     // Send email notification
     console.log("Attempting to send email...")
+    let emailResult = null
+    let emailError = null
+
     try {
-      await sendEmailNotification({
+      emailResult = await sendEmailNotification({
         name,
         email,
         requestType,
@@ -84,20 +89,30 @@ export async function submitUpdateRequest(prevState: RequestState | null, formDa
         source,
         timestamp,
       })
-      console.log("Email sent successfully")
-    } catch (emailError) {
-      console.error("Email sending failed:", emailError)
-      // For now, we'll still return success since CSV backup worked
-      // You might want to change this behavior based on your needs
-      console.log("Continuing despite email failure...")
+      console.log("Email function completed:", emailResult)
+    } catch (error) {
+      emailError = error
+      console.error("Email sending failed:", error)
     }
 
-    console.log("Form submission completed successfully")
-    return { success: true }
+    // Provide detailed feedback about what happened
+    let debugInfo = `CSV backup: ${csvSuccess ? "Success" : "Failed"}\n`
+    debugInfo += `Email attempt: ${emailError ? "Failed - " + emailError.message : "Completed"}\n`
+    debugInfo += `API Key present: ${!!process.env.RESEND_API_KEY}\n`
+
+    if (emailResult) {
+      debugInfo += `Email ID: ${emailResult.id || "No ID returned"}\n`
+    }
+
+    console.log("Form submission completed with debug info:", debugInfo)
+
+    return {
+      success: true,
+      debug: debugInfo,
+    }
   } catch (error) {
     console.error("Unexpected error in submitUpdateRequest:", error)
 
-    // Provide more specific error information
     if (error instanceof Error) {
       console.error("Error message:", error.message)
       console.error("Error stack:", error.stack)
@@ -160,71 +175,55 @@ async function sendEmailNotification({
     </p>
   `
 
-  const textContent = `
-New UX Glossary Update Request
-
-Submitted: ${new Date(timestamp).toLocaleString()}
-
-Contact Information:
-Name: ${name}
-Email: ${email}
-
-Request Details:
-Type: ${requestType}
-Source/Reference: ${source || "Not provided"}
-
-Request Description:
-${updateRequest}
-
----
-This email was automatically generated from the UX Glossary request form.
-  `
-
   const emailPayload = {
     from: "UX Glossary <noreply@calee.me>",
     to: "cal@calee.me",
     reply_to: email,
     subject: subject,
     html: htmlContent,
-    text: textContent,
   }
 
-  console.log("Email payload prepared, checking for RESEND_API_KEY...")
+  console.log("Email payload prepared")
   console.log("RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY)
+  console.log("API Key length:", process.env.RESEND_API_KEY?.length || 0)
 
   // Check if Resend API key is available
-  if (process.env.RESEND_API_KEY) {
-    console.log("Sending email via Resend API...")
-
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(emailPayload),
-    })
-
-    console.log("Resend API response status:", response.status)
-
-    if (!response.ok) {
-      const errorData = await response.text()
-      console.error("Resend API error response:", errorData)
-      throw new Error(`Email API error: ${response.status} - ${errorData}`)
-    }
-
-    const result = await response.json()
-    console.log("Email sent successfully via Resend:", result)
-    return result
-  } else {
-    // Fallback: Log email content if no email service is configured
-    console.log("No RESEND_API_KEY found, logging email content instead:")
-    console.log("Subject:", subject)
-    console.log("To: cal@calee.me")
-    console.log("From:", email)
-    console.log("Content preview:", textContent.substring(0, 200) + "...")
-
-    // Don't throw an error in development - just log
-    console.log("Email would be sent in production with proper API key")
+  if (!process.env.RESEND_API_KEY) {
+    console.log("No RESEND_API_KEY found - email will not be sent")
+    throw new Error("RESEND_API_KEY environment variable is not set")
   }
+
+  console.log("Sending email via Resend API...")
+  console.log("Payload:", JSON.stringify(emailPayload, null, 2))
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(emailPayload),
+  })
+
+  console.log("Resend API response status:", response.status)
+  console.log("Response headers:", Object.fromEntries(response.headers.entries()))
+
+  const responseText = await response.text()
+  console.log("Raw response:", responseText)
+
+  if (!response.ok) {
+    console.error("Resend API error response:", responseText)
+    throw new Error(`Email API error: ${response.status} - ${responseText}`)
+  }
+
+  let result
+  try {
+    result = JSON.parse(responseText)
+    console.log("Parsed email response:", result)
+  } catch (parseError) {
+    console.error("Failed to parse response as JSON:", parseError)
+    throw new Error("Invalid response from email service")
+  }
+
+  return result
 }

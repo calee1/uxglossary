@@ -81,9 +81,10 @@ export function RequestForm() {
       {state?.success && (
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
           <p className="text-green-800 font-medium">✓ Request submitted successfully!</p>
-          <p className="text-green-700 text-sm mt-1">
-            Thank you for your contribution. Your request has been sent to cal@calee.me and we'll review it soon.
-          </p>
+          <p className="text-green-700 text-sm mt-1">Your request has been processed. Check the details below:</p>
+          {state.debug && (
+            <div className="mt-2 p-2 bg-gray-100 rounded text-xs font-mono whitespace-pre-line">{state.debug}</div>
+          )}
         </div>
       )}
 
