@@ -13,9 +13,9 @@ interface GlossaryItem {
 function isAuthenticated(): boolean {
   try {
     const cookieStore = cookies()
-    const authCookie = cookieStore.get("admin-auth")
-    const isAuth = authCookie?.value === "authenticated"
-    console.log("Authentication check:", isAuth)
+    const authCookie = cookieStore.get("admin_auth")
+    const isAuth = authCookie?.value === "true"
+    console.log("Authentication check - cookie value:", authCookie?.value, "isAuth:", isAuth)
     return isAuth
   } catch (error) {
     console.error("Auth check error:", error)
@@ -158,12 +158,12 @@ export async function GET() {
   console.log("GET /api/admin/glossary-items called")
 
   if (!isAuthenticated()) {
-    console.log("Authentication failed")
+    console.log("Authentication failed - returning 401")
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {
-    console.log("Loading glossary items...")
+    console.log("Authentication successful, loading glossary items...")
     const items = loadGlossaryItems()
     console.log(`Returning ${items.length} glossary items`)
 

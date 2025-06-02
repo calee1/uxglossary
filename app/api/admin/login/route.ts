@@ -8,28 +8,30 @@ export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json()
 
+    console.log("Login attempt with password:", password ? "***" : "empty")
+
     if (password === ADMIN_PASSWORD) {
-      // Create a response with a success message
+      console.log("Password correct, setting auth cookie")
+
+      // Create response with success
       const response = NextResponse.json({ success: true })
 
-      // Set a secure HTTP-only cookie for authentication
-      // This is more secure than localStorage
-      response.cookies.set({
-        name: "admin_auth",
-        value: "true",
+      // Set HTTP-only cookie for authentication
+      response.cookies.set("admin_auth", "true", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         maxAge: 60 * 60 * 24 * 7, // 1 week
         path: "/",
       })
 
       return response
+    } else {
+      console.log("Password incorrect")
+      return NextResponse.json({ error: "Invalid password" }, { status: 401 })
     }
-
-    return NextResponse.json({ success: false, error: "Invalid password" }, { status: 401 })
   } catch (error) {
     console.error("Login error:", error)
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 })
+    return NextResponse.json({ error: "Login failed" }, { status: 500 })
   }
 }
