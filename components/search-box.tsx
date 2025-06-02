@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState, useEffect, useRef, useMemo } from "react"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import { Search, X } from "lucide-react"
 import type { GlossaryItem } from "@/lib/csv-parser"
 
@@ -127,15 +126,15 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
         <Input
           ref={inputRef}
           type="text"
-          placeholder="Search UX terms and definitions..."
+          placeholder="Begin typing for suggestions..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => searchTerm && setShowSuggestions(true)}
-          className="pl-8 sm:pl-10 pr-16 sm:pr-20 py-2 sm:py-3 text-base sm:text-lg border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+          className="pl-8 sm:pl-10 pr-8 sm:pr-10 py-2 sm:py-3 text-base sm:text-lg border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
         />
-        <div className="absolute inset-y-0 right-0 flex items-center gap-1 sm:gap-2 pr-2 sm:pr-3">
-          {searchTerm && (
+        {searchTerm && (
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:pr-3">
             <button
               onClick={clearSearch}
               className="p-1 hover:bg-gray-100 rounded-full transition-colors"
@@ -143,19 +142,8 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
             >
               <X className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
             </button>
-          )}
-          <Button
-            size="sm"
-            className="bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm py-1 px-2 sm:px-3"
-            onClick={() => {
-              if (suggestions.length > 0) {
-                navigateToTerm(suggestions[0])
-              }
-            }}
-          >
-            Search
-          </Button>
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Suggestions dropdown */}
