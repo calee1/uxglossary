@@ -21,8 +21,8 @@ export default function RequestUpdatePage() {
 
       <div className="mt-8 p-4 bg-blue-50 rounded-lg">
         <h3 className="font-semibold text-blue-800 mb-2">What happens next?</h3>
-        <ul className="text-sm text-blue-700 space-y-1">
-          <li>• Your request will be emailed to calee607@gmail.com for review</li>
+        <ul className="text-sm text-gray-600 space-y-1">
+          <li>• Your request will be emailed to c***7@gmail.com for review</li>
           <li>• We'll contact you directly using the email you provided</li>
           <li>• Updates are typically processed within 5-7 business days</li>
           <li>• You'll receive a confirmation email once changes are made</li>
