@@ -405,26 +405,61 @@ export async function PUT(request: NextRequest) {
   try {
     console.log("=== PUT /api/admin/glossary-items ===")
 
+    // Step 1: Check authentication
+    console.log("Step 1: Checking authentication...")
     if (!isAuthenticated()) {
+      console.log("Authentication failed")
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+    console.log("Authentication successful")
 
-    const { index, item }: { index: number; item: GlossaryItem } = await request.json()
+    // Step 2: Parse request body
+    console.log("Step 2: Parsing request body...")
+    let requestData: { index: number; item: GlossaryItem }
+    try {
+      requestData = await request.json()
+      console.log("Request body parsed:", {
+        index: requestData.index,
+        letter: requestData.item?.letter,
+        term: requestData.item?.term,
+        definitionLength: requestData.item?.definition?.length,
+      })
+    } catch (parseError) {
+      console.error("Failed to parse request body:", parseError)
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
+    }
 
-    // Validate required fields
-    if (!item.letter || !item.term || !item.definition) {
+    const { index, item } = requestData
+
+    // Step 3: Validate required fields
+    console.log("Step 3: Validating required fields...")
+    if (typeof index !== "number" || !item || !item.letter || !item.term || !item.definition) {
+      console.log("Validation failed - missing fields:", {
+        hasIndex: typeof index === "number",
+        hasItem: !!item,
+        hasLetter: !!item?.letter,
+        hasTerm: !!item?.term,
+        hasDefinition: !!item?.definition,
+      })
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
+    console.log("Validation successful")
 
-    // Load existing items
+    // Step 4: Load existing items
+    console.log("Step 4: Loading existing items...")
     const items = loadGlossaryItems()
+    console.log("Loaded", items.length, "existing items")
 
-    // Validate index
+    // Step 5: Validate index
+    console.log("Step 5: Validating index...")
     if (index < 0 || index >= items.length) {
+      console.log("Invalid index:", index, "- array length:", items.length)
       return NextResponse.json({ error: "Invalid item index" }, { status: 400 })
     }
+    console.log("Index validation successful")
 
-    // Check for duplicates (excluding the item being edited)
+    // Step 6: Check for duplicates (excluding the item being edited)
+    console.log("Step 6: Checking for duplicates...")
     const duplicate = items.find(
       (existingItem, i) =>
         i !== index &&
@@ -433,36 +468,52 @@ export async function PUT(request: NextRequest) {
     )
 
     if (duplicate) {
+      console.log("Duplicate found:", duplicate.term)
       return NextResponse.json({ error: "Term already exists in this letter" }, { status: 400 })
     }
+    console.log("No duplicates found")
 
-    // Update item
+    // Step 7: Update item
+    console.log("Step 7: Updating item...")
+    const oldItem = items[index]
+    console.log("Old item:", oldItem)
+
     items[index] = {
       letter: item.letter.toUpperCase(),
       term: item.term.trim(),
       definition: item.definition.trim(),
     }
 
-    // Try to save via GitHub API
+    console.log("New item:", items[index])
+
+    // Step 8: Save via GitHub API
+    console.log("Step 8: Saving via GitHub API...")
     const saveResult = await updateCSVViaGitHub(items)
 
     if (saveResult.success) {
-      return NextResponse.json({ success: true })
+      console.log("Successfully saved to GitHub")
+      return NextResponse.json({
+        success: true,
+        message: "Item updated successfully and saved to repository",
+      })
     } else {
+      console.error("Failed to save to GitHub:", saveResult.error)
       return NextResponse.json(
         {
-          error: "Failed to update item",
+          error: "Failed to update item in repository",
           details: saveResult.error,
+          debugInfo: saveResult.details,
         },
         { status: 500 },
       )
     }
   } catch (error) {
-    console.error("Error updating item:", error)
+    console.error("Error in PUT handler:", error)
     return NextResponse.json(
       {
-        error: "Failed to update item",
+        error: "Internal server error",
         details: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
       },
       { status: 500 },
     )
@@ -474,43 +525,83 @@ export async function DELETE(request: NextRequest) {
   try {
     console.log("=== DELETE /api/admin/glossary-items ===")
 
+    // Step 1: Check authentication
+    console.log("Step 1: Checking authentication...")
     if (!isAuthenticated()) {
+      console.log("Authentication failed")
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+    console.log("Authentication successful")
 
-    const { index }: { index: number } = await request.json()
-
-    // Load existing items
-    const items = loadGlossaryItems()
-
-    // Validate index
-    if (index < 0 || index >= items.length) {
-      return NextResponse.json({ error: "Invalid item index" }, { status: 400 })
+    // Step 2: Parse request body
+    console.log("Step 2: Parsing request body...")
+    let requestData: { index: number }
+    try {
+      requestData = await request.json()
+      console.log("Request body parsed:", { index: requestData.index })
+    } catch (parseError) {
+      console.error("Failed to parse request body:", parseError)
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
     }
 
-    // Remove item
-    items.splice(index, 1)
+    const { index } = requestData
 
-    // Try to save via GitHub API
+    // Step 3: Validate index type
+    console.log("Step 3: Validating index...")
+    if (typeof index !== "number") {
+      console.log("Invalid index type:", typeof index)
+      return NextResponse.json({ error: "Invalid index type" }, { status: 400 })
+    }
+
+    // Step 4: Load existing items
+    console.log("Step 4: Loading existing items...")
+    const items = loadGlossaryItems()
+    console.log("Loaded", items.length, "existing items")
+
+    // Step 5: Validate index range
+    console.log("Step 5: Validating index range...")
+    if (index < 0 || index >= items.length) {
+      console.log("Invalid index:", index, "- array length:", items.length)
+      return NextResponse.json({ error: "Invalid item index" }, { status: 400 })
+    }
+    console.log("Index validation successful")
+
+    // Step 6: Remove item
+    console.log("Step 6: Removing item...")
+    const removedItem = items[index]
+    console.log("Removing item:", removedItem)
+
+    items.splice(index, 1)
+    console.log("Item removed, new total:", items.length)
+
+    // Step 7: Save via GitHub API
+    console.log("Step 7: Saving via GitHub API...")
     const saveResult = await updateCSVViaGitHub(items)
 
     if (saveResult.success) {
-      return NextResponse.json({ success: true })
+      console.log("Successfully saved to GitHub")
+      return NextResponse.json({
+        success: true,
+        message: "Item deleted successfully and saved to repository",
+      })
     } else {
+      console.error("Failed to save to GitHub:", saveResult.error)
       return NextResponse.json(
         {
-          error: "Failed to delete item",
+          error: "Failed to delete item from repository",
           details: saveResult.error,
+          debugInfo: saveResult.details,
         },
         { status: 500 },
       )
     }
   } catch (error) {
-    console.error("Error deleting item:", error)
+    console.error("Error in DELETE handler:", error)
     return NextResponse.json(
       {
-        error: "Failed to delete item",
+        error: "Internal server error",
         details: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
       },
       { status: 500 },
     )
