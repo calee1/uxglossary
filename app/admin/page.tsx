@@ -300,7 +300,12 @@ export default function AdminPage() {
           <Link href="/" className="text-blue-500 hover:underline text-sm">
             ← Back to UX Glossary
           </Link>
-          <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:text-gray-700">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+          >
             <LogOut className="h-4 w-4 mr-1" />
             Logout
           </Button>
@@ -322,29 +327,36 @@ export default function AdminPage() {
         <Link href="/" className="text-blue-500 hover:underline text-sm">
           ← Back to UX Glossary
         </Link>
-        <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:text-gray-700">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleLogout}
+          className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+        >
           <LogOut className="h-4 w-4 mr-1" />
           Logout
         </Button>
       </div>
 
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Admin Panel</h1>
-        <p className="text-gray-600">Manage your UX Glossary content and settings.</p>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">Admin Panel</h1>
+        <p className="text-gray-600 dark:text-gray-300">Manage your UX Glossary content and settings.</p>
       </div>
 
       {/* GitHub Integration Status */}
-      <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+      <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-            <h3 className="font-semibold text-green-800">GitHub Integration Active</h3>
+            <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <h3 className="font-semibold text-green-800 dark:text-green-300">GitHub Integration Active</h3>
           </div>
           <Button variant="outline" size="sm" onClick={() => setShowSetupWizard(true)}>
             Reconfigure
           </Button>
         </div>
-        <p className="text-sm text-green-700 mt-1">Changes are automatically saved to your GitHub repository.</p>
+        <p className="text-sm text-green-700 dark:text-green-400 mt-1">
+          Changes are automatically saved to your GitHub repository.
+        </p>
       </div>
 
       {/* Add the DiagnosticPanel here */}
@@ -355,24 +367,27 @@ export default function AdminPage() {
 
       {/* Saving Indicator */}
       {isSaving && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
           <div className="flex items-center gap-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600"></div>
-            <span className="text-yellow-800 font-medium">Saving changes to repository...</span>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600 dark:border-yellow-400"></div>
+            <span className="text-yellow-800 dark:text-yellow-300 font-medium">Saving changes to repository...</span>
           </div>
         </div>
       )}
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:gap-6 md:grid-cols-3 mb-8">
-        <Card className="bg-green-50 border-green-200">
+        <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
           <CardHeader className="pb-3">
-            <CardTitle className="text-green-800 text-lg">Quick Add</CardTitle>
+            <CardTitle className="text-green-800 dark:text-green-300 text-lg">Quick Add</CardTitle>
           </CardHeader>
           <CardContent>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="w-full bg-green-600 hover:bg-green-700" disabled={isSaving}>
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+                  disabled={isSaving}
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Add New Term
                 </Button>
@@ -383,7 +398,7 @@ export default function AdminPage() {
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium">Term</label>
+                    <label className="text-sm font-medium dark:text-gray-200">Term</label>
                     <Input
                       value={newItem.term}
                       onChange={(e) => {
@@ -396,7 +411,7 @@ export default function AdminPage() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Definition</label>
+                    <label className="text-sm font-medium dark:text-gray-200">Definition</label>
                     <Textarea
                       value={newItem.definition}
                       onChange={(e) => setNewItem({ ...newItem, definition: e.target.value })}
@@ -419,32 +434,32 @@ export default function AdminPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-blue-50 border-blue-200">
+        <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
           <CardHeader className="pb-3">
-            <CardTitle className="text-blue-800 text-lg">Download CSV</CardTitle>
+            <CardTitle className="text-blue-800 dark:text-blue-300 text-lg">Download CSV</CardTitle>
           </CardHeader>
           <CardContent>
             <DownloadButton />
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-50 border-gray-200">
+        <Card className="bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700">
           <CardHeader className="pb-3">
-            <CardTitle className="text-gray-800 text-lg">Stats</CardTitle>
+            <CardTitle className="text-gray-800 dark:text-gray-200 text-lg">Stats</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-2 text-center">
               <div>
-                <div className="text-2xl font-bold text-blue-600">{nonEmptyLetters.length}</div>
-                <div className="text-gray-600 text-sm">Letters</div>
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{nonEmptyLetters.length}</div>
+                <div className="text-gray-600 dark:text-gray-300 text-sm">Letters</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-green-600">{totalTerms}</div>
-                <div className="text-gray-600 text-sm">Total Terms</div>
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">{totalTerms}</div>
+                <div className="text-gray-600 dark:text-gray-300 text-sm">Total Terms</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-purple-600">{avgTermsPerLetter}</div>
-                <div className="text-gray-600 text-sm">Avg/Letter</div>
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{avgTermsPerLetter}</div>
+                <div className="text-gray-600 dark:text-gray-300 text-sm">Avg/Letter</div>
               </div>
             </div>
           </CardContent>
@@ -454,12 +469,12 @@ export default function AdminPage() {
       {/* Search and Filter */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="text-lg">Manage Existing Terms</CardTitle>
+          <CardTitle className="text-lg dark:text-gray-100">Manage Existing Terms</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
               <Input
                 placeholder="Search terms or definitions..."
                 value={searchTerm}
@@ -490,16 +505,16 @@ export default function AdminPage() {
                 return (
                   <div
                     key={`${item.letter}-${item.term}-${index}`}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-medium">
+                        <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded font-medium">
                           {item.letter}
                         </span>
-                        <span className="font-medium text-gray-900 truncate">{item.term}</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100 truncate">{item.term}</span>
                       </div>
-                      <p className="text-sm text-gray-600 line-clamp-2">{item.definition}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{item.definition}</p>
                     </div>
                     <div className="flex gap-2 ml-4">
                       <Button
@@ -514,7 +529,7 @@ export default function AdminPage() {
                         size="sm"
                         variant="outline"
                         onClick={() => handleDeleteItem(originalIndex, item.term)}
-                        className="text-red-600 hover:text-red-700"
+                        className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                         disabled={isSaving}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -524,7 +539,7 @@ export default function AdminPage() {
                 )
               })
             ) : (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 {items.length === 0 ? (
                   <div>
                     <p className="mb-2">No glossary terms found.</p>
@@ -548,7 +563,7 @@ export default function AdminPage() {
           {editingItem && (
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium">Term</label>
+                <label className="text-sm font-medium dark:text-gray-200">Term</label>
                 <Input
                   value={editingItem.term}
                   onChange={(e) => {
@@ -561,7 +576,7 @@ export default function AdminPage() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Definition</label>
+                <label className="text-sm font-medium dark:text-gray-200">Definition</label>
                 <Textarea
                   value={editingItem.definition}
                   onChange={(e) => setEditingItem({ ...editingItem, definition: e.target.value })}
