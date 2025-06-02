@@ -28,6 +28,7 @@ export default function AdminPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<GlossaryItem | null>(null)
   const [editingIndex, setEditingIndex] = useState(-1)
+  const [letterCounts, setLetterCounts] = useState<Record<string, number>>({})
   const router = useRouter()
 
   // Form state
@@ -63,6 +64,17 @@ export default function AdminPage() {
         const data = await response.json()
         setItems(data)
         setFilteredItems(data)
+
+        // Calculate letter counts
+        const counts: Record<string, number> = {}
+        data.forEach((item: GlossaryItem) => {
+          counts[item.letter] = (counts[item.letter] || 0) + 1
+        })
+        setLetterCounts(counts)
+
+        console.log(`Loaded ${data.length} glossary items`)
+      } else {
+        console.error("Failed to load items:", await response.text())
       }
     } catch (error) {
       console.error("Error loading items:", error)
@@ -115,7 +127,8 @@ export default function AdminPage() {
         setIsAddDialogOpen(false)
         alert("Item added successfully!")
       } else {
-        alert("Error adding item")
+        const errorData = await response.json()
+        alert(`Error adding item: ${errorData.error || "Unknown error"}`)
       }
     } catch (error) {
       console.error("Error adding item:", error)
@@ -143,7 +156,8 @@ export default function AdminPage() {
         setIsEditDialogOpen(false)
         alert("Item updated successfully!")
       } else {
-        alert("Error updating item")
+        const errorData = await response.json()
+        alert(`Error updating item: ${errorData.error || "Unknown error"}`)
       }
     } catch (error) {
       console.error("Error updating item:", error)
@@ -167,7 +181,8 @@ export default function AdminPage() {
         await loadGlossaryItems()
         alert("Item deleted successfully!")
       } else {
-        alert("Error deleting item")
+        const errorData = await response.json()
+        alert(`Error deleting item: ${errorData.error || "Unknown error"}`)
       }
     } catch (error) {
       console.error("Error deleting item:", error)
@@ -190,6 +205,9 @@ export default function AdminPage() {
   }
 
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
+  const nonEmptyLetters = letters.filter((letter) => letterCounts[letter] > 0)
+  const totalTerms = items.length
+  const avgTermsPerLetter = nonEmptyLetters.length > 0 ? Math.round(totalTerms / nonEmptyLetters.length) : 0
 
   return (
     <main className="max-w-6xl mx-auto p-4 md:p-6 my-8">
@@ -282,9 +300,19 @@ export default function AdminPage() {
             <CardTitle className="text-gray-800 text-lg">Stats</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{items.length}</div>
-              <div className="text-gray-600 text-sm">Total Terms</div>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <div className="text-2xl font-bold text-blue-600">{nonEmptyLetters.length}</div>
+                <div className="text-gray-600 text-sm">Letters</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-green-600">{totalTerms}</div>
+                <div className="text-gray-600 text-sm">Total Terms</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-purple-600">{avgTermsPerLetter}</div>
+                <div className="text-gray-600 text-sm">Avg/Letter</div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -314,7 +342,7 @@ export default function AdminPage() {
                 <SelectItem value="all">All Letters</SelectItem>
                 {letters.map((letter) => (
                   <SelectItem key={letter} value={letter}>
-                    {letter}
+                    {letter} {letterCounts[letter] ? `(${letterCounts[letter]})` : ""}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -323,43 +351,52 @@ export default function AdminPage() {
 
           {/* Items List */}
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {filteredItems.map((item, index) => {
-              const originalIndex = items.findIndex((i) => i.term === item.term && i.letter === item.letter)
-              return (
-                <div
-                  key={`${item.letter}-${item.term}-${index}`}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-medium">
-                        {item.letter}
-                      </span>
-                      <span className="font-medium text-gray-900 truncate">{item.term}</span>
+            {filteredItems.length > 0 ? (
+              filteredItems.map((item, index) => {
+                const originalIndex = items.findIndex((i) => i.term === item.term && i.letter === item.letter)
+                return (
+                  <div
+                    key={`${item.letter}-${item.term}-${index}`}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-medium">
+                          {item.letter}
+                        </span>
+                        <span className="font-medium text-gray-900 truncate">{item.term}</span>
+                      </div>
+                      <p className="text-sm text-gray-600 line-clamp-2">{item.definition}</p>
                     </div>
-                    <p className="text-sm text-gray-600 line-clamp-2">{item.definition}</p>
+                    <div className="flex gap-2 ml-4">
+                      <Button size="sm" variant="outline" onClick={() => openEditDialog(item, originalIndex)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeleteItem(originalIndex, item.term)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex gap-2 ml-4">
-                    <Button size="sm" variant="outline" onClick={() => openEditDialog(item, originalIndex)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDeleteItem(originalIndex, item.term)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                )
+              })
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                {items.length === 0 ? (
+                  <div>
+                    <p className="mb-2">No glossary terms found.</p>
+                    <p className="text-sm">There might be an issue loading the glossary data.</p>
                   </div>
-                </div>
-              )
-            })}
+                ) : (
+                  <p>No terms found matching your search criteria.</p>
+                )}
+              </div>
+            )}
           </div>
-
-          {filteredItems.length === 0 && (
-            <div className="text-center py-8 text-gray-500">No terms found matching your search criteria.</div>
-          )}
         </CardContent>
       </Card>
 

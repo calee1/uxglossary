@@ -55,16 +55,22 @@ function loadGlossaryItems(): GlossaryItem[] {
     const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
 
     if (!fs.existsSync(csvPath)) {
+      console.error("CSV file not found at:", csvPath)
       return []
     }
 
     const csvContent = fs.readFileSync(csvPath, "utf-8")
     const lines = csvContent.trim().split("\n")
 
+    console.log(`CSV loaded with ${lines.length} lines (including header)`)
+
     // Skip header row
     const items: GlossaryItem[] = []
 
-    for (let i = 1; i < lines.length; i++) {
+    for (let i = 0; i < lines.length; i++) {
+      // Skip empty lines and header
+      if (i === 0 || !lines[i].trim()) continue
+
       const values = parseCSVLine(lines[i])
       if (values.length >= 3) {
         items.push({
@@ -72,9 +78,12 @@ function loadGlossaryItems(): GlossaryItem[] {
           term: values[1].trim(),
           definition: values[2].trim(),
         })
+      } else {
+        console.warn(`Line ${i + 1} has invalid format:`, lines[i])
       }
     }
 
+    console.log(`Successfully parsed ${items.length} glossary items`)
     return items
   } catch (error) {
     console.error("Error loading glossary items:", error)
@@ -104,6 +113,7 @@ function saveGlossaryItems(items: GlossaryItem[]): boolean {
     })
 
     fs.writeFileSync(csvPath, csvContent)
+    console.log(`Successfully saved ${items.length} glossary items to CSV`)
     return true
   } catch (error) {
     console.error("Error saving glossary items:", error)
@@ -119,6 +129,7 @@ export async function GET() {
 
   try {
     const items = loadGlossaryItems()
+    console.log(`Returning ${items.length} glossary items`)
     return NextResponse.json(items)
   } catch (error) {
     console.error("Error fetching items:", error)
