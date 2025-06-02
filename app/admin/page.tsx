@@ -285,26 +285,46 @@ export default function AdminPage() {
       <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-gray-800">Debug Information</h3>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={async () => {
-              try {
-                const response = await fetch("/api/admin/debug")
-                const data = await response.json()
-                console.log("Debug info:", data)
-                alert("Debug info logged to console. Check browser developer tools.")
-              } catch (error) {
-                console.error("Debug error:", error)
-                alert("Debug failed - check console for details")
-              }
-            }}
-          >
-            Run Debug Test
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  const response = await fetch("/api/admin/test-simple")
+                  const data = await response.json()
+                  console.log("Simple test result:", data)
+                  alert(`Simple test ${data.success ? "passed" : "failed"}. Check console for details.`)
+                } catch (error) {
+                  console.error("Simple test error:", error)
+                  alert("Simple test failed - check console for details")
+                }
+              }}
+            >
+              Test Basic API
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  const response = await fetch("/api/admin/debug")
+                  const data = await response.json()
+                  console.log("Debug info:", data)
+                  alert("Debug info logged to console. Check browser developer tools.")
+                } catch (error) {
+                  console.error("Debug error:", error)
+                  alert("Debug failed - check console for details")
+                }
+              }}
+            >
+              Test GitHub API
+            </Button>
+          </div>
         </div>
         <p className="text-sm text-gray-600">
-          If you're experiencing issues, click "Run Debug Test" and check the browser console for detailed information.
+          If you're experiencing issues, click "Test Basic API" first, then "Test GitHub API" and check the browser
+          console for detailed information.
         </p>
       </div>
 

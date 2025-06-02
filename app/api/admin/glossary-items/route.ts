@@ -15,6 +15,7 @@ function isAuthenticated(): boolean {
     const cookieStore = cookies()
     const authCookie = cookieStore.get("admin_auth")
     const isAuth = authCookie?.value === "true"
+    console.log("Auth check result:", isAuth)
     return isAuth
   } catch (error) {
     console.error("Auth check error:", error)
@@ -58,7 +59,9 @@ function itemToCSVLine(item: GlossaryItem): string {
 // Load all glossary items from CSV
 function loadGlossaryItems(): GlossaryItem[] {
   try {
+    console.log("Loading glossary items from CSV...")
     const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
+    console.log("CSV path:", csvPath)
 
     if (!fs.existsSync(csvPath)) {
       console.error("CSV file not found at:", csvPath)
@@ -66,7 +69,10 @@ function loadGlossaryItems(): GlossaryItem[] {
     }
 
     const csvContent = fs.readFileSync(csvPath, "utf-8")
+    console.log("CSV content length:", csvContent.length)
+
     const lines = csvContent.trim().split("\n")
+    console.log("CSV lines count:", lines.length)
 
     // Skip header row and empty lines
     const items: GlossaryItem[] = []
@@ -84,6 +90,7 @@ function loadGlossaryItems(): GlossaryItem[] {
       }
     }
 
+    console.log("Loaded items count:", items.length)
     return items
   } catch (error) {
     console.error("Error loading glossary items:", error)
@@ -94,34 +101,33 @@ function loadGlossaryItems(): GlossaryItem[] {
 // Update CSV file via GitHub API
 async function updateCSVViaGitHub(items: GlossaryItem[]): Promise<{ success: boolean; error?: string; details?: any }> {
   try {
+    console.log("=== Starting GitHub API Update ===")
+
     const githubToken = process.env.GITHUB_TOKEN
     const githubRepo = process.env.GITHUB_REPO // format: "username/repo-name"
     const githubBranch = process.env.GITHUB_BRANCH || "main"
 
-    console.log("GitHub Integration Check:")
+    console.log("Environment check:")
     console.log("- Token exists:", !!githubToken)
-    console.log(
-      "- Token starts with correct prefix:",
-      githubToken?.startsWith("ghp_") || githubToken?.startsWith("github_pat_"),
-    )
+    console.log("- Token length:", githubToken?.length || 0)
+    console.log("- Token prefix:", githubToken?.substring(0, 20) + "...")
     console.log("- Repo:", githubRepo)
     console.log("- Branch:", githubBranch)
 
-    if (!githubToken || !githubRepo) {
-      const error = "GitHub integration not configured. Please set GITHUB_TOKEN and GITHUB_REPO environment variables."
+    if (!githubToken) {
+      const error = "GITHUB_TOKEN environment variable is not set"
       console.error(error)
-      return {
-        success: false,
-        error,
-        details: {
-          hasToken: !!githubToken,
-          hasRepo: !!githubRepo,
-          tokenPrefix: githubToken?.substring(0, 10) + "...",
-        },
-      }
+      return { success: false, error }
+    }
+
+    if (!githubRepo) {
+      const error = "GITHUB_REPO environment variable is not set"
+      console.error(error)
+      return { success: false, error }
     }
 
     // Create CSV content
+    console.log("Creating CSV content...")
     let csvContent = "letter,term,definition\n"
     const sortedItems = items.sort((a, b) => {
       if (a.letter !== b.letter) {
@@ -134,12 +140,41 @@ async function updateCSVViaGitHub(items: GlossaryItem[]): Promise<{ success: boo
       csvContent += itemToCSVLine(item) + "\n"
     })
 
-    console.log("CSV content prepared, length:", csvContent.length)
+    console.log("CSV content created, length:", csvContent.length)
+    console.log("First 200 chars:", csvContent.substring(0, 200))
 
-    // Get current file SHA (required for updates)
-    console.log("Fetching current file SHA...")
+    // Step 1: Test basic GitHub API access
+    console.log("Step 1: Testing basic GitHub API access...")
+    const repoUrl = `https://api.github.com/repos/${githubRepo}`
+    console.log("Testing repo URL:", repoUrl)
+
+    const repoResponse = await fetch(repoUrl, {
+      headers: {
+        Authorization: `Bearer ${githubToken}`,
+        "User-Agent": "UX-Glossary-Admin",
+        Accept: "application/vnd.github.v3+json",
+      },
+    })
+
+    console.log("Repo response status:", repoResponse.status)
+
+    if (!repoResponse.ok) {
+      const errorText = await repoResponse.text()
+      console.error("Repo access failed:", errorText)
+      return {
+        success: false,
+        error: `Cannot access repository: ${repoResponse.status}`,
+        details: { status: repoResponse.status, response: errorText },
+      }
+    }
+
+    const repoData = await repoResponse.json()
+    console.log("Repo access successful. Repo name:", repoData.name)
+
+    // Step 2: Get current file SHA (if exists)
+    console.log("Step 2: Getting current file SHA...")
     const getFileUrl = `https://api.github.com/repos/${githubRepo}/contents/data/glossary.csv?ref=${githubBranch}`
-    console.log("GET URL:", getFileUrl)
+    console.log("Get file URL:", getFileUrl)
 
     const getFileResponse = await fetch(getFileUrl, {
       headers: {
@@ -168,10 +203,10 @@ async function updateCSVViaGitHub(items: GlossaryItem[]): Promise<{ success: boo
       }
     }
 
-    // Update file via GitHub API
-    console.log("Updating file via GitHub API...")
+    // Step 3: Update/create file
+    console.log("Step 3: Updating/creating file...")
     const updateUrl = `https://api.github.com/repos/${githubRepo}/contents/data/glossary.csv`
-    console.log("PUT URL:", updateUrl)
+    console.log("Update URL:", updateUrl)
 
     const updatePayload = {
       message: `Update glossary: ${items.length} terms`,
@@ -180,12 +215,11 @@ async function updateCSVViaGitHub(items: GlossaryItem[]): Promise<{ success: boo
       ...(sha && { sha }), // Only include SHA if file exists
     }
 
-    console.log("Update payload:", {
-      message: updatePayload.message,
-      contentLength: updatePayload.content.length,
-      branch: updatePayload.branch,
-      hasSha: !!sha,
-    })
+    console.log("Update payload prepared:")
+    console.log("- Message:", updatePayload.message)
+    console.log("- Content length (base64):", updatePayload.content.length)
+    console.log("- Branch:", updatePayload.branch)
+    console.log("- Has SHA:", !!sha)
 
     const updateResponse = await fetch(updateUrl, {
       method: "PUT",
@@ -207,7 +241,7 @@ async function updateCSVViaGitHub(items: GlossaryItem[]): Promise<{ success: boo
       return { success: true }
     } else {
       const errorData = await updateResponse.text()
-      console.error("GitHub API error:", updateResponse.status, errorData)
+      console.error("GitHub API update error:", updateResponse.status, errorData)
 
       let parsedError
       try {
@@ -227,7 +261,7 @@ async function updateCSVViaGitHub(items: GlossaryItem[]): Promise<{ success: boo
       }
     }
   } catch (error) {
-    console.error("Error updating via GitHub:", error)
+    console.error("Error in updateCSVViaGitHub:", error)
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
@@ -242,11 +276,15 @@ async function updateCSVViaGitHub(items: GlossaryItem[]): Promise<{ success: boo
 // GET - Fetch all glossary items
 export async function GET() {
   try {
+    console.log("=== GET /api/admin/glossary-items ===")
+
     if (!isAuthenticated()) {
+      console.log("Authentication failed")
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const items = loadGlossaryItems()
+    console.log("Returning", items.length, "items")
     return NextResponse.json(items)
   } catch (error) {
     console.error("Error in GET handler:", error)
@@ -263,32 +301,50 @@ export async function GET() {
 // POST - Add new glossary item
 export async function POST(request: NextRequest) {
   try {
-    console.log("POST request received for adding new item")
+    console.log("=== POST /api/admin/glossary-items ===")
 
+    // Step 1: Check authentication
+    console.log("Step 1: Checking authentication...")
     if (!isAuthenticated()) {
       console.log("Authentication failed")
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+    console.log("Authentication successful")
 
-    const newItem: GlossaryItem = await request.json()
-    console.log("New item received:", {
-      letter: newItem.letter,
-      term: newItem.term,
-      definitionLength: newItem.definition?.length,
-    })
-
-    // Validate required fields
-    if (!newItem.letter || !newItem.term || !newItem.definition) {
-      console.log("Validation failed - missing fields")
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    // Step 2: Parse request body
+    console.log("Step 2: Parsing request body...")
+    let newItem: GlossaryItem
+    try {
+      newItem = await request.json()
+      console.log("Request body parsed:", {
+        letter: newItem.letter,
+        term: newItem.term,
+        definitionLength: newItem.definition?.length,
+      })
+    } catch (parseError) {
+      console.error("Failed to parse request body:", parseError)
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
     }
 
-    // Load existing items
-    console.log("Loading existing items...")
+    // Step 3: Validate required fields
+    console.log("Step 3: Validating required fields...")
+    if (!newItem.letter || !newItem.term || !newItem.definition) {
+      console.log("Validation failed - missing fields:", {
+        hasLetter: !!newItem.letter,
+        hasTerm: !!newItem.term,
+        hasDefinition: !!newItem.definition,
+      })
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    }
+    console.log("Validation successful")
+
+    // Step 4: Load existing items
+    console.log("Step 4: Loading existing items...")
     const items = loadGlossaryItems()
     console.log("Loaded", items.length, "existing items")
 
-    // Check for duplicates
+    // Step 5: Check for duplicates
+    console.log("Step 5: Checking for duplicates...")
     const duplicate = items.find(
       (item) => item.letter === newItem.letter && item.term.toLowerCase() === newItem.term.toLowerCase(),
     )
@@ -297,8 +353,10 @@ export async function POST(request: NextRequest) {
       console.log("Duplicate found:", duplicate.term)
       return NextResponse.json({ error: "Term already exists in this letter" }, { status: 400 })
     }
+    console.log("No duplicates found")
 
-    // Add new item
+    // Step 6: Add new item
+    console.log("Step 6: Adding new item...")
     const itemToAdd = {
       letter: newItem.letter.toUpperCase(),
       term: newItem.term.trim(),
@@ -308,8 +366,8 @@ export async function POST(request: NextRequest) {
     items.push(itemToAdd)
     console.log("Item added to array, total items:", items.length)
 
-    // Try to save via GitHub API
-    console.log("Attempting to save via GitHub API...")
+    // Step 7: Save via GitHub API
+    console.log("Step 7: Saving via GitHub API...")
     const saveResult = await updateCSVViaGitHub(items)
 
     if (saveResult.success) {
@@ -322,7 +380,7 @@ export async function POST(request: NextRequest) {
       console.error("Failed to save to GitHub:", saveResult.error)
       return NextResponse.json(
         {
-          error: "Failed to save item",
+          error: "Failed to save item to repository",
           details: saveResult.error,
           debugInfo: saveResult.details,
         },
@@ -333,7 +391,7 @@ export async function POST(request: NextRequest) {
     console.error("Error in POST handler:", error)
     return NextResponse.json(
       {
-        error: "Failed to add item",
+        error: "Internal server error",
         details: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
       },
@@ -345,6 +403,8 @@ export async function POST(request: NextRequest) {
 // PUT - Update existing glossary item
 export async function PUT(request: NextRequest) {
   try {
+    console.log("=== PUT /api/admin/glossary-items ===")
+
     if (!isAuthenticated()) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -412,6 +472,8 @@ export async function PUT(request: NextRequest) {
 // DELETE - Remove glossary item
 export async function DELETE(request: NextRequest) {
   try {
+    console.log("=== DELETE /api/admin/glossary-items ===")
+
     if (!isAuthenticated()) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
