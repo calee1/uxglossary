@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, XCircle, Github, ExternalLink, AlertTriangle, Copy } from "lucide-react"
+import { CheckCircle, XCircle, Github, ExternalLink, AlertTriangle, Eye, EyeOff } from "lucide-react"
 
 interface SetupWizardProps {
   onComplete: () => void
@@ -14,6 +14,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
   const [step, setStep] = useState(1)
   const [testResults, setTestResults] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [showToken, setShowToken] = useState(false)
   const [formData, setFormData] = useState({
     githubToken: "",
     githubRepo: "",
@@ -70,16 +71,19 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
       <div className="bg-yellow-50 p-4 rounded-lg">
         <div className="flex items-center gap-2 mb-2">
           <AlertTriangle className="h-4 w-4 text-yellow-600" />
-          <span className="font-semibold text-yellow-800">Important: Token Permissions</span>
+          <span className="font-semibold text-yellow-800">Important: Token Requirements</span>
         </div>
-        <p className="text-sm text-yellow-700 mb-2">Your GitHub token must have the correct scope:</p>
+        <p className="text-sm text-yellow-700 mb-2">Your GitHub token must:</p>
         <ul className="text-sm text-yellow-700 space-y-1">
           <li>
-            • <strong>For private repositories:</strong> Select "repo" (Full control of private repositories)
+            • Start with <code className="bg-yellow-100 px-1 rounded">ghp_</code> or{" "}
+            <code className="bg-yellow-100 px-1 rounded">github_pat_</code>
           </li>
           <li>
-            • <strong>For public repositories:</strong> Select "public_repo" (Access public repositories)
+            • Have the <strong>"repo"</strong> scope selected
           </li>
+          <li>• Not be expired</li>
+          <li>• Be copied completely (they're long!)</li>
         </ul>
       </div>
 
@@ -121,14 +125,26 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
             GitHub Personal Access Token
             <span className="text-red-500">*</span>
           </label>
-          <Input
-            type="password"
-            placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
-            value={formData.githubToken}
-            onChange={(e) => setFormData({ ...formData, githubToken: e.target.value })}
-          />
+          <div className="relative">
+            <Input
+              type={showToken ? "text" : "password"}
+              placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+              value={formData.githubToken}
+              onChange={(e) => setFormData({ ...formData, githubToken: e.target.value })}
+              className="pr-10"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="absolute right-0 top-0 h-full px-3"
+              onClick={() => setShowToken(!showToken)}
+            >
+              {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
+          </div>
           <div className="flex items-center justify-between mt-1">
-            <p className="text-xs text-gray-500">Token must have correct scope permissions</p>
+            <p className="text-xs text-gray-500">Should start with "ghp_" and be about 40 characters long</p>
             <Button
               variant="link"
               size="sm"
@@ -137,6 +153,18 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
               Create Token
             </Button>
           </div>
+
+          {/* Token validation feedback */}
+          {formData.githubToken && (
+            <div className="mt-2 text-xs">
+              {formData.githubToken.startsWith("ghp_") || formData.githubToken.startsWith("github_pat_") ? (
+                <span className="text-green-600">✓ Token format looks correct</span>
+              ) : (
+                <span className="text-red-600">⚠ Token should start with "ghp_" or "github_pat_"</span>
+              )}
+              <span className="text-gray-500 ml-2">Length: {formData.githubToken.length} chars</span>
+            </div>
+          )}
         </div>
 
         <div>
@@ -150,26 +178,49 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
         </div>
       </div>
 
-      {/* Token Creation Guide */}
+      {/* Step-by-step token creation guide */}
       <div className="bg-gray-50 p-4 rounded-lg">
-        <h3 className="font-semibold text-gray-800 mb-2">📝 How to create a GitHub token:</h3>
-        <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
-          <li>Go to GitHub Settings → Developer settings → Personal access tokens</li>
-          <li>Click "Generate new token (classic)"</li>
-          <li>Give it a descriptive name like "UX Glossary Admin"</li>
-          <li>Select expiration (recommend 90 days or No expiration)</li>
+        <h3 className="font-semibold text-gray-800 mb-3">📝 How to create a GitHub token:</h3>
+        <ol className="text-sm text-gray-700 space-y-2 list-decimal list-inside">
+          <li>
+            Go to{" "}
+            <Button
+              variant="link"
+              size="sm"
+              className="p-0 h-auto text-blue-600"
+              onClick={() => window.open("https://github.com/settings/tokens/new", "_blank")}
+            >
+              GitHub Settings → Personal access tokens
+            </Button>
+          </li>
+          <li>
+            Click <strong>"Generate new token (classic)"</strong>
+          </li>
+          <li>
+            Give it a name like <code className="bg-gray-200 px-1 rounded">"UX Glossary Admin"</code>
+          </li>
+          <li>
+            Set expiration (recommend <strong>90 days</strong> or <strong>No expiration</strong>)
+          </li>
           <li>
             <strong>Select scopes:</strong>
+            <div className="ml-4 mt-1 p-2 bg-yellow-50 border border-yellow-200 rounded">
+              <div className="flex items-center gap-2">
+                <input type="checkbox" checked disabled />
+                <strong>repo</strong> - Full control of private repositories
+              </div>
+              <p className="text-xs text-yellow-700 mt-1">This gives access to read and write to your repositories</p>
+            </div>
           </li>
-          <ul className="ml-6 mt-1 space-y-1">
-            <li>
-              • ✅ <strong>repo</strong> (for private repositories)
-            </li>
-            <li>
-              • ✅ <strong>public_repo</strong> (for public repositories)
-            </li>
-          </ul>
-          <li>Click "Generate token" and copy it immediately</li>
+          <li>
+            Click <strong>"Generate token"</strong>
+          </li>
+          <li>
+            <strong>⚠️ IMPORTANT:</strong> Copy the token immediately!
+            <div className="text-xs text-red-600 mt-1">
+              You won't be able to see it again. It should start with "ghp_" and be about 40 characters long.
+            </div>
+          </li>
         </ol>
       </div>
 
@@ -181,48 +232,52 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
           </div>
           <p className="text-sm text-red-700 mb-2">{testResults.error}</p>
 
-          {/* Specific 403 error handling */}
-          {testResults.error?.includes("403") && (
-            <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
-              <h4 className="font-medium text-yellow-800 mb-2">🔑 Permission Issue Detected</h4>
-              <p className="text-sm text-yellow-700 mb-2">
-                This is usually a token permissions problem. Here's how to fix it:
-              </p>
-              <ol className="text-sm text-yellow-700 space-y-1 list-decimal list-inside">
-                <li>Go to your GitHub token settings</li>
-                <li>
-                  Check if your token has the <strong>"repo"</strong> scope selected
-                </li>
-                <li>If not, create a new token with the correct permissions</li>
-                <li>Make sure the repository exists and you have access to it</li>
-              </ol>
-              <div className="mt-2 flex gap-2">
+          {/* Specific 401 error handling */}
+          {testResults.error?.includes("401") && (
+            <div className="mt-3 p-3 bg-red-100 border border-red-300 rounded">
+              <h4 className="font-medium text-red-800 mb-2">🔑 Token Authentication Failed</h4>
+              <p className="text-sm text-red-700 mb-2">Your GitHub token is invalid, expired, or copied incorrectly.</p>
+              <div className="text-sm text-red-700 space-y-1">
+                <p>
+                  <strong>Quick fixes to try:</strong>
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Double-check you copied the entire token (no missing characters)</li>
+                  <li>Make sure the token starts with "ghp_" or "github_pat_"</li>
+                  <li>Check if the token has expired in your GitHub settings</li>
+                  <li>Create a brand new token with "repo" scope</li>
+                </ul>
+              </div>
+              <div className="mt-3 flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => window.open("https://github.com/settings/tokens", "_blank")}
                 >
                   <ExternalLink className="h-3 w-3 mr-1" />
-                  Check Token
+                  Check My Tokens
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => window.open(`https://github.com/${formData.githubRepo}`, "_blank")}
+                  onClick={() => window.open("https://github.com/settings/tokens/new", "_blank")}
                 >
                   <ExternalLink className="h-3 w-3 mr-1" />
-                  Check Repo
+                  Create New Token
                 </Button>
               </div>
             </div>
           )}
 
           {testResults.suggestions && (
-            <ul className="text-sm text-red-700 space-y-1 mt-2">
-              {testResults.suggestions.map((suggestion: string, index: number) => (
-                <li key={index}>• {suggestion}</li>
-              ))}
-            </ul>
+            <div className="mt-3">
+              <h4 className="font-medium text-red-800 mb-1">Suggestions:</h4>
+              <ul className="text-sm text-red-700 space-y-1">
+                {testResults.suggestions.map((suggestion: string, index: number) => (
+                  <li key={index}>{suggestion}</li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       )}
@@ -254,6 +309,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
             <li>• Branch: {formData.githubBranch}</li>
             <li>• User: {testResults.username}</li>
             <li>• Repository Access: ✓ Confirmed</li>
+            <li>• Write Access: ✓ Available</li>
           </ul>
         </div>
       )}
@@ -265,36 +321,6 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
           <li>• Changes will automatically commit to your repository</li>
           <li>• Your site will redeploy when changes are made</li>
         </ul>
-      </div>
-
-      <div className="bg-yellow-50 p-4 rounded-lg">
-        <h3 className="font-semibold text-yellow-800 mb-2">⚠️ Important: Environment Variables</h3>
-        <p className="text-sm text-yellow-700 mb-2">
-          Make sure these environment variables are set in your Vercel project:
-        </p>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between bg-white p-2 rounded border">
-            <code className="text-xs">GITHUB_TOKEN</code>
-            <Button variant="ghost" size="sm" onClick={() => copyToClipboard(formData.githubToken)}>
-              <Copy className="h-3 w-3" />
-            </Button>
-          </div>
-          <div className="flex items-center justify-between bg-white p-2 rounded border">
-            <code className="text-xs">GITHUB_REPO</code>
-            <Button variant="ghost" size="sm" onClick={() => copyToClipboard(formData.githubRepo)}>
-              <Copy className="h-3 w-3" />
-            </Button>
-          </div>
-          <div className="flex items-center justify-between bg-white p-2 rounded border">
-            <code className="text-xs">GITHUB_BRANCH</code>
-            <Button variant="ghost" size="sm" onClick={() => copyToClipboard(formData.githubBranch)}>
-              <Copy className="h-3 w-3" />
-            </Button>
-          </div>
-        </div>
-        <p className="text-xs text-yellow-600 mt-2">
-          Click the copy buttons to copy values, then add them to your Vercel environment variables.
-        </p>
       </div>
 
       <Button onClick={onComplete} className="w-full">
