@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 
 // This should be a secure, hashed password in a real application
 // For this example, we're using a simple password
-const ADMIN_PASSWORD = "UXglossary2025"
+const ADMIN_PASSWORD = "l3tm3intogloss@12"
 
 export async function POST(request: NextRequest) {
   try {
