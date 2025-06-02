@@ -27,6 +27,7 @@ A,Aliasing,The visual distortion that occurs when high-resolution images are dis
 A,Alignment,The arrangement of elements along a common line or edge to create visual order
 A,Alpha Channel,The transparency information in an image that determines which parts are opaque or transparent
 A,Alternative Text,Descriptive text that provides information about images for screen readers and accessibility
+A,Alt Text,Alternative text for images that describes their content for screen readers and accessibility
 A,Americans with Disabilities Act,ADA; US federal law that prohibits discrimination based on disability and requires accessibility accommodations
 A,Analog,Relating to or using signals or information represented by continuously variable physical quantities
 A,Analogous Colors,Colors that are adjacent to each other on the color wheel and create harmonious color schemes
@@ -41,6 +42,8 @@ A,Ant Design,A design language and React UI library with high-quality components
 A,Anti-aliasing,A technique used to smooth jagged edges in digital images and text
 A,Anticipatory Design,Design that predicts user needs and takes action before the user explicitly requests it
 A,API,"Application Programming Interface, a set of protocols for building and integrating application software"
+A,API Design,Creating user-friendly application programming interfaces that are intuitive and well-documented
+A,Atomic Design,A methodology for creating design systems by breaking interfaces down into basic building blocks: atoms, molecules, organisms, templates, and pages
 A,Applet,A small application designed to perform a specific function within a larger program
 A,Application,A software program designed to perform specific tasks for users
 A,ARIA,"Accessible Rich Internet Applications, a set of attributes that define ways to make web content more accessible"
@@ -168,6 +171,8 @@ C,Color Palette,A range of colors chosen for use in a design or brand
 C,Color Picker,A tool that allows users to select colors from a palette or spectrum
 C,Color Theory,"The science and art of using color, including how colors mix and match"
 C,Color Wheel,A circular diagram showing the relationships between colors
+C,Color Blindness,A visual impairment that affects the ability to perceive or distinguish certain colors, important consideration in accessible design
+C,Component Library,A collection of reusable UI components with defined standards for consistent implementation across products
 C,Colspan,An HTML attribute that specifies how many columns a table cell should span
 C,Combo Box,A UI control that combines a dropdown list with a text input field
 C,Commits,Saved changes to a code repository with a descriptive message
@@ -238,6 +243,14 @@ D,Design Critique,A structured review process for evaluating and improving desig
 D,Design Debt,The accumulated cost of design decisions that need to be addressed later
 D,Design Deliverables,The outputs and artifacts produced during the design process
 D,Design Handoff,The process of transferring design specifications to developers
+D,Design Advocacy,The practice of promoting and communicating the value of design within organizations and to stakeholders
+D,Design Handoff,The process of transferring design specifications and assets from designers to developers for implementation
+D,Design Leadership,Strategic guidance and management of design teams, processes, and organizational design culture
+D,Design Maturity,An organization's level of design sophistication, processes, and integration of design thinking
+D,Design Ops,The practice of streamlining design processes, operations, and team efficiency through systematic approaches
+D,Design Research,Systematic investigation and analysis conducted to inform and validate design decisions
+D,Design ROI,Return on investment for design efforts, measuring the business value and impact of design work
+D,Design System Governance,The processes and practices for managing, maintaining, and evolving design systems over time
 D,Design Matrix,A tool for organizing and comparing design alternatives
 D,Design Patterns,Reusable solutions to common design problems
 D,Design Specifications,Detailed documentation of design requirements and guidelines
@@ -293,6 +306,8 @@ F,Fidelity,The level of detail and functionality in a prototype or design
 F,Figma,A collaborative design tool for creating user interfaces and prototypes
 F,Filtering Data,The process of showing only data that meets specific criteria
 F,First-click Test,A usability test that measures where users click first on a page
+F,First-time User Experience,The initial experience and onboarding process that new users have when first using a product
+F,Focus States,Visual indicators that show which element currently has keyboard focus for accessibility and navigation
 F,Five-second Test,A usability test that measures first impressions in five seconds
 F,Flash,Adobe's multimedia platform for creating interactive content
 F,Flat Design,A design style that uses simple elements without three-dimensional effects
@@ -384,14 +399,16 @@ I,Iterative,A process that involves repeated cycles of improvement
 I,Iterative Design,A design methodology based on repeated cycles of prototyping and testing
 J,Jacob's Law,Users prefer your site to work the same way as other sites they already know
 J,JavaScript,A programming language commonly used for web development
-J,JPG,"Joint Photographic Experts Group, a common image file format"
+J,Jobs to be Done,A framework for understanding customer motivations by focusing on the progress they're trying to make
 J,Justified,Text alignment where both left and right edges are aligned
+J,JPG,"Joint Photographic Experts Group, a common image file format"
 K,Kebab Menu,A menu represented by three vertical dots
 K,Kerning,The adjustment of space between individual letter pairs
 K,Kickoff,An initial meeting to start a project and align team members
 K,Kiosk,A standalone interactive terminal for public use
 K,Knowledge Gap,The difference between what users know and what they need to know
 K,KPI,"Key Performance Indicator, a measurable value that demonstrates effectiveness"
+K,Keyboard Navigation,The ability to navigate and interact with interfaces using only keyboard inputs, essential for accessibility
 L,Label,Text that identifies or describes an interface element
 L,Landing Page,A standalone web page created for a specific marketing campaign
 L,Landscape Display,Screen orientation that is wider than it is tall
@@ -429,6 +446,8 @@ M,Message Testing,Research method to evaluate the effectiveness of communication
 M,Metadata,Data that provides information about other data
 M,Micro Copy,Small pieces of text that guide users through interactions
 M,Micro Interaction,"Small, contained product moments that accomplish a single task"
+M,Micro-interactions,Small, functional animations and feedback mechanisms that guide users and enhance the user experience
+M,Moderated Testing,Usability testing conducted with a facilitator present to guide participants and ask questions
 M,Microsoft Blend,A user interface design tool for creating web and desktop applications
 M,Mind Map,A visual representation of information showing relationships between concepts
 M,Mind Mapping,The process of creating visual diagrams to organize information
@@ -523,6 +542,7 @@ P,Program Manager,A professional who manages multiple related projects
 P,Progress Indicator,A visual element that shows the completion status of a process
 P,Progressive Disclosure,Revealing information gradually to avoid overwhelming users
 P,Progressive Enhancement,Building web pages that work for everyone and enhance for capable browsers
+P,Progressive Web App,A web application that uses modern web capabilities to deliver native app-like experiences to users
 P,Project Manager,A professional responsible for planning and executing projects
 P,Prototype,An early model of a product used to test concepts and functionality
 P,Prototype Test,Testing a prototype with users to gather feedback and insights
@@ -557,6 +577,7 @@ R,Research Strategy,A high-level approach to conducting research
 R,Resizable,Elements that can be adjusted in size by users
 R,Response Time,The time it takes for a system to respond to user input
 R,Responsive Design,Design that adapts to different screen sizes and devices
+R,Responsive Breakpoints,Specific screen widths where responsive designs change their layout to accommodate different devices
 R,Retention,The ability to keep users engaged with a product over time
 R,Reverse Prototype,A prototype that demonstrates what not to do
 R,RGB/RGBA,"Red, Green, Blue color model, with optional Alpha channel for transparency"
@@ -571,7 +592,8 @@ S,Saturation,The intensity or purity of a color
 S,Scannability,How easily users can quickly scan and understand content
 S,Scenario,A narrative describing how users might interact with a product
 S,Screen Flow,The sequence of screens users navigate through in an application
-S,Screen Reader,Assistive technology that reads screen content aloud
+S,Screen Reader,Assistive technology that reads screen content aloud for users with visual impairments
+S,Screen Reader,Assistive technology software that reads screen content aloud for users with visual impairments
 S,Screener,A survey used to identify qualified research participants
 S,Scroll Area,A region where content can be scrolled to view additional information
 S,Scrolling,Moving through content that extends beyond the visible area
@@ -609,6 +631,7 @@ S,Split Complementary Colors,A color scheme using one color and the two colors a
 S,Sprint,A time-boxed iteration in agile development
 S,Square Colors,A color scheme using four colors evenly spaced around the color wheel
 S,Stakeholder,Anyone with an interest in or influence on a project
+S,Stakeholder Management,The practice of effectively working with and managing relationships with all project stakeholders
 S,Standard Deviation,A measure of how spread out data points are from the average
 S,Statistical Analysis,The process of collecting and analyzing data to identify patterns
 S,Statistical Significance,The likelihood that a result is not due to chance
@@ -639,7 +662,8 @@ T,Test Marketing,Testing a product with a limited audience before full launch
 T,Text Area,A multi-line input field for entering longer text
 T,Text Box,A single-line input field for entering text
 T,Theming,The process of applying consistent visual styles across an interface
-T,Think-aloud Protocol,A usability testing method where users verbalize their thoughts
+T,Think-aloud Protocol,A usability testing method where participants verbalize their thoughts
+T,Think-aloud Protocol,A usability testing method where participants verbalize their thoughts and decision-making process while using a product
 T,Third Party Sign In,Authentication using credentials from another service
 T,Three Clicks,The principle that users should be able to find information within three clicks
 T,Time on Task,The amount of time users spend completing a specific task
@@ -664,6 +688,8 @@ U,UI Pattern,A reusable solution for common interface design problems
 U,UI Template,A pre-designed layout that can be customized for specific needs
 U,Unit Testing,Testing individual components of software in isolation
 U,Unmoderated Testing,Usability testing conducted without a facilitator present
+U,Unmoderated Testing,Usability testing conducted without a facilitator present, allowing participants to complete tasks independently
+U,Usability Heuristics,A set of general principles for user interface design, most commonly referring to Nielsen's 10 usability principles
 U,Uppercase,Text written in capital letters
 U,Usability,How easy and pleasant a product is to use
 U,Usability Evaluation,The process of assessing how usable a product is
