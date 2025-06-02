@@ -119,10 +119,10 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
   }
 
   return (
-    <div ref={searchRef} className="relative w-full max-w-2xl mx-auto mb-8">
+    <div ref={searchRef} className="relative w-full max-w-2xl mx-auto mb-6 sm:mb-8">
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-gray-400" />
+          <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
         </div>
         <Input
           ref={inputRef}
@@ -132,21 +132,21 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => searchTerm && setShowSuggestions(true)}
-          className="pl-10 pr-20 py-3 text-lg border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+          className="pl-8 sm:pl-10 pr-16 sm:pr-20 py-2 sm:py-3 text-base sm:text-lg border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
         />
-        <div className="absolute inset-y-0 right-0 flex items-center gap-2 pr-3">
+        <div className="absolute inset-y-0 right-0 flex items-center gap-1 sm:gap-2 pr-2 sm:pr-3">
           {searchTerm && (
             <button
               onClick={clearSearch}
               className="p-1 hover:bg-gray-100 rounded-full transition-colors"
               aria-label="Clear search"
             >
-              <X className="h-4 w-4 text-gray-400" />
+              <X className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
             </button>
           )}
           <Button
             size="sm"
-            className="bg-blue-500 hover:bg-blue-600 text-white"
+            className="bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm py-1 px-2 sm:px-3"
             onClick={() => {
               if (suggestions.length > 0) {
                 navigateToTerm(suggestions[0])
@@ -160,27 +160,29 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
 
       {/* Suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96 overflow-y-auto">
+        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 sm:max-h-96 overflow-y-auto">
           {suggestions.map((item, index) => (
             <button
               key={`${item.letter}-${item.term}`}
               onClick={() => navigateToTerm(item)}
-              className={`w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors ${
+              className={`w-full text-left px-3 sm:px-4 py-2 sm:py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors ${
                 index === selectedIndex ? "bg-blue-50 border-blue-200" : ""
               }`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-gray-900 mb-1">{highlightMatch(item.term, searchTerm)}</div>
-                  <div className="text-sm text-gray-600 line-clamp-2">
+                  <div className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">
+                    {highlightMatch(item.term, searchTerm)}
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-600 line-clamp-2">
                     {highlightMatch(
-                      item.definition.length > 120 ? item.definition.substring(0, 120) + "..." : item.definition,
+                      item.definition.length > 100 ? item.definition.substring(0, 100) + "..." : item.definition,
                       searchTerm,
                     )}
                   </div>
                 </div>
-                <div className="ml-3 flex-shrink-0">
-                  <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-medium text-blue-600 bg-blue-100 rounded-full">
+                <div className="ml-2 sm:ml-3 flex-shrink-0">
+                  <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 text-xs font-medium text-blue-600 bg-blue-100 rounded-full">
                     {item.letter}
                   </span>
                 </div>
@@ -188,7 +190,7 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
             </button>
           ))}
           {totalMatchCount > 8 && (
-            <div className="px-4 py-2 text-sm text-gray-500 bg-gray-50 text-center">
+            <div className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-500 bg-gray-50 text-center">
               Showing first 8 of {totalMatchCount} results. Try a more specific search for better results.
             </div>
           )}
@@ -198,9 +200,9 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
       {/* No results message */}
       {showSuggestions && searchTerm && suggestions.length === 0 && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
-          <div className="px-4 py-6 text-center text-gray-500">
-            <Search className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-            <p className="text-sm">No terms found for "{searchTerm}"</p>
+          <div className="px-3 sm:px-4 py-4 sm:py-6 text-center text-gray-500">
+            <Search className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-2 text-gray-300" />
+            <p className="text-xs sm:text-sm">No terms found for "{searchTerm}"</p>
             <p className="text-xs mt-1">Try a different search term or browse by letter below</p>
           </div>
         </div>

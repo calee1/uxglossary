@@ -11,21 +11,21 @@ export default async function HomePage() {
   const hasGlossaryItems = Object.keys(glossaryItems).length > 0
 
   return (
-    <main className="max-w-4xl mx-auto p-6 border rounded-lg my-8 bg-white">
+    <main className="max-w-4xl mx-auto p-4 sm:p-6 border rounded-lg my-4 sm:my-8 bg-white">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
-        <div className="flex items-baseline gap-3">
+        <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-3">
           <div>
-            <h1 className="text-4xl font-bold">UX Glossary</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold">UX Glossary</h1>
             <p className="text-sm text-gray-500 italic mt-1">work in progress - June 2025</p>
           </div>
-          <span className="text-lg">
+          <span className="text-base sm:text-lg mt-1 md:mt-0">
             By:{" "}
             <Link href="http://calee.me/" className="text-blue-500 hover:underline">
               calee
             </Link>
           </span>
         </div>
-        <div className="flex items-center gap-3 mt-2 md:mt-0">
+        <div className="flex items-center gap-3 mt-3 md:mt-0">
           <Link href="/request-update" className="text-blue-500 hover:underline">
             Request an Update
           </Link>
@@ -36,8 +36,8 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <div className="text-center mb-8">
-        <p className="text-lg text-gray-600 mb-6">
+      <div className="text-center mb-6 sm:mb-8">
+        <p className="text-base sm:text-lg text-gray-600 mb-4 sm:mb-6">
           Browse my comprehensive AI-assisted glossary by selecting a letter below
         </p>
       </div>
@@ -46,7 +46,7 @@ export default async function HomePage() {
       <SearchBox glossaryItems={glossaryItems} />
 
       {!hasGlossaryItems && (
-        <div className="p-6 bg-yellow-50 border border-yellow-200 rounded-lg mb-8">
+        <div className="p-4 sm:p-6 bg-yellow-50 border border-yellow-200 rounded-lg mb-6 sm:mb-8">
           <h3 className="text-yellow-800 font-medium text-lg mb-2">Getting Started</h3>
           <p className="text-yellow-700">
             The glossary is being initialized with default data. If you're seeing this message, the application is
@@ -55,8 +55,8 @@ export default async function HomePage() {
         </div>
       )}
 
-      {/* Alphabet navigation grid */}
-      <div className="grid grid-cols-6 md:grid-cols-13 gap-4 justify-center my-8">
+      {/* Alphabet navigation grid - more responsive */}
+      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 lg:grid-cols-13 gap-2 sm:gap-4 justify-center my-6 sm:my-8">
         {alphabet.map((letter) => {
           const hasContent = glossaryItems[letter] && glossaryItems[letter].length > 0
           return (
@@ -64,7 +64,7 @@ export default async function HomePage() {
               key={letter}
               href={hasContent ? `/letter/${letter.toLowerCase()}` : "#"}
               className={`
-                text-center p-4 border-2 rounded-lg transition-all duration-200
+                text-center p-2 sm:p-4 border-2 rounded-lg transition-all duration-200
                 ${
                   hasContent
                     ? "border-blue-500 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:border-blue-600"
@@ -72,10 +72,10 @@ export default async function HomePage() {
                 }
               `}
             >
-              <div className="text-2xl font-bold">{letter}</div>
+              <div className="text-xl sm:text-2xl font-bold">{letter}</div>
               {hasContent && (
-                <div className="text-xs mt-1">
-                  {glossaryItems[letter].length} term{glossaryItems[letter].length !== 1 ? "s" : ""}
+                <div className="text-xs mt-1 whitespace-nowrap">
+                  {glossaryItems[letter].length} {glossaryItems[letter].length === 1 ? "term" : "terms"}
                 </div>
               )}
             </Link>
@@ -84,27 +84,27 @@ export default async function HomePage() {
       </div>
 
       {/* Statistics */}
-      <div className="mt-12 p-6 bg-gray-50 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Glossary Statistics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-          <div>
-            <div className="text-2xl font-bold text-blue-600">{Object.keys(glossaryItems).length}</div>
-            <div className="text-gray-600">Letters with content</div>
+      <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-gray-50 rounded-lg">
+        <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Glossary Statistics</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+          <div className="p-2">
+            <div className="text-xl sm:text-2xl font-bold text-blue-600">{Object.keys(glossaryItems).length}</div>
+            <div className="text-sm sm:text-base text-gray-600">Letters with content</div>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-green-600">
+          <div className="p-2">
+            <div className="text-xl sm:text-2xl font-bold text-green-600">
               {Object.values(glossaryItems).reduce((total, items) => total + items.length, 0)}
             </div>
-            <div className="text-gray-600">Total terms</div>
+            <div className="text-sm sm:text-base text-gray-600">Total terms</div>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-purple-600">
+          <div className="p-2">
+            <div className="text-xl sm:text-2xl font-bold text-purple-600">
               {Math.round(
                 Object.values(glossaryItems).reduce((total, items) => total + items.length, 0) /
                   Math.max(1, Object.keys(glossaryItems).length),
               )}
             </div>
-            <div className="text-gray-600">Average terms per letter</div>
+            <div className="text-sm sm:text-base text-gray-600">Average terms per letter</div>
           </div>
         </div>
       </div>
