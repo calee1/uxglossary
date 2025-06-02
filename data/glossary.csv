@@ -179,6 +179,7 @@ C,Component Variants,Different versions of a UI component for different use case
 C,Components,Reusable UI elements that maintain consistency across a design system
 C,Compound Colors,Colors created by mixing multiple base colors
 C,Concept Testing,Evaluating ideas or concepts with users before full development
+C,Concatenate,The process of joining two or more strings or data elements together end-to-end to form a single combined element
 C,Confidence Interval,A range of values that likely contains the true population parameter
 C,Confidence Level,The probability that a confidence interval contains the true parameter
 C,Confirmation Bias,The tendency to search for or interpret information that confirms existing beliefs
@@ -651,6 +652,7 @@ T,Toggle Switch,A UI control that switches between on and off states
 T,Tooltip,A small popup that provides additional information about an element
 T,Total Addressable Market,The total market demand for a product or service
 T,Tree Testing,A usability technique for evaluating the findability of topics in a website
+T,Truncate,To shorten text or data by cutting off characters at a specified length, often with an ellipsis (...) to indicate the content continues
 T,Triad Colors,A color scheme using three colors evenly spaced around the color wheel
 T,Tribalism,The tendency for people to form groups and favor their own group
 T,Typography,The art and technique of arranging type to make written language readable
