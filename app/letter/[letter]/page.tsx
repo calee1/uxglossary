@@ -1,9 +1,9 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { Input } from "@/components/ui/input"
 import { loadGlossaryData } from "@/lib/csv-parser"
-import { ChevronLeft, ChevronRight, Search } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LetterPageContent } from "./letter-page-content"
 
 interface LetterPageProps {
   params: {
@@ -92,7 +92,7 @@ export default async function LetterPage({ params }: LetterPageProps) {
         </Link>
       </div>
 
-      {/* Alphabet navigation - more responsive */}
+      {/* Alphabet navigation */}
       <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 lg:grid-cols-13 gap-1 sm:gap-2 justify-items-center my-4 sm:my-6 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
         {alphabet.map((alphabetLetter) => {
           const hasContent = glossaryItems[alphabetLetter] && glossaryItems[alphabetLetter].length > 0
@@ -119,49 +119,8 @@ export default async function LetterPage({ params }: LetterPageProps) {
         })}
       </div>
 
-      {/* Search box - updated to match homepage */}
-      <div className="relative w-full max-w-2xl mx-auto mb-6 sm:mb-8">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500" />
-          </div>
-          <Input
-            type="text"
-            placeholder="Begin typing for suggestions..."
-            className="pl-8 sm:pl-10 pr-4 py-2 sm:py-3 text-base sm:text-lg border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-          />
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="mt-6 sm:mt-8">
-        {items.length === 0 ? (
-          <div className="text-center py-8 sm:py-12">
-            <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg">
-              No terms found for letter "{letter}"
-            </p>
-            <Link href="/" className="text-blue-500 dark:text-blue-400 hover:underline mt-3 sm:mt-4 inline-block">
-              ← Back to main glossary
-            </Link>
-          </div>
-        ) : (
-          <div className="space-y-4 sm:space-y-6">
-            {items.map((item, index) => (
-              <div
-                key={`${letter}-${index}`}
-                className="border-l-4 border-blue-200 dark:border-blue-600 pl-4 sm:pl-6 py-2"
-              >
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">
-                  {item.term}
-                </h3>
-                <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-                  {item.definition}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Client-side content with search functionality */}
+      <LetterPageContent items={items} letter={letter} />
 
       {/* Navigation footer */}
       <div className="flex justify-between items-center mt-8 sm:mt-12 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
