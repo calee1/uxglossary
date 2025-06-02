@@ -755,6 +755,11 @@ W,Wizard,A step-by-step interface that guides users through a complex process
 W,Wizard-of-Oz Testing,Testing where a human secretly provides responses that appear to come from a computer
 W,Word Cloud,A visual representation of text where word size indicates frequency or importance
 W,Worst Idea,A brainstorming technique where participants intentionally generate bad ideas
-X,XD Adobe,Adobe's user experience design software for designing and prototyping
-Y,YOLO,You Only Live Once - a popular acronym emphasizing living life to the fullest and taking opportunities
+X,X-axis,The horizontal axis in a coordinate system or data visualization that typically represents the independent variable or categories
+Y,Y-axis,The vertical axis in a coordinate system or data visualization that typically represents the dependent variable or measured values
+Z,Z-axis,The depth axis in a three-dimensional coordinate system that represents the third dimension perpendicular to both X and Y axes
+Z,Z-fold,A paper folding technique where the document is folded in a zigzag pattern creating multiple panels that stack on top of each other
+Z,Z-height,The perceived elevation or depth of an element in a user interface design system that determines its visual hierarchy and shadow effects
+Z,Zip Disk,A removable storage medium that was popular in the 1990s for backing up and transferring files between computers
+Z,Zoom and Pan,Interactive navigation controls that allow users to magnify content (zoom) and move around within a larger view area (pan)
 Z,zeplin,A design-collaboration platform assisting teams in crafting visually captivating products
