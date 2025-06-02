@@ -79,12 +79,19 @@ export async function POST(request: NextRequest) {
         if (userResponse.status === 401) {
           results.suggestions.push("GitHub token is invalid or expired")
           results.suggestions.push("Create a new token at: https://github.com/settings/tokens/new")
-          results.suggestions.push("Make sure the token has 'repo' scope")
+          results.suggestions.push(
+            "Make sure the token has 'repo' scope for private repos or 'public_repo' for public repos",
+          )
+        } else if (userResponse.status === 403) {
+          results.suggestions.push("GitHub token permissions are insufficient")
+          results.suggestions.push("Check that your token has the correct scopes:")
+          results.suggestions.push("- 'repo' scope for private repositories")
+          results.suggestions.push("- 'public_repo' scope for public repositories")
         }
 
         return NextResponse.json({
           success: false,
-          error: "GitHub token authentication failed",
+          error: `GitHub token authentication failed (${userResponse.status})`,
           suggestions: results.suggestions,
           details: results.tests,
         })
@@ -121,10 +128,8 @@ export async function POST(request: NextRequest) {
 
         // Check if we have write permissions
         if (!repoData.permissions?.push) {
-          results.suggestions.push("Warning: Token may not have write access to this repository")
-          results.suggestions.push(
-            "Make sure your token has 'repo' scope for private repos or 'public_repo' for public repos",
-          )
+          results.suggestions.push("⚠️ Warning: Token may not have write access to this repository")
+          results.suggestions.push("Make sure your token has 'repo' scope for full access")
         }
       } else {
         const errorText = await repoResponse.text()
@@ -133,19 +138,27 @@ export async function POST(request: NextRequest) {
 
         if (repoResponse.status === 404) {
           results.suggestions.push(`Repository '${githubRepo}' not found`)
-          results.suggestions.push("Check that the repository name is correct")
+          results.suggestions.push("Check that the repository name is correct (username/repo-name)")
           results.suggestions.push("Make sure the repository exists and is accessible")
           results.suggestions.push("For private repos, ensure your token has access")
         } else if (repoResponse.status === 403) {
-          results.suggestions.push("Access forbidden to repository")
-          results.suggestions.push("Your token may not have the required permissions")
-          results.suggestions.push("For private repos, token needs 'repo' scope")
-          results.suggestions.push("For public repos, token needs 'public_repo' scope")
+          results.suggestions.push("🔑 Access forbidden - This is a permissions issue!")
+          results.suggestions.push("Your GitHub token doesn't have the right permissions")
+          results.suggestions.push("")
+          results.suggestions.push("To fix this:")
+          results.suggestions.push("1. Go to https://github.com/settings/tokens")
+          results.suggestions.push("2. Find your token or create a new one")
+          results.suggestions.push("3. Make sure these scopes are selected:")
+          results.suggestions.push("   ✅ 'repo' (Full control of private repositories)")
+          results.suggestions.push("   ✅ 'public_repo' (Access public repositories)")
+          results.suggestions.push("4. If editing an existing token, you may need to regenerate it")
+          results.suggestions.push("")
+          results.suggestions.push("Alternative: Create a new token with the correct permissions")
         }
 
         return NextResponse.json({
           success: false,
-          error: `Cannot access repository: ${repoResponse.status}`,
+          error: `GitHub API error: ${repoResponse.status}`,
           suggestions: results.suggestions,
           details: results.tests,
         })
