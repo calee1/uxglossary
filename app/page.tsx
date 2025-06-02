@@ -38,7 +38,7 @@ export default async function HomePage() {
 
       <div className="text-center mb-6 sm:mb-8">
         <p className="text-base sm:text-lg text-gray-600 mb-4 sm:mb-6">
-          Browse my comprehensive AI-assisted glossary by selecting a letter below
+          Browse my comprehensive AI-assisted UX glossary
         </p>
       </div>
 

@@ -13,7 +13,7 @@ export default function RequestUpdatePage() {
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Request an Update</h1>
         <p className="text-gray-600">
-          Help us improve the glossary by suggesting new terms, corrections, or updates to existing definitions.
+          Help improve this glossary by suggesting new terms, corrections, or updates to existing definitions.
         </p>
       </div>
 
