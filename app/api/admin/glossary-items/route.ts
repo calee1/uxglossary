@@ -91,15 +91,22 @@ function loadGlossaryItems(): GlossaryItem[] {
   }
 }
 
-// Save all glossary items to CSV (with error handling for serverless)
-function saveGlossaryItems(items: GlossaryItem[]): { success: boolean; error?: string } {
+// Update CSV file via GitHub API
+async function updateCSVViaGitHub(items: GlossaryItem[]): Promise<{ success: boolean; error?: string }> {
   try {
-    const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
+    const githubToken = process.env.GITHUB_TOKEN
+    const githubRepo = process.env.GITHUB_REPO // format: "username/repo-name"
+    const githubBranch = process.env.GITHUB_BRANCH || "main"
 
-    // Create header
+    if (!githubToken || !githubRepo) {
+      return {
+        success: false,
+        error: "GitHub integration not configured. Please set GITHUB_TOKEN and GITHUB_REPO environment variables.",
+      }
+    }
+
+    // Create CSV content
     let csvContent = "letter,term,definition\n"
-
-    // Sort items by letter, then by term
     const sortedItems = items.sort((a, b) => {
       if (a.letter !== b.letter) {
         return a.letter.localeCompare(b.letter)
@@ -107,27 +114,60 @@ function saveGlossaryItems(items: GlossaryItem[]): { success: boolean; error?: s
       return a.term.localeCompare(b.term)
     })
 
-    // Add each item
     sortedItems.forEach((item) => {
       csvContent += itemToCSVLine(item) + "\n"
     })
 
-    // Try to write the file
-    fs.writeFileSync(csvPath, csvContent, { encoding: "utf-8" })
-    return { success: true }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error"
-    console.error("Error saving glossary items:", errorMessage)
+    // Get current file SHA (required for updates)
+    const getFileResponse = await fetch(
+      `https://api.github.com/repos/${githubRepo}/contents/data/glossary.csv?ref=${githubBranch}`,
+      {
+        headers: {
+          Authorization: `Bearer ${githubToken}`,
+          "User-Agent": "UX-Glossary-Admin",
+        },
+      },
+    )
 
-    // Check if it's a read-only file system error (common in serverless)
-    if (errorMessage.includes("EROFS") || errorMessage.includes("read-only")) {
-      return {
-        success: false,
-        error: "Cannot save changes: This is a read-only environment. Changes will be lost when the server restarts.",
-      }
+    let sha = ""
+    if (getFileResponse.ok) {
+      const fileData = await getFileResponse.json()
+      sha = fileData.sha
     }
 
-    return { success: false, error: errorMessage }
+    // Update file via GitHub API
+    const updateResponse = await fetch(`https://api.github.com/repos/${githubRepo}/contents/data/glossary.csv`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${githubToken}`,
+        "Content-Type": "application/json",
+        "User-Agent": "UX-Glossary-Admin",
+      },
+      body: JSON.stringify({
+        message: `Update glossary: ${items.length} terms`,
+        content: Buffer.from(csvContent).toString("base64"),
+        sha: sha,
+        branch: githubBranch,
+      }),
+    })
+
+    if (updateResponse.ok) {
+      console.log("Successfully updated CSV via GitHub API")
+      return { success: true }
+    } else {
+      const errorData = await updateResponse.json()
+      console.error("GitHub API error:", errorData)
+      return {
+        success: false,
+        error: `GitHub API error: ${errorData.message || "Unknown error"}`,
+      }
+    }
+  } catch (error) {
+    console.error("Error updating via GitHub:", error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    }
   }
 }
 
@@ -187,17 +227,19 @@ export async function POST(request: NextRequest) {
 
     items.push(itemToAdd)
 
-    // Try to save to CSV
-    const saveResult = saveGlossaryItems(items)
+    // Try to save via GitHub API
+    const saveResult = await updateCSVViaGitHub(items)
 
     if (saveResult.success) {
-      return NextResponse.json({ success: true, message: "Item added successfully" })
+      return NextResponse.json({
+        success: true,
+        message: "Item added successfully and saved to repository",
+      })
     } else {
       return NextResponse.json(
         {
           error: "Failed to save item",
           details: saveResult.error,
-          warning: "The item was added to memory but cannot be permanently saved in this environment.",
         },
         { status: 500 },
       )
@@ -255,8 +297,8 @@ export async function PUT(request: NextRequest) {
       definition: item.definition.trim(),
     }
 
-    // Try to save to CSV
-    const saveResult = saveGlossaryItems(items)
+    // Try to save via GitHub API
+    const saveResult = await updateCSVViaGitHub(items)
 
     if (saveResult.success) {
       return NextResponse.json({ success: true })
@@ -301,8 +343,8 @@ export async function DELETE(request: NextRequest) {
     // Remove item
     items.splice(index, 1)
 
-    // Try to save to CSV
-    const saveResult = saveGlossaryItems(items)
+    // Try to save via GitHub API
+    const saveResult = await updateCSVViaGitHub(items)
 
     if (saveResult.success) {
       return NextResponse.json({ success: true })

@@ -4,7 +4,7 @@ import Link from "next/link"
 import { DownloadButton } from "./download-button"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { LogOut, Plus, Edit, Trash2, Search, AlertTriangle } from "lucide-react"
+import { LogOut, Plus, Edit, Trash2, Search, Github } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -30,7 +30,7 @@ export default function AdminPage() {
   const [editingIndex, setEditingIndex] = useState(-1)
   const [letterCounts, setLetterCounts] = useState<Record<string, number>>({})
   const [loadError, setLoadError] = useState<string | null>(null)
-  const [testInfo, setTestInfo] = useState<any>(null)
+  const [isSaving, setIsSaving] = useState(false)
   const router = useRouter()
 
   // Form state
@@ -49,7 +49,6 @@ export default function AdminPage() {
         } else {
           setIsLoading(false)
           loadGlossaryItems()
-          runDiagnostics()
         }
       } catch (error) {
         console.error("Auth check error:", error)
@@ -59,19 +58,6 @@ export default function AdminPage() {
 
     checkAuth()
   }, [router])
-
-  const runDiagnostics = async () => {
-    try {
-      const response = await fetch("/api/admin/test")
-      if (response.ok) {
-        const data = await response.json()
-        setTestInfo(data)
-        console.log("Diagnostic info:", data)
-      }
-    } catch (error) {
-      console.error("Diagnostics failed:", error)
-    }
-  }
 
   const loadGlossaryItems = async () => {
     try {
@@ -145,6 +131,7 @@ export default function AdminPage() {
       return
     }
 
+    setIsSaving(true)
     try {
       const response = await fetch("/api/admin/glossary-items", {
         method: "POST",
@@ -155,17 +142,23 @@ export default function AdminPage() {
       const responseData = await response.json()
 
       if (response.ok) {
-        await loadGlossaryItems()
-        setNewItem({ letter: "A", term: "", definition: "" })
-        setIsAddDialogOpen(false)
-        alert("Item added successfully!")
+        // Wait a moment for GitHub to process the change
+        setTimeout(async () => {
+          await loadGlossaryItems()
+          setNewItem({ letter: "A", term: "", definition: "" })
+          setIsAddDialogOpen(false)
+          setIsSaving(false)
+          alert("Item added successfully and saved to repository!")
+        }, 2000)
       } else {
+        setIsSaving(false)
         alert(`Error adding item: ${responseData.error || "Unknown error"}`)
         if (responseData.details) {
           console.error("Error details:", responseData.details)
         }
       }
     } catch (error) {
+      setIsSaving(false)
       console.error("Error adding item:", error)
       alert("Error adding item")
     }
@@ -177,6 +170,7 @@ export default function AdminPage() {
       return
     }
 
+    setIsSaving(true)
     try {
       const response = await fetch("/api/admin/glossary-items", {
         method: "PUT",
@@ -185,16 +179,22 @@ export default function AdminPage() {
       })
 
       if (response.ok) {
-        await loadGlossaryItems()
-        setEditingItem(null)
-        setEditingIndex(-1)
-        setIsEditDialogOpen(false)
-        alert("Item updated successfully!")
+        // Wait a moment for GitHub to process the change
+        setTimeout(async () => {
+          await loadGlossaryItems()
+          setEditingItem(null)
+          setEditingIndex(-1)
+          setIsEditDialogOpen(false)
+          setIsSaving(false)
+          alert("Item updated successfully and saved to repository!")
+        }, 2000)
       } else {
+        setIsSaving(false)
         const errorData = await response.json()
         alert(`Error updating item: ${errorData.error || "Unknown error"}`)
       }
     } catch (error) {
+      setIsSaving(false)
       console.error("Error updating item:", error)
       alert("Error updating item")
     }
@@ -205,6 +205,7 @@ export default function AdminPage() {
       return
     }
 
+    setIsSaving(true)
     try {
       const response = await fetch("/api/admin/glossary-items", {
         method: "DELETE",
@@ -213,13 +214,19 @@ export default function AdminPage() {
       })
 
       if (response.ok) {
-        await loadGlossaryItems()
-        alert("Item deleted successfully!")
+        // Wait a moment for GitHub to process the change
+        setTimeout(async () => {
+          await loadGlossaryItems()
+          setIsSaving(false)
+          alert("Item deleted successfully and saved to repository!")
+        }, 2000)
       } else {
+        setIsSaving(false)
         const errorData = await response.json()
         alert(`Error deleting item: ${errorData.error || "Unknown error"}`)
       }
     } catch (error) {
+      setIsSaving(false)
       console.error("Error deleting item:", error)
       alert("Error deleting item")
     }
@@ -261,19 +268,27 @@ export default function AdminPage() {
         <p className="text-gray-600">Manage your UX Glossary content and settings.</p>
       </div>
 
-      {/* Environment Warning */}
-      {testInfo && !testInfo.success && (
+      {/* GitHub Integration Notice */}
+      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex items-center gap-2 mb-2">
+          <Github className="h-5 w-5 text-blue-600" />
+          <h3 className="font-semibold text-blue-800">GitHub Integration</h3>
+        </div>
+        <p className="text-sm text-blue-700 mb-2">
+          Changes are saved directly to your GitHub repository for permanent storage.
+        </p>
+        <p className="text-sm text-blue-700">
+          After making changes, your site will automatically redeploy with the updates.
+        </p>
+      </div>
+
+      {/* Saving Indicator */}
+      {isSaving && (
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="h-5 w-5 text-yellow-600" />
-            <h3 className="font-semibold text-yellow-800">Environment Notice</h3>
+          <div className="flex items-center gap-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600"></div>
+            <span className="text-yellow-800 font-medium">Saving changes to repository...</span>
           </div>
-          <p className="text-sm text-yellow-700 mb-2">
-            This appears to be a serverless environment where file changes cannot be permanently saved.
-          </p>
-          <p className="text-sm text-yellow-700">
-            You can view and search existing terms, but adding/editing/deleting will only work temporarily.
-          </p>
         </div>
       )}
 
@@ -297,7 +312,7 @@ export default function AdminPage() {
           <CardContent>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="w-full bg-green-600 hover:bg-green-700">
+                <Button className="w-full bg-green-600 hover:bg-green-700" disabled={isSaving}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add New Term
                 </Button>
@@ -328,6 +343,7 @@ export default function AdminPage() {
                       value={newItem.term}
                       onChange={(e) => setNewItem({ ...newItem, term: e.target.value })}
                       placeholder="Enter term name"
+                      disabled={isSaving}
                     />
                   </div>
                   <div>
@@ -337,10 +353,11 @@ export default function AdminPage() {
                       onChange={(e) => setNewItem({ ...newItem, definition: e.target.value })}
                       placeholder="Enter definition"
                       rows={3}
+                      disabled={isSaving}
                     />
                   </div>
-                  <Button onClick={handleAddItem} className="w-full">
-                    Add Term
+                  <Button onClick={handleAddItem} className="w-full" disabled={isSaving}>
+                    {isSaving ? "Saving..." : "Add Term"}
                   </Button>
                 </div>
               </DialogContent>
@@ -431,7 +448,12 @@ export default function AdminPage() {
                       <p className="text-sm text-gray-600 line-clamp-2">{item.definition}</p>
                     </div>
                     <div className="flex gap-2 ml-4">
-                      <Button size="sm" variant="outline" onClick={() => openEditDialog(item, originalIndex)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openEditDialog(item, originalIndex)}
+                        disabled={isSaving}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button
@@ -439,6 +461,7 @@ export default function AdminPage() {
                         variant="outline"
                         onClick={() => handleDeleteItem(originalIndex, item.term)}
                         className="text-red-600 hover:text-red-700"
+                        disabled={isSaving}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -480,6 +503,7 @@ export default function AdminPage() {
                 <Select
                   value={editingItem.letter}
                   onValueChange={(value) => setEditingItem({ ...editingItem, letter: value })}
+                  disabled={isSaving}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -499,6 +523,7 @@ export default function AdminPage() {
                   value={editingItem.term}
                   onChange={(e) => setEditingItem({ ...editingItem, term: e.target.value })}
                   placeholder="Enter term name"
+                  disabled={isSaving}
                 />
               </div>
               <div>
@@ -508,13 +533,14 @@ export default function AdminPage() {
                   onChange={(e) => setEditingItem({ ...editingItem, definition: e.target.value })}
                   placeholder="Enter definition"
                   rows={3}
+                  disabled={isSaving}
                 />
               </div>
               <div className="flex gap-2">
-                <Button onClick={handleEditItem} className="flex-1">
-                  Update Term
+                <Button onClick={handleEditItem} className="flex-1" disabled={isSaving}>
+                  {isSaving ? "Saving..." : "Update Term"}
                 </Button>
-                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} disabled={isSaving}>
                   Cancel
                 </Button>
               </div>
@@ -526,7 +552,8 @@ export default function AdminPage() {
       <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
         <h3 className="font-semibold text-yellow-800 mb-2">⚠️ Important Notes</h3>
         <ul className="text-sm text-yellow-700 space-y-1">
-          <li>• Changes are saved immediately and will be visible on the live site</li>
+          <li>• Changes are saved directly to your GitHub repository</li>
+          <li>• Your site will automatically redeploy after changes are made</li>
           <li>• Always backup your glossary using the download feature before making major changes</li>
           <li>• Use the search and filter tools to quickly find specific terms</li>
           <li>• Definitions should be clear and concise for best user experience</li>
