@@ -2,9 +2,10 @@
 
 import Link from "next/link"
 import { DownloadButton } from "./download-button"
+import { SetupWizard } from "./setup-wizard"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { LogOut, Plus, Edit, Trash2, Search, Github } from "lucide-react"
+import { LogOut, Plus, Edit, Trash2, Search, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -31,6 +32,9 @@ export default function AdminPage() {
   const [letterCounts, setLetterCounts] = useState<Record<string, number>>({})
   const [loadError, setLoadError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [debugInfo, setDebugInfo] = useState<any>(null)
+  const [showSetupWizard, setShowSetupWizard] = useState(false)
+  const [githubConfigured, setGithubConfigured] = useState(false)
   const router = useRouter()
 
   // Form state
@@ -48,6 +52,7 @@ export default function AdminPage() {
           router.push("/admin/login")
         } else {
           setIsLoading(false)
+          await checkGitHubSetup()
           loadGlossaryItems()
         }
       } catch (error) {
@@ -58,6 +63,28 @@ export default function AdminPage() {
 
     checkAuth()
   }, [router])
+
+  const checkGitHubSetup = async () => {
+    try {
+      const response = await fetch("/api/admin/debug")
+      const data = await response.json()
+
+      // Check if GitHub is properly configured
+      const hasToken = data.environment?.hasGithubToken
+      const hasRepo = data.environment?.githubRepo
+      const repoAccessOk = data.tests?.repoAccess?.ok
+
+      const isConfigured = hasToken && hasRepo && repoAccessOk
+      setGithubConfigured(isConfigured)
+
+      if (!isConfigured) {
+        setShowSetupWizard(true)
+      }
+    } catch (error) {
+      console.error("GitHub setup check failed:", error)
+      setShowSetupWizard(true)
+    }
+  }
 
   const loadGlossaryItems = async () => {
     try {
@@ -123,6 +150,24 @@ export default function AdminPage() {
     } catch (error) {
       console.error("Logout error:", error)
     }
+  }
+
+  const runDebugTest = async () => {
+    try {
+      const response = await fetch("/api/admin/debug")
+      const data = await response.json()
+      setDebugInfo(data)
+      console.log("Debug info:", data)
+    } catch (error) {
+      console.error("Debug error:", error)
+      alert("Debug failed - check console for details")
+    }
+  }
+
+  const handleSetupComplete = () => {
+    setShowSetupWizard(false)
+    setGithubConfigured(true)
+    loadGlossaryItems()
   }
 
   const handleAddItem = async () => {
@@ -246,6 +291,25 @@ export default function AdminPage() {
     )
   }
 
+  // Show setup wizard if GitHub isn't configured
+  if (showSetupWizard) {
+    return (
+      <main className="max-w-6xl mx-auto p-4 md:p-6 my-8">
+        <div className="flex justify-between items-center mb-6">
+          <Link href="/" className="text-blue-500 hover:underline text-sm">
+            ← Back to UX Glossary
+          </Link>
+          <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:text-gray-700">
+            <LogOut className="h-4 w-4 mr-1" />
+            Logout
+          </Button>
+        </div>
+
+        <SetupWizard onComplete={handleSetupComplete} />
+      </main>
+    )
+  }
+
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
   const nonEmptyLetters = letters.filter((letter) => letterCounts[letter] > 0)
   const totalTerms = items.length
@@ -268,65 +332,22 @@ export default function AdminPage() {
         <p className="text-gray-600">Manage your UX Glossary content and settings.</p>
       </div>
 
-      {/* GitHub Integration Notice */}
-      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <div className="flex items-center gap-2 mb-2">
-          <Github className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-blue-800">GitHub Integration</h3>
-        </div>
-        <p className="text-sm text-blue-700 mb-2">
-          Changes are saved directly to your GitHub repository for permanent storage.
-        </p>
-        <p className="text-sm text-blue-700">
-          After making changes, your site will automatically redeploy with the updates.
-        </p>
-      </div>
-      {/* Debug Section */}
-      <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-gray-800">Debug Information</h3>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={async () => {
-                try {
-                  const response = await fetch("/api/admin/test-simple")
-                  const data = await response.json()
-                  console.log("Simple test result:", data)
-                  alert(`Simple test ${data.success ? "passed" : "failed"}. Check console for details.`)
-                } catch (error) {
-                  console.error("Simple test error:", error)
-                  alert("Simple test failed - check console for details")
-                }
-              }}
-            >
-              Test Basic API
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={async () => {
-                try {
-                  const response = await fetch("/api/admin/debug")
-                  const data = await response.json()
-                  console.log("Debug info:", data)
-                  alert("Debug info logged to console. Check browser developer tools.")
-                } catch (error) {
-                  console.error("Debug error:", error)
-                  alert("Debug failed - check console for details")
-                }
-              }}
-            >
-              Test GitHub API
-            </Button>
+      {/* GitHub Integration Status */}
+      <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            <h3 className="font-semibold text-green-800">GitHub Integration Active</h3>
           </div>
+          <Button variant="outline" size="sm" onClick={() => setShowSetupWizard(true)}>
+            Reconfigure
+          </Button>
         </div>
-        <p className="text-sm text-gray-600">
-          If you're experiencing issues, click "Test Basic API" first, then "Test GitHub API" and check the browser
-          console for detailed information.
-        </p>
+        <p className="text-sm text-green-700 mt-1">Changes are automatically saved to your GitHub repository.</p>
       </div>
+
+      {/* Rest of the admin interface... */}
+      {/* (keeping the existing admin interface code) */}
 
       {/* Saving Indicator */}
       {isSaving && (
@@ -335,17 +356,6 @@ export default function AdminPage() {
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600"></div>
             <span className="text-yellow-800 font-medium">Saving changes to repository...</span>
           </div>
-        </div>
-      )}
-
-      {/* Debug Information */}
-      {loadError && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <h3 className="font-semibold text-red-800 mb-2">Debug Information</h3>
-          <p className="text-sm text-red-700">{loadError}</p>
-          <Button onClick={loadGlossaryItems} className="mt-2 bg-red-600 hover:bg-red-700 text-white" size="sm">
-            Retry Loading
-          </Button>
         </div>
       )}
 
@@ -520,12 +530,7 @@ export default function AdminPage() {
                 {items.length === 0 ? (
                   <div>
                     <p className="mb-2">No glossary terms found.</p>
-                    <p className="text-sm">There might be an issue loading the glossary data.</p>
-                    {loadError && (
-                      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                        <strong>Error details:</strong> {loadError}
-                      </div>
-                    )}
+                    <p className="text-sm">Add your first term using the "Add New Term" button above.</p>
                   </div>
                 ) : (
                   <p>No terms found matching your search criteria.</p>
@@ -594,17 +599,6 @@ export default function AdminPage() {
           )}
         </DialogContent>
       </Dialog>
-
-      <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <h3 className="font-semibold text-yellow-800 mb-2">⚠️ Important Notes</h3>
-        <ul className="text-sm text-yellow-700 space-y-1">
-          <li>• Changes are saved directly to your GitHub repository</li>
-          <li>• Your site will automatically redeploy after changes are made</li>
-          <li>• Always backup your glossary using the download feature before making major changes</li>
-          <li>• Use the search and filter tools to quickly find specific terms</li>
-          <li>• Definitions should be clear and concise for best user experience</li>
-        </ul>
-      </div>
     </main>
   )
 }
