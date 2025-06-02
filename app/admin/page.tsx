@@ -4,7 +4,7 @@ import Link from "next/link"
 import { DownloadButton } from "./download-button"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { LogOut, Plus, Edit, Trash2, Search } from "lucide-react"
+import { LogOut, Plus, Edit, Trash2, Search, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -30,6 +30,7 @@ export default function AdminPage() {
   const [editingIndex, setEditingIndex] = useState(-1)
   const [letterCounts, setLetterCounts] = useState<Record<string, number>>({})
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [testInfo, setTestInfo] = useState<any>(null)
   const router = useRouter()
 
   // Form state
@@ -48,6 +49,7 @@ export default function AdminPage() {
         } else {
           setIsLoading(false)
           loadGlossaryItems()
+          runDiagnostics()
         }
       } catch (error) {
         console.error("Auth check error:", error)
@@ -57,6 +59,19 @@ export default function AdminPage() {
 
     checkAuth()
   }, [router])
+
+  const runDiagnostics = async () => {
+    try {
+      const response = await fetch("/api/admin/test")
+      if (response.ok) {
+        const data = await response.json()
+        setTestInfo(data)
+        console.log("Diagnostic info:", data)
+      }
+    } catch (error) {
+      console.error("Diagnostics failed:", error)
+    }
+  }
 
   const loadGlossaryItems = async () => {
     try {
@@ -69,13 +84,10 @@ export default function AdminPage() {
       })
 
       console.log("Response status:", response.status)
-      console.log("Response headers:", Object.fromEntries(response.headers.entries()))
 
       if (response.ok) {
         const data = await response.json()
         console.log("Received data:", data)
-        console.log("Data type:", typeof data)
-        console.log("Data length:", Array.isArray(data) ? data.length : "Not an array")
 
         setItems(data)
         setFilteredItems(data)
@@ -140,14 +152,18 @@ export default function AdminPage() {
         body: JSON.stringify(newItem),
       })
 
+      const responseData = await response.json()
+
       if (response.ok) {
         await loadGlossaryItems()
         setNewItem({ letter: "A", term: "", definition: "" })
         setIsAddDialogOpen(false)
         alert("Item added successfully!")
       } else {
-        const errorData = await response.json()
-        alert(`Error adding item: ${errorData.error || "Unknown error"}`)
+        alert(`Error adding item: ${responseData.error || "Unknown error"}`)
+        if (responseData.details) {
+          console.error("Error details:", responseData.details)
+        }
       }
     } catch (error) {
       console.error("Error adding item:", error)
@@ -244,6 +260,22 @@ export default function AdminPage() {
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Admin Panel</h1>
         <p className="text-gray-600">Manage your UX Glossary content and settings.</p>
       </div>
+
+      {/* Environment Warning */}
+      {testInfo && !testInfo.success && (
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+            <h3 className="font-semibold text-yellow-800">Environment Notice</h3>
+          </div>
+          <p className="text-sm text-yellow-700 mb-2">
+            This appears to be a serverless environment where file changes cannot be permanently saved.
+          </p>
+          <p className="text-sm text-yellow-700">
+            You can view and search existing terms, but adding/editing/deleting will only work temporarily.
+          </p>
+        </div>
+      )}
 
       {/* Debug Information */}
       {loadError && (
