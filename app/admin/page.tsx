@@ -405,9 +405,14 @@ export default function AdminPage() {
                       disabled={isSaving}
                     />
                   </div>
-                  <Button onClick={handleAddItem} className="w-full" disabled={isSaving}>
-                    {isSaving ? "Saving..." : "Add Term"}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} disabled={isSaving}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleAddItem} className="flex-1" disabled={isSaving}>
+                      {isSaving ? "Saving..." : "Add Term"}
+                    </Button>
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>
@@ -566,11 +571,11 @@ export default function AdminPage() {
                 />
               </div>
               <div className="flex gap-2">
-                <Button onClick={handleEditItem} className="flex-1" disabled={isSaving}>
-                  {isSaving ? "Saving..." : "Update Term"}
-                </Button>
                 <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} disabled={isSaving}>
                   Cancel
+                </Button>
+                <Button onClick={handleEditItem} className="flex-1" disabled={isSaving}>
+                  {isSaving ? "Saving..." : "Update Term"}
                 </Button>
               </div>
             </div>
