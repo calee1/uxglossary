@@ -11,9 +11,16 @@ interface GlossaryItem {
 
 // Check authentication
 function isAuthenticated(): boolean {
-  const cookieStore = cookies()
-  const authCookie = cookieStore.get("admin-auth")
-  return authCookie?.value === "authenticated"
+  try {
+    const cookieStore = cookies()
+    const authCookie = cookieStore.get("admin-auth")
+    const isAuth = authCookie?.value === "authenticated"
+    console.log("Authentication check:", isAuth)
+    return isAuth
+  } catch (error) {
+    console.error("Auth check error:", error)
+    return false
+  }
 }
 
 // Parse CSV line handling quoted fields
@@ -53,23 +60,42 @@ function itemToCSVLine(item: GlossaryItem): string {
 function loadGlossaryItems(): GlossaryItem[] {
   try {
     const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
+    console.log("Looking for CSV file at:", csvPath)
 
     if (!fs.existsSync(csvPath)) {
       console.error("CSV file not found at:", csvPath)
+
+      // Try alternative paths
+      const altPath1 = path.join(process.cwd(), "data", "glossary.csv")
+      const altPath2 = path.join(__dirname, "../../../data/glossary.csv")
+
+      console.log("Trying alternative path 1:", altPath1, "exists:", fs.existsSync(altPath1))
+      console.log("Trying alternative path 2:", altPath2, "exists:", fs.existsSync(altPath2))
+
+      // List contents of data directory if it exists
+      const dataDir = path.resolve(process.cwd(), "data")
+      if (fs.existsSync(dataDir)) {
+        console.log("Data directory contents:", fs.readdirSync(dataDir))
+      } else {
+        console.log("Data directory does not exist at:", dataDir)
+      }
+
       return []
     }
 
     const csvContent = fs.readFileSync(csvPath, "utf-8")
-    const lines = csvContent.trim().split("\n")
+    console.log("CSV file size:", csvContent.length, "characters")
+    console.log("First 200 characters:", csvContent.substring(0, 200))
 
+    const lines = csvContent.trim().split("\n")
     console.log(`CSV loaded with ${lines.length} lines (including header)`)
 
     // Skip header row
     const items: GlossaryItem[] = []
 
-    for (let i = 0; i < lines.length; i++) {
-      // Skip empty lines and header
-      if (i === 0 || !lines[i].trim()) continue
+    for (let i = 1; i < lines.length; i++) {
+      // Skip empty lines
+      if (!lines[i].trim()) continue
 
       const values = parseCSVLine(lines[i])
       if (values.length >= 3) {
@@ -79,11 +105,17 @@ function loadGlossaryItems(): GlossaryItem[] {
           definition: values[2].trim(),
         })
       } else {
-        console.warn(`Line ${i + 1} has invalid format:`, lines[i])
+        console.warn(`Line ${i + 1} has invalid format (${values.length} columns):`, lines[i])
       }
     }
 
     console.log(`Successfully parsed ${items.length} glossary items`)
+
+    // Log first few items for verification
+    if (items.length > 0) {
+      console.log("First 3 items:", items.slice(0, 3))
+    }
+
     return items
   } catch (error) {
     console.error("Error loading glossary items:", error)
@@ -123,17 +155,34 @@ function saveGlossaryItems(items: GlossaryItem[]): boolean {
 
 // GET - Fetch all glossary items
 export async function GET() {
+  console.log("GET /api/admin/glossary-items called")
+
   if (!isAuthenticated()) {
+    console.log("Authentication failed")
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {
+    console.log("Loading glossary items...")
     const items = loadGlossaryItems()
     console.log(`Returning ${items.length} glossary items`)
-    return NextResponse.json(items)
+
+    return NextResponse.json(items, {
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    })
   } catch (error) {
-    console.error("Error fetching items:", error)
-    return NextResponse.json({ error: "Failed to fetch items" }, { status: 500 })
+    console.error("Error in GET handler:", error)
+    return NextResponse.json(
+      {
+        error: "Failed to fetch items",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
   }
 }
 

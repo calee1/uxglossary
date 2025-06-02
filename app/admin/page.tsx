@@ -29,6 +29,7 @@ export default function AdminPage() {
   const [editingItem, setEditingItem] = useState<GlossaryItem | null>(null)
   const [editingIndex, setEditingIndex] = useState(-1)
   const [letterCounts, setLetterCounts] = useState<Record<string, number>>({})
+  const [loadError, setLoadError] = useState<string | null>(null)
   const router = useRouter()
 
   // Form state
@@ -59,11 +60,26 @@ export default function AdminPage() {
 
   const loadGlossaryItems = async () => {
     try {
-      const response = await fetch("/api/admin/glossary-items")
+      console.log("Fetching glossary items...")
+      const response = await fetch("/api/admin/glossary-items", {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      })
+
+      console.log("Response status:", response.status)
+      console.log("Response headers:", Object.fromEntries(response.headers.entries()))
+
       if (response.ok) {
         const data = await response.json()
+        console.log("Received data:", data)
+        console.log("Data type:", typeof data)
+        console.log("Data length:", Array.isArray(data) ? data.length : "Not an array")
+
         setItems(data)
         setFilteredItems(data)
+        setLoadError(null)
 
         // Calculate letter counts
         const counts: Record<string, number> = {}
@@ -72,12 +88,15 @@ export default function AdminPage() {
         })
         setLetterCounts(counts)
 
-        console.log(`Loaded ${data.length} glossary items`)
+        console.log(`Successfully loaded ${data.length} glossary items`)
       } else {
-        console.error("Failed to load items:", await response.text())
+        const errorText = await response.text()
+        console.error("Failed to load items:", response.status, errorText)
+        setLoadError(`Failed to load items: ${response.status} - ${errorText}`)
       }
     } catch (error) {
       console.error("Error loading items:", error)
+      setLoadError(`Error loading items: ${error instanceof Error ? error.message : "Unknown error"}`)
     }
   }
 
@@ -225,6 +244,17 @@ export default function AdminPage() {
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Admin Panel</h1>
         <p className="text-gray-600">Manage your UX Glossary content and settings.</p>
       </div>
+
+      {/* Debug Information */}
+      {loadError && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <h3 className="font-semibold text-red-800 mb-2">Debug Information</h3>
+          <p className="text-sm text-red-700">{loadError}</p>
+          <Button onClick={loadGlossaryItems} className="mt-2 bg-red-600 hover:bg-red-700 text-white" size="sm">
+            Retry Loading
+          </Button>
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:gap-6 md:grid-cols-3 mb-8">
@@ -390,6 +420,11 @@ export default function AdminPage() {
                   <div>
                     <p className="mb-2">No glossary terms found.</p>
                     <p className="text-sm">There might be an issue loading the glossary data.</p>
+                    {loadError && (
+                      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                        <strong>Error details:</strong> {loadError}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <p>No terms found matching your search criteria.</p>
