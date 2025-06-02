@@ -92,16 +92,32 @@ function loadGlossaryItems(): GlossaryItem[] {
 }
 
 // Update CSV file via GitHub API
-async function updateCSVViaGitHub(items: GlossaryItem[]): Promise<{ success: boolean; error?: string }> {
+async function updateCSVViaGitHub(items: GlossaryItem[]): Promise<{ success: boolean; error?: string; details?: any }> {
   try {
     const githubToken = process.env.GITHUB_TOKEN
     const githubRepo = process.env.GITHUB_REPO // format: "username/repo-name"
     const githubBranch = process.env.GITHUB_BRANCH || "main"
 
+    console.log("GitHub Integration Check:")
+    console.log("- Token exists:", !!githubToken)
+    console.log(
+      "- Token starts with correct prefix:",
+      githubToken?.startsWith("ghp_") || githubToken?.startsWith("github_pat_"),
+    )
+    console.log("- Repo:", githubRepo)
+    console.log("- Branch:", githubBranch)
+
     if (!githubToken || !githubRepo) {
+      const error = "GitHub integration not configured. Please set GITHUB_TOKEN and GITHUB_REPO environment variables."
+      console.error(error)
       return {
         success: false,
-        error: "GitHub integration not configured. Please set GITHUB_TOKEN and GITHUB_REPO environment variables.",
+        error,
+        details: {
+          hasToken: !!githubToken,
+          hasRepo: !!githubRepo,
+          tokenPrefix: githubToken?.substring(0, 10) + "...",
+        },
       }
     }
 
@@ -118,48 +134,96 @@ async function updateCSVViaGitHub(items: GlossaryItem[]): Promise<{ success: boo
       csvContent += itemToCSVLine(item) + "\n"
     })
 
+    console.log("CSV content prepared, length:", csvContent.length)
+
     // Get current file SHA (required for updates)
-    const getFileResponse = await fetch(
-      `https://api.github.com/repos/${githubRepo}/contents/data/glossary.csv?ref=${githubBranch}`,
-      {
-        headers: {
-          Authorization: `Bearer ${githubToken}`,
-          "User-Agent": "UX-Glossary-Admin",
-        },
+    console.log("Fetching current file SHA...")
+    const getFileUrl = `https://api.github.com/repos/${githubRepo}/contents/data/glossary.csv?ref=${githubBranch}`
+    console.log("GET URL:", getFileUrl)
+
+    const getFileResponse = await fetch(getFileUrl, {
+      headers: {
+        Authorization: `Bearer ${githubToken}`,
+        "User-Agent": "UX-Glossary-Admin",
+        Accept: "application/vnd.github.v3+json",
       },
-    )
+    })
+
+    console.log("Get file response status:", getFileResponse.status)
 
     let sha = ""
     if (getFileResponse.ok) {
       const fileData = await getFileResponse.json()
       sha = fileData.sha
+      console.log("Current file SHA:", sha)
+    } else if (getFileResponse.status === 404) {
+      console.log("File doesn't exist yet, will create new file")
+    } else {
+      const errorText = await getFileResponse.text()
+      console.error("Error fetching file:", getFileResponse.status, errorText)
+      return {
+        success: false,
+        error: `Failed to fetch current file: ${getFileResponse.status}`,
+        details: { status: getFileResponse.status, response: errorText },
+      }
     }
 
     // Update file via GitHub API
-    const updateResponse = await fetch(`https://api.github.com/repos/${githubRepo}/contents/data/glossary.csv`, {
+    console.log("Updating file via GitHub API...")
+    const updateUrl = `https://api.github.com/repos/${githubRepo}/contents/data/glossary.csv`
+    console.log("PUT URL:", updateUrl)
+
+    const updatePayload = {
+      message: `Update glossary: ${items.length} terms`,
+      content: Buffer.from(csvContent).toString("base64"),
+      branch: githubBranch,
+      ...(sha && { sha }), // Only include SHA if file exists
+    }
+
+    console.log("Update payload:", {
+      message: updatePayload.message,
+      contentLength: updatePayload.content.length,
+      branch: updatePayload.branch,
+      hasSha: !!sha,
+    })
+
+    const updateResponse = await fetch(updateUrl, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${githubToken}`,
         "Content-Type": "application/json",
         "User-Agent": "UX-Glossary-Admin",
+        Accept: "application/vnd.github.v3+json",
       },
-      body: JSON.stringify({
-        message: `Update glossary: ${items.length} terms`,
-        content: Buffer.from(csvContent).toString("base64"),
-        sha: sha,
-        branch: githubBranch,
-      }),
+      body: JSON.stringify(updatePayload),
     })
 
+    console.log("Update response status:", updateResponse.status)
+
     if (updateResponse.ok) {
+      const responseData = await updateResponse.json()
       console.log("Successfully updated CSV via GitHub API")
+      console.log("Commit SHA:", responseData.commit?.sha)
       return { success: true }
     } else {
-      const errorData = await updateResponse.json()
-      console.error("GitHub API error:", errorData)
+      const errorData = await updateResponse.text()
+      console.error("GitHub API error:", updateResponse.status, errorData)
+
+      let parsedError
+      try {
+        parsedError = JSON.parse(errorData)
+      } catch {
+        parsedError = errorData
+      }
+
       return {
         success: false,
-        error: `GitHub API error: ${errorData.message || "Unknown error"}`,
+        error: `GitHub API error: ${updateResponse.status}`,
+        details: {
+          status: updateResponse.status,
+          response: parsedError,
+          url: updateUrl,
+        },
       }
     }
   } catch (error) {
@@ -167,6 +231,10 @@ async function updateCSVViaGitHub(items: GlossaryItem[]): Promise<{ success: boo
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
+      details: {
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : undefined,
+      },
     }
   }
 }
@@ -195,19 +263,30 @@ export async function GET() {
 // POST - Add new glossary item
 export async function POST(request: NextRequest) {
   try {
+    console.log("POST request received for adding new item")
+
     if (!isAuthenticated()) {
+      console.log("Authentication failed")
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const newItem: GlossaryItem = await request.json()
+    console.log("New item received:", {
+      letter: newItem.letter,
+      term: newItem.term,
+      definitionLength: newItem.definition?.length,
+    })
 
     // Validate required fields
     if (!newItem.letter || !newItem.term || !newItem.definition) {
+      console.log("Validation failed - missing fields")
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
     // Load existing items
+    console.log("Loading existing items...")
     const items = loadGlossaryItems()
+    console.log("Loaded", items.length, "existing items")
 
     // Check for duplicates
     const duplicate = items.find(
@@ -215,6 +294,7 @@ export async function POST(request: NextRequest) {
     )
 
     if (duplicate) {
+      console.log("Duplicate found:", duplicate.term)
       return NextResponse.json({ error: "Term already exists in this letter" }, { status: 400 })
     }
 
@@ -226,30 +306,36 @@ export async function POST(request: NextRequest) {
     }
 
     items.push(itemToAdd)
+    console.log("Item added to array, total items:", items.length)
 
     // Try to save via GitHub API
+    console.log("Attempting to save via GitHub API...")
     const saveResult = await updateCSVViaGitHub(items)
 
     if (saveResult.success) {
+      console.log("Successfully saved to GitHub")
       return NextResponse.json({
         success: true,
         message: "Item added successfully and saved to repository",
       })
     } else {
+      console.error("Failed to save to GitHub:", saveResult.error)
       return NextResponse.json(
         {
           error: "Failed to save item",
           details: saveResult.error,
+          debugInfo: saveResult.details,
         },
         { status: 500 },
       )
     }
   } catch (error) {
-    console.error("Error adding item:", error)
+    console.error("Error in POST handler:", error)
     return NextResponse.json(
       {
         error: "Failed to add item",
         details: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
       },
       { status: 500 },
     )
