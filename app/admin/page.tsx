@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { DiagnosticPanel } from "./diagnostic-panel"
 
 interface GlossaryItem {
   letter: string
@@ -345,6 +346,9 @@ export default function AdminPage() {
         </div>
         <p className="text-sm text-green-700 mt-1">Changes are automatically saved to your GitHub repository.</p>
       </div>
+
+      {/* Add the DiagnosticPanel here */}
+      <DiagnosticPanel />
 
       {/* Rest of the admin interface... */}
       {/* (keeping the existing admin interface code) */}
