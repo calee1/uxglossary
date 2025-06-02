@@ -594,7 +594,6 @@ S,Scannability,How easily users can quickly scan and understand content
 S,Scenario,A narrative describing how users might interact with a product
 S,Screen Flow,The sequence of screens users navigate through in an application
 S,Screen Reader,Assistive technology that reads screen content aloud for users with visual impairments
-S,Screen Reader,Assistive technology software that reads screen content aloud for users with visual impairments
 S,Screener,A survey used to identify qualified research participants
 S,Scroll Area,A region where content can be scrolled to view additional information
 S,Scrolling,Moving through content that extends beyond the visible area
@@ -689,7 +688,6 @@ U,UI Kit,A collection of pre-designed user interface components
 U,UI Pattern,A reusable solution for common interface design problems
 U,UI Template,A pre-designed layout that can be customized for specific needs
 U,Unit Testing,Testing individual components of software in isolation
-U,Unmoderated Testing,Usability testing conducted without a facilitator present
 U,Unmoderated Testing,Usability testing conducted without a facilitator present
 U,Uppercase,Text written in capital letters
 U,Usability,How easy and pleasant a product is to use
