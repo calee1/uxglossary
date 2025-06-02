@@ -383,25 +383,14 @@ export default function AdminPage() {
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium">Letter</label>
-                    <Select value={newItem.letter} onValueChange={(value) => setNewItem({ ...newItem, letter: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {letters.map((letter) => (
-                          <SelectItem key={letter} value={letter}>
-                            {letter}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
                     <label className="text-sm font-medium">Term</label>
                     <Input
                       value={newItem.term}
-                      onChange={(e) => setNewItem({ ...newItem, term: e.target.value })}
+                      onChange={(e) => {
+                        const term = e.target.value
+                        const letter = term.charAt(0).toUpperCase() || "A"
+                        setNewItem({ ...newItem, term, letter })
+                      }}
                       placeholder="Enter term name"
                       disabled={isSaving}
                     />
@@ -554,29 +543,14 @@ export default function AdminPage() {
           {editingItem && (
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium">Letter</label>
-                <Select
-                  value={editingItem.letter}
-                  onValueChange={(value) => setEditingItem({ ...editingItem, letter: value })}
-                  disabled={isSaving}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {letters.map((letter) => (
-                      <SelectItem key={letter} value={letter}>
-                        {letter}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
                 <label className="text-sm font-medium">Term</label>
                 <Input
                   value={editingItem.term}
-                  onChange={(e) => setEditingItem({ ...editingItem, term: e.target.value })}
+                  onChange={(e) => {
+                    const term = e.target.value
+                    const letter = term.charAt(0).toUpperCase() || editingItem.letter
+                    setEditingItem({ ...editingItem, term, letter })
+                  }}
                   placeholder="Enter term name"
                   disabled={isSaving}
                 />
