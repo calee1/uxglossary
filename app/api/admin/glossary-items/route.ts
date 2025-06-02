@@ -67,10 +67,8 @@ function loadGlossaryItems(): GlossaryItem[] {
 
       // Try alternative paths
       const altPath1 = path.join(process.cwd(), "data", "glossary.csv")
-      const altPath2 = path.join(__dirname, "../../../data/glossary.csv")
 
       console.log("Trying alternative path 1:", altPath1, "exists:", fs.existsSync(altPath1))
-      console.log("Trying alternative path 2:", altPath2, "exists:", fs.existsSync(altPath2))
 
       // List contents of data directory if it exists
       const dataDir = path.resolve(process.cwd(), "data")
@@ -85,7 +83,6 @@ function loadGlossaryItems(): GlossaryItem[] {
 
     const csvContent = fs.readFileSync(csvPath, "utf-8")
     console.log("CSV file size:", csvContent.length, "characters")
-    console.log("First 200 characters:", csvContent.substring(0, 200))
 
     const lines = csvContent.trim().split("\n")
     console.log(`CSV loaded with ${lines.length} lines (including header)`)
@@ -110,12 +107,6 @@ function loadGlossaryItems(): GlossaryItem[] {
     }
 
     console.log(`Successfully parsed ${items.length} glossary items`)
-
-    // Log first few items for verification
-    if (items.length > 0) {
-      console.log("First 3 items:", items.slice(0, 3))
-    }
-
     return items
   } catch (error) {
     console.error("Error loading glossary items:", error)
@@ -127,6 +118,16 @@ function loadGlossaryItems(): GlossaryItem[] {
 function saveGlossaryItems(items: GlossaryItem[]): boolean {
   try {
     const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
+    console.log("Attempting to save to:", csvPath)
+
+    // Check if we can write to the file
+    try {
+      fs.accessSync(path.dirname(csvPath), fs.constants.W_OK)
+      console.log("Directory is writable")
+    } catch (error) {
+      console.error("Directory is not writable:", error)
+      return false
+    }
 
     // Create header
     let csvContent = "letter,term,definition\n"
@@ -144,11 +145,26 @@ function saveGlossaryItems(items: GlossaryItem[]): boolean {
       csvContent += itemToCSVLine(item) + "\n"
     })
 
-    fs.writeFileSync(csvPath, csvContent)
+    // Try to write the file
+    fs.writeFileSync(csvPath, csvContent, { encoding: "utf-8" })
     console.log(`Successfully saved ${items.length} glossary items to CSV`)
+
+    // Verify the file was written correctly
+    const verifyContent = fs.readFileSync(csvPath, "utf-8")
+    const verifyLines = verifyContent.trim().split("\n")
+    console.log(`Verification: File has ${verifyLines.length} lines`)
+
     return true
   } catch (error) {
     console.error("Error saving glossary items:", error)
+    console.error("Error details:", {
+      name: error instanceof Error ? error.name : "Unknown",
+      message: error instanceof Error ? error.message : "Unknown error",
+      code: (error as any)?.code,
+      errno: (error as any)?.errno,
+      syscall: (error as any)?.syscall,
+      path: (error as any)?.path,
+    })
     return false
   }
 }
@@ -188,20 +204,27 @@ export async function GET() {
 
 // POST - Add new glossary item
 export async function POST(request: NextRequest) {
+  console.log("POST /api/admin/glossary-items called")
+
   if (!isAuthenticated()) {
+    console.log("Authentication failed for POST")
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {
     const newItem: GlossaryItem = await request.json()
+    console.log("Adding new item:", newItem)
 
     // Validate required fields
     if (!newItem.letter || !newItem.term || !newItem.definition) {
+      console.log("Missing required fields")
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
     // Load existing items
+    console.log("Loading existing items...")
     const items = loadGlossaryItems()
+    console.log(`Loaded ${items.length} existing items`)
 
     // Check for duplicates
     const duplicate = items.find(
@@ -209,25 +232,48 @@ export async function POST(request: NextRequest) {
     )
 
     if (duplicate) {
+      console.log("Duplicate term found:", duplicate)
       return NextResponse.json({ error: "Term already exists in this letter" }, { status: 400 })
     }
 
     // Add new item
-    items.push({
+    const itemToAdd = {
       letter: newItem.letter.toUpperCase(),
       term: newItem.term.trim(),
       definition: newItem.definition.trim(),
-    })
+    }
+
+    items.push(itemToAdd)
+    console.log("Item added to array, total items:", items.length)
 
     // Save to CSV
-    if (saveGlossaryItems(items)) {
-      return NextResponse.json({ success: true })
+    console.log("Attempting to save to CSV...")
+    const saveResult = saveGlossaryItems(items)
+    console.log("Save result:", saveResult)
+
+    if (saveResult) {
+      console.log("Successfully saved item")
+      return NextResponse.json({ success: true, message: "Item added successfully" })
     } else {
-      return NextResponse.json({ error: "Failed to save item" }, { status: 500 })
+      console.log("Failed to save item")
+      return NextResponse.json(
+        {
+          error: "Failed to save item",
+          details:
+            "Unable to write to CSV file. This might be due to file permissions or serverless environment limitations.",
+        },
+        { status: 500 },
+      )
     }
   } catch (error) {
     console.error("Error adding item:", error)
-    return NextResponse.json({ error: "Failed to add item" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Failed to add item",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
   }
 }
 
@@ -239,6 +285,7 @@ export async function PUT(request: NextRequest) {
 
   try {
     const { index, item }: { index: number; item: GlossaryItem } = await request.json()
+    console.log("Updating item at index:", index, "with:", item)
 
     // Validate required fields
     if (!item.letter || !item.term || !item.definition) {
@@ -292,6 +339,7 @@ export async function DELETE(request: NextRequest) {
 
   try {
     const { index }: { index: number } = await request.json()
+    console.log("Deleting item at index:", index)
 
     // Load existing items
     const items = loadGlossaryItems()
@@ -300,6 +348,9 @@ export async function DELETE(request: NextRequest) {
     if (index < 0 || index >= items.length) {
       return NextResponse.json({ error: "Invalid item index" }, { status: 400 })
     }
+
+    const itemToDelete = items[index]
+    console.log("Deleting item:", itemToDelete)
 
     // Remove item
     items.splice(index, 1)
