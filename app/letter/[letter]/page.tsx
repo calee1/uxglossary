@@ -35,9 +35,7 @@ export default async function LetterPage({ params }: LetterPageProps) {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-3">
-          <Link href="/" className="text-blue-500 dark:text-blue-400 hover:underline">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">UX Glossary</h1>
-          </Link>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">UX Glossary</h1>
           <span className="text-base sm:text-lg mt-1 md:mt-0 text-gray-900 dark:text-gray-100">
             By:{" "}
             <Link href="http://calee.me/" className="text-blue-500 dark:text-blue-400 hover:underline">
@@ -46,6 +44,10 @@ export default async function LetterPage({ params }: LetterPageProps) {
           </span>
         </div>
         <div className="flex items-center gap-3 mt-3 md:mt-0">
+          <Link href="/" className="text-blue-500 dark:text-blue-400 hover:underline">
+            Home
+          </Link>
+          <span className="text-gray-300 dark:text-gray-600">|</span>
           <Link href="/request-update" className="text-blue-500 dark:text-blue-400 hover:underline">
             Request an Update
           </Link>

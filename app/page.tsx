@@ -27,6 +27,8 @@ export default async function HomePage() {
           </span>
         </div>
         <div className="flex items-center gap-3 mt-3 md:mt-0">
+          <span className="text-gray-500 dark:text-gray-400">Home</span>
+          <span className="text-gray-300 dark:text-gray-600">|</span>
           <Link href="/request-update" className="text-blue-500 dark:text-blue-400 hover:underline">
             Request an Update
           </Link>
