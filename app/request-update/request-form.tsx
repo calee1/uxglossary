@@ -11,28 +11,28 @@ export function RequestForm() {
   return (
     <form action={action} className="space-y-6">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Your Name *
         </label>
         <Input type="text" id="name" name="name" required className="w-full" placeholder="Enter your full name" />
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Email Address *
         </label>
         <Input type="email" id="email" name="email" required className="w-full" placeholder="your.email@example.com" />
       </div>
 
       <div>
-        <label htmlFor="requestType" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="requestType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Request Type *
         </label>
         <select
           id="requestType"
           name="requestType"
           required
-          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
         >
           <option value="">Select request type</option>
           <option value="new-term">Add new term</option>
@@ -44,7 +44,7 @@ export function RequestForm() {
       </div>
 
       <div>
-        <label htmlFor="updateRequest" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="updateRequest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Update Request Details *
         </label>
         <Textarea
@@ -62,7 +62,7 @@ export function RequestForm() {
       </div>
 
       <div>
-        <label htmlFor="source" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="source" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Source/Reference (Optional)
         </label>
         <Input
@@ -80,8 +80,10 @@ export function RequestForm() {
 
       {state?.success && (
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-800 font-medium">✓ Request submitted successfully!</p>
-          <p className="text-green-700 text-sm mt-1">Your request has been processed. Check the details below:</p>
+          <p className="text-green-800 dark:text-green-200 font-medium">✓ Request submitted successfully!</p>
+          <p className="text-green-700 dark:text-green-300 text-sm mt-1">
+            Your request has been processed. Check the details below:
+          </p>
           {state.debug && (
             <div className="mt-2 p-2 bg-gray-100 rounded text-xs font-mono whitespace-pre-line">{state.debug}</div>
           )}
@@ -90,8 +92,8 @@ export function RequestForm() {
 
       {state?.error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800 font-medium">✗ Error submitting request</p>
-          <p className="text-red-700 text-sm mt-1">{state.error}</p>
+          <p className="text-red-800 dark:text-red-200 font-medium">✗ Error submitting request</p>
+          <p className="text-red-700 dark:text-red-300 text-sm mt-1">{state.error}</p>
         </div>
       )}
     </form>
