@@ -151,7 +151,6 @@ C,Clickstream,The sequence of clicks a user makes while navigating through a web
 C,Client-side,Operations that occur on the user's device rather than on a server,
 C,Clipboard,A temporary storage area for data that has been cut or copied,
 C,Cloud,Internet-based computing services that provide storage and processing power,
-C,CMYK,"Cyan, Magenta, Yellow, and Black color model used in printing",CMYK
 C,Cognitive Bias,Systematic errors in thinking that affect decisions and judgments,
 C,Cognitive Dissonance,Mental discomfort from holding contradictory beliefs or attitudes,
 C,Cognitive Drift,The gradual change in mental models or understanding over time,
@@ -221,6 +220,7 @@ C,Customer Acquisition Cost,The cost of acquiring a new customer,CAC
 C,Customer Centricity,A business approach that prioritizes customer needs and experiences,
 C,Customer Experience,The overall perception customers have of their interactions with a company,CX
 C,Customer Feedback Loop,"A system for collecting, analyzing, and acting on customer feedback",
+C,Cyan Magenta Yellow Black,Color model used in printing,CMYK
 D,Dark Patterns,Deceptive design practices that trick users into unintended actions,
 D,Dark UX,User experience design that manipulates users for business benefit rather than user benefit,
 D,Dashboard,A visual interface that displays key information and metrics at a glance,
