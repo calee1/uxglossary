@@ -577,8 +577,8 @@ R,Responsive Design,Design that adapts to different screen sizes and devices,
 R,Retention,The ability to keep users engaged with a product over time,
 R,Return on Investment,A metric used to measure the profitability of an investment relative to its cost,ROI
 R,Reverse Prototype,A prototype that demonstrates what not to do,
+R,RGB,"Red, Green, Blue color model, with optional Alpha channel for opacity",RGBA
 R,RGB/RGBA,"Red, Green, Blue color model, with optional Alpha channel for transparency",RGB
-R,RICE Method,"A prioritization framework: Reach, Impact, Confidence, Effort",RICE
 R,Right-aligned,Text alignment where text is aligned to the right margin,
 R,Roadmap,A strategic plan showing the direction and progress of a product,
 R,Rowspan,An HTML attribute specifying how many rows a table cell should span,
