@@ -9,12 +9,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Query parameter 'q' is required" }, { status: 400 })
     }
 
-    // Dynamic import to avoid build-time issues
+    console.log("API: Searching for:", query)
     const { searchGlossaryItems } = await import("@/lib/csv-parser.server")
     const results = await searchGlossaryItems(query)
+    console.log("API: Found", results.length, "results")
     return NextResponse.json(results)
   } catch (error) {
-    console.error("Error searching glossary:", error)
+    console.error("API Error searching glossary:", error)
     return NextResponse.json({ error: "Failed to search glossary" }, { status: 500 })
   }
 }

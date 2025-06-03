@@ -4,11 +4,13 @@ import { ThemeToggle } from "@/components/theme-toggle"
 
 async function loadGlossaryDataSafe() {
   try {
-    // Dynamic import to avoid build-time issues
+    console.log("Page: Loading glossary data...")
     const { loadGlossaryData } = await import("@/lib/csv-parser.server")
-    return await loadGlossaryData()
+    const data = await loadGlossaryData()
+    console.log("Page: Loaded data with keys:", Object.keys(data))
+    return data
   } catch (error) {
-    console.error("Failed to load glossary data:", error)
+    console.error("Page: Failed to load glossary data:", error)
     return {}
   }
 }
@@ -18,6 +20,9 @@ export default async function HomePage() {
   const hasGlossaryItems = Object.keys(glossaryItems).length > 0
   const allLettersHaveContent = Object.keys(glossaryItems).length === 26
   const alphabetWithNumbers = ["0", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))]
+
+  console.log("Page: Has glossary items:", hasGlossaryItems)
+  console.log("Page: Letters with content:", Object.keys(glossaryItems))
 
   return (
     <main className="max-w-4xl mx-auto p-4 sm:p-6 border border-gray-200 dark:border-gray-700 rounded-lg my-4 sm:my-8 bg-white dark:bg-gray-800 transition-colors">
@@ -58,10 +63,12 @@ export default async function HomePage() {
 
       {!hasGlossaryItems && (
         <div className="p-4 sm:p-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg mb-6 sm:mb-8">
-          <h3 className="text-yellow-800 dark:text-yellow-200 font-medium text-lg mb-2">Getting Started</h3>
+          <h3 className="text-yellow-800 dark:text-yellow-200 font-medium text-lg mb-2">Loading Glossary Data</h3>
           <p className="text-yellow-700 dark:text-yellow-300">
-            The glossary is being initialized with default data. If you're seeing this message, the application is
-            creating the necessary files. Please refresh the page in a few seconds.
+            The glossary data is being loaded. If this message persists, there may be an issue with the data file.
+          </p>
+          <p className="text-yellow-700 dark:text-yellow-300 text-sm mt-2">
+            Debug info: Found {Object.keys(glossaryItems).length} letter groups
           </p>
         </div>
       )}
