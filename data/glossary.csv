@@ -584,6 +584,7 @@ R,Right-aligned,Text alignment where text is aligned to the right margin,
 R,Roadmap,A strategic plan showing the direction and progress of a product,
 R,Rowspan,An HTML attribute specifying how many rows a table cell should span,
 S,Sample Size,The number of participants in a research study,
+S,Scalable Vector Graphics,A vector image format for web graphics,SVG
 S,Scannability,How easily users can quickly scan and understand content,
 S,Scenario,A narrative describing how users might interact with a product,
 S,Screen Flow,The sequence of screens users navigate through in an application,
@@ -635,11 +636,10 @@ S,Style Guide,A document that outlines design standards and guidelines,
 S,Subscription Revenue Model,A business model where customers pay recurring fees,
 S,Summative Testing,Testing conducted after development to evaluate final performance,
 S,Survey,A research method using questionnaires to collect data from users,
-S,SVG,"Scalable Vector Graphics, a vector image format for web graphics",SVG
+S,SUS,"System Usability Scale, a standardized questionnaire for measuring usability",SUS
 S,Switch,A UI control that toggles between two states,
 S,SWOT Analysis,"A strategic planning technique: Strengths, Weaknesses, Opportunities, Threats",SWOT
 S,Syntactically Awesome Style Sheets,A preprocessor scripting language that is interpreted or compiled into CSS,SASS
-S,System Usability Scale,A standardized questionnaire for measuring usability,SUS
 T,Tab,A UI element that allows users to switch between different views or sections,
 T,Table,A structured arrangement of data in rows and columns,
 T,Table Footer,"The bottom section of a table, often containing summary information",
