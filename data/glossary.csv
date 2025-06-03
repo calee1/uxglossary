@@ -337,7 +337,6 @@ G,Graphic Design,"The art of visual communication through typography, imagery, a
 G,Graphical User Interface,A visual way for users to interact with computers,GUI
 G,Grid,A structure of intersecting lines used to organize content and layout,
 G,Guerrilla Testing,"Quick, informal usability testing in public spaces",
-H,H1,"The main heading tag in HTML, typically the most important heading on a page",
 H,Hack,"A clever solution to a problem, often involving unconventional methods",
 H,Hamburger Menu,A menu icon consisting of three horizontal lines,
 H,Haptic Feedback,Tactile feedback that users feel through vibrations or force,
@@ -345,6 +344,7 @@ H,Hardware,The physical components of a computer or electronic device,
 H,Hawthorne Effect,The tendency for people to modify behavior when they know they're being observed,
 H,Header,The top section of a webpage or document containing navigation and branding,
 H,Headline,A prominent text element that introduces or summarizes content,
+H,Headline 1,"The main heading tag in HTML, typically the most important heading on a page and required for accessibility. Headline tags run from H1 to H6",H1
 H,Heatmap,"A visual representation showing where users click, scroll, or focus attention",
 H,Hero,"A large, prominent section at the top of a webpage featuring key content",
 H,Heuristic Evaluation,A usability evaluation method using established usability principles,
