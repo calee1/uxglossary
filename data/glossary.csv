@@ -249,7 +249,6 @@ D,Design Maturity,An organization's level of design sophistication,
 D,Design Ops,The practice of streamlining design processes,
 D,Design Patterns,Reusable solutions to common design problems,
 D,Design Research,Systematic investigation and analysis conducted to inform and validate design decisions,
-D,Design ROI,Return on investment for design efforts,ROI
 D,Design Specifications,Detailed documentation of design requirements and guidelines,
 D,Design Sprint,A time-constrained process for rapidly prototyping and testing ideas,
 D,Design Survey,Research method using questionnaires to gather design-related feedback,
@@ -578,6 +577,7 @@ R,Response Time,The time it takes for a system to respond to user input,
 R,Responsive Breakpoints,Specific screen widths where responsive designs change their layout to accommodate different devices,
 R,Responsive Design,Design that adapts to different screen sizes and devices,
 R,Retention,The ability to keep users engaged with a product over time,
+R,Return on Investment,A metric used to measure the profitability of an investment relative to its cost,ROI
 R,Reverse Prototype,A prototype that demonstrates what not to do,
 R,RGB/RGBA,"Red, Green, Blue color model, with optional Alpha channel for transparency",RGB
 R,RICE Method,"A prioritization framework: Reach, Impact, Confidence, Effort",RICE
