@@ -513,6 +513,9 @@ export default function AdminPage() {
             {filteredItems.length > 0 ? (
               filteredItems.map((item, index) => {
                 const originalIndex = items.findIndex((i) => i.term === item.term && i.letter === item.letter)
+                const isTermTruncated = item.term.length > 30
+                const isDefinitionTruncated = item.definition.length > 100
+
                 return (
                   <div
                     key={`${item.letter}-${item.term}-${index}`}
@@ -523,14 +526,24 @@ export default function AdminPage() {
                         <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded font-medium">
                           {item.letter}
                         </span>
-                        <span className="font-medium text-gray-900 dark:text-gray-100 truncate">{item.term}</span>
+                        <span
+                          className="font-medium text-gray-900 dark:text-gray-100 truncate"
+                          title={isTermTruncated ? item.term : undefined}
+                        >
+                          {item.term}
+                        </span>
                         {item.acronym && (
                           <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded font-medium">
                             {item.acronym}
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{item.definition}</p>
+                      <p
+                        className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2"
+                        title={isDefinitionTruncated ? item.definition : undefined}
+                      >
+                        {item.definition}
+                      </p>
                     </div>
                     <div className="flex gap-2 ml-4">
                       <Button

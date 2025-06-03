@@ -189,41 +189,53 @@ export function SearchBox({ glossaryItems = {} }: SearchBoxProps) {
       {/* Suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && (
         <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-80 sm:max-h-96 overflow-y-auto">
-          {suggestions.map((item, index) => (
-            <button
-              key={`${item.letter}-${item.term}-${index}`}
-              onClick={() => navigateToTerm(item)}
-              className={`w-full text-left px-3 sm:px-4 py-2 sm:py-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors ${
-                index === selectedIndex ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700" : ""
-              }`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-gray-900 dark:text-gray-100 mb-1 text-sm sm:text-base flex items-center gap-2">
-                    {highlightMatch(item.term, searchTerm)}
-                    {item.acronym && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                        {item.acronym}
+          {suggestions.map((item, index) => {
+            const truncatedDefinition =
+              item.definition && item.definition.length > 100
+                ? item.definition.substring(0, 100) + "..."
+                : item.definition || ""
+            const isTermTruncated = item.term && item.term.length > 40
+            const isDefinitionTruncated = item.definition && item.definition.length > 100
+
+            return (
+              <button
+                key={`${item.letter}-${item.term}-${index}`}
+                onClick={() => navigateToTerm(item)}
+                className={`w-full text-left px-3 sm:px-4 py-2 sm:py-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors ${
+                  index === selectedIndex ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700" : ""
+                }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-gray-900 dark:text-gray-100 mb-1 text-sm sm:text-base flex items-center gap-2">
+                      <span
+                        className={isTermTruncated ? "truncate" : ""}
+                        title={isTermTruncated ? item.term : undefined}
+                      >
+                        {highlightMatch(item.term, searchTerm)}
                       </span>
-                    )}
+                      {item.acronym && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                          {item.acronym}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 line-clamp-2"
+                      title={isDefinitionTruncated ? item.definition : undefined}
+                    >
+                      {highlightMatch(truncatedDefinition, searchTerm)}
+                    </div>
                   </div>
-                  <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                    {highlightMatch(
-                      item.definition && item.definition.length > 100
-                        ? item.definition.substring(0, 100) + "..."
-                        : item.definition || "",
-                      searchTerm,
-                    )}
+                  <div className="ml-2 sm:ml-3 flex-shrink-0">
+                    <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                      {item.letter || item.term?.charAt(0)?.toUpperCase() || "?"}
+                    </span>
                   </div>
                 </div>
-                <div className="ml-2 sm:ml-3 flex-shrink-0">
-                  <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                    {item.letter || item.term?.charAt(0)?.toUpperCase() || "?"}
-                  </span>
-                </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            )
+          })}
           {totalMatchCount > 8 && (
             <div className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 text-center">
               Showing first 8 of {totalMatchCount} results. Try a more specific search for better results.
