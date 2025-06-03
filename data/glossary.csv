@@ -130,7 +130,7 @@ C,Caption,"Descriptive text that accompanies an image, video, or other media",
 C,Carbon Copy,An email feature that sends copies to additional recipients,CC
 C,Card,A UI component that groups related information in a contained format,
 C,Card Sorting,A user research method where participants organize topics into categories,
-C,Caret,A cursor indicator that shows where text will be inserted,
+C,Caret,A cursor indicator ( > ) that shows where text will be inserted,
 C,Carousel,A UI component that displays multiple items in a rotating or sliding format,
 C,Cascading Menu,A menu system where submenus appear when hovering over or clicking parent items,
 C,Case Study,"A detailed analysis of a particular project, situation, or user",
