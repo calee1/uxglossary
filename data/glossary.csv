@@ -1,6 +1,6 @@
 letter,term,definition,acronym
 0,4-color printing,Printing in CMYK or full-color,
-A,A/B Testing,A method of comparing two versions of a webpage or app to determine which performs better by showing different versions to different users,
+A,A/B Testing,A method of comparing two versions of a webpage or app to determine which performs better,
 A,Above-the-fold,"The portion of a webpage that is visible without scrolling, derived from newspaper terminology",
 A,Absolute Positioning,A CSS positioning method where an element is positioned relative to its nearest positioned ancestor,
 A,Abstraction Layer,A way of hiding the implementation details of a particular set of functionality to simplify complex systems,
@@ -42,6 +42,7 @@ A,Ant Design,A UI design language and React component library for building enter
 A,Anti-aliasing,A technique used to smooth jagged edges in digital images and text,
 A,Anticipatory Design,Design that predicts user needs and takes action before the user explicitly requests it,
 A,API Design,Creating user-friendly application programming interfaces that are intuitive and well-documented,
+A,API,Application Programming Interface - a set of rules for building software applications,API
 A,Applet,A small application designed to perform a specific function within a larger program,
 A,Application,A software program designed to perform specific tasks for users,
 A,Application Programming Interface,A set of rules and protocols that allows different software programs to communicate and exchange data,API
@@ -67,6 +68,7 @@ B,B2C,"Business-to-Consumer, referring to transactions between companies and ind
 B,B2G,"Business-to-Government, referring to transactions between companies and government entities",B2G
 B,Backdrop,A background layer or surface that appears behind other interface elements,
 B,Background,The area behind the main content or the underlying layer of a design,
+B,Backend,The server-side of an application that handles data storage and business logic,
 B,Backlog,"A prioritized list of features, user stories, or tasks to be completed in future iterations",
 B,Badge,"A small visual indicator that displays status, notifications, or achievements",
 B,Bait and Switch,A deceptive practice where users are lured with one offer but presented with another,
@@ -98,6 +100,7 @@ B,Bookmark,A saved link to a webpage for easy future access,
 B,Boolean,A data type that can have one of two values: true or false,
 B,Border,A line or boundary that surrounds an element to define its edges,
 B,Border Style,"The visual appearance of a border, such as solid, dashed, or dotted",
+B,Bootstrap,A popular CSS framework for developing responsive websites,
 B,Bottleneck,"A point in a process where the flow is restricted, causing delays or limitations",
 B,Bounce,When a user visits a website and leaves without interacting with any other pages,
 B,Bounce Rate,The percentage of visitors who navigate away from a site after viewing only one page,
@@ -181,6 +184,7 @@ C,Completely Automated Public Turing test to tell Computers and Humans Apart,A c
 C,Component Library,A collection of reusable UI components with defined standards for consistent implementation across products,
 C,Component State,"The various conditions a UI component can be in, such as hover or selected",
 C,Component Variants,Different versions of a UI component for different use cases,
+C,Component,Reusable UI elements that maintain consistency across a design system,
 C,Components,Reusable UI elements that maintain consistency across a design system,
 C,Compound Colors,Colors created by mixing multiple base colors,
 C,Concatenate,The process of joining two or more strings or data elements together end-to-end to form a single combined element,
@@ -267,6 +271,7 @@ D,Diary Study,A research method where participants record their experiences over
 D,Digital,Relating to computer technology and electronic systems,
 D,Divergent Thinking,"In design thinking, when unlimited ideas are created",
 D,Documentation,Written materials that explain how to use or understand a system,
+D,DOM,Document Object Model - a programming interface for web documents,DOM,HTML
 D,Domain Expert,A person with specialized knowledge in a particular field,
 D,Double Caret,A symbol (>>) indicating a nested or secondary action,
 D,Double Click,Clicking a mouse button twice in quick succession,
@@ -279,6 +284,7 @@ E,Edge Case,An unusual or extreme situation that occurs at the boundary of norma
 E,Elevation,The perceived height of an element above the background surface,
 E,Empathy,The ability to understand and share the feelings of users,
 E,Empathy Map,"A visual tool that captures what users think, feel, see, and do",
+E,Encryption,The process of converting information into a secret code to prevent unauthorized access,,
 E,End User,The person who ultimately uses a product or service,
 E,End-to-end UX,User experience design work that encompasses the entire lifecycle of design from initial discovery research through pixel-perfect implementation,
 E,Enterprise,Large-scale business software designed for organizations,
@@ -287,6 +293,7 @@ E,Epic,A large user story that can be broken down into smaller stories,
 E,Ergonomics,The study of designing equipment and devices that fit the human body,
 E,Ethical Design,Design practices that consider moral implications and user welfare,
 E,Ethnography,The study of people and cultures through observation and participation,
+E,Event,An action or occurrence that can be detected and handled by a program,,
 E,Expandable,UI elements that can be enlarged to show additional content,
 E,Experience Sampling,A research method that captures user experiences in real-time,
 E,Experimental Group,The group in an experiment that receives the treatment being tested,
@@ -322,9 +329,10 @@ F,Font,"A set of characters with a specific typeface, size, and style",
 F,Footer,The bottom section of a webpage or document,
 F,Form,A collection of input fields for gathering user information,
 F,Formative Testing,Testing conducted during development to improve the design,
+F,Framework,A platform for developing software applications that provides a foundation of pre-written code,,
 F,Framing,How information is presented to influence perception and decision-making,
 F,Freemium,A business model offering basic features for free with premium features for a fee,
-F,Front-end,The client-side of an application that users interact with directly,
+F,Frontend,The client-side of an application that users interact with directly,,Backend
 F,Full-stack Designer,A designer who works on both user interface and user experience,
 F,Funnel Testing,Testing different versions of conversion funnels to optimize performance,
 G,Gamification,Adding game-like elements to non-game contexts to increase engagement,
@@ -338,7 +346,7 @@ G,Goal-directed Design,A design approach that focuses on user goals and motivati
 G,Gradient,A gradual transition between two or more colors,
 G,Graphic Design,"The art of visual communication through typography, imagery, and layout",
 G,Graphical User Interface,A visual way for users to interact with computers,GUI
-G,Grid,A structure of intersecting lines used to organize content and layout,
+G,Grid,A structure of intersecting lines used to organize content and layout,,Layout
 G,Guerrilla Testing,"Quick, informal usability testing in public spaces",
 H,Hack,"A clever solution to a problem, often involving unconventional methods",
 H,Hamburger Menu,A menu icon consisting of three horizontal lines,
@@ -360,6 +368,8 @@ H,Home Page,The main or introductory page of a website,
 H,Hover,The state when a cursor is positioned over an interactive element,
 H,How Might We,A question format used in design thinking to frame problems as opportunities,HMW
 H,HSB,"Hue, Saturation, Brightness color model",HSB
+H,HTML,HyperText Markup Language - the standard markup language for web pages,HTML,CSS
+H,HTTP,HyperText Transfer Protocol - the foundation of data communication on the web,HTTP,
 H,Hue,The pure color without tint or shade,
 H,Human Factors,The study of how humans interact with systems and environments,
 H,Human-centered Design,A design approach that prioritizes human needs and capabilities,HCD
@@ -387,7 +397,7 @@ I,Innovation,"The process of creating new ideas, products, or methods",
 I,Intentional Friction,Deliberately adding steps to slow down user actions for safety or consideration,
 I,Interaction,The communication between a user and a system,
 I,Interaction Design,The design of interactive products and services,IxD
-I,Interface,The point where two systems meet and interact,
+I,Interface,The point where two systems meet and interact,UI,
 I,Internationalization,The process of designing software for multiple languages and regions,I18N
 I,Interviews,One-on-one conversations with stakeholders or users to gather insights,
 I,Intuitive Design,Design that feels natural and easy to understand without instruction,
@@ -399,7 +409,7 @@ I,Iteration,"A repeated cycle of design, test, and refine",
 I,Iterative,A process that involves repeated cycles of improvement,
 I,Iterative Design,A design methodology based on repeated cycles of prototyping and testing,
 J,Jacob's Law,Users prefer your site to work the same way as other sites they already know,
-J,JavaScript,A programming language commonly used for web development,JS
+J,JavaScript,A programming language commonly used for web development,JS,
 J,Jobs to be Done,A framework for understanding customer motivations by focusing on the progress they're trying to make,JTBD
 J,JPG,"Joint Photographic Experts Group, a common image file format",JPG
 J,Justified,Text alignment where both left and right edges are aligned,
@@ -422,7 +432,7 @@ L,Left-aligned,Text alignment where text is aligned to the left margin,
 L,LESS,A dynamic preprocessor style sheet language that can be compiled into CSS and run on the client or server,
 L,Likert Scale,A rating scale used in surveys to measure attitudes or opinions,
 L,Line Break,A point where text wraps to the next line,
-L,Link,A clickable element that navigates to another page or resource,
+L,Link,A clickable element that navigates to another page or resource,,
 L,Listbox,A UI control that displays a list of options for selection,
 L,Load Time,The amount of time it takes for a page or application to fully load,
 L,Localization,Adapting a product for a specific region or language,L10N
@@ -454,7 +464,7 @@ M,Mind Mapping,The process of creating visual diagrams to organize information,
 M,Minesweeping,Randomly clicking around an interface to find interactive elements,
 M,Minimum Viable Product,The simplest version of a product that can be released to users,MVP
 M,Mobile Web,Websites optimized for viewing on mobile devices,
-M,Mobile-first Design,A design approach that starts with mobile devices and scales up,
+M,Mobile-first Design,A design approach that starts with mobile devices and scales up,,Responsive
 M,Mockup,A static representation of a design showing visual elements,
 M,Modal,A dialog box that requires user interaction before returning to the main interface,
 M,Moderated Testing,Usability testing conducted with a facilitator present to guide participants and ask questions,
@@ -469,7 +479,7 @@ M,Multi-variant Testing,Testing multiple versions of elements simultaneously,
 N,Native Mobile,Applications built specifically for a particular mobile platform,
 N,Natural Language Interface,An interface that allows users to interact using everyday language,
 N,Natural Language Processing,AI technology that helps computers understand human language,NLP
-N,Navigation,The system that allows users to move through a website or application,
+N,Navigation,The system that allows users to move through a website or application,,Breadcrumb
 N,Near Field Communication,Short-range wireless technology for data exchange,NFC
 N,Negative Space,Empty or white space around and between design elements,
 N,Net Promoter Score,A metric that measures customer loyalty and satisfaction,NPS
@@ -486,6 +496,7 @@ O,One-time Passcode,A temporary password valid for a single login session,OTP
 O,Opacity,The degree to which an element is transparent or opaque,
 O,Open Source,"Software with source code that anyone can inspect, modify, and enhance",
 O,Open-ended Questions,"Questions that allow for detailed, unrestricted responses",
+O,Optimization,The process of making something as effective or functional as possible,,Performance
 O,Overlay,A layer that appears on top of existing content,
 O,Overline,A horizontal line drawn above text,
 P,Padding,The space inside an element between its content and border,
@@ -545,7 +556,7 @@ P,Progressive Disclosure,Revealing information gradually to avoid overwhelming u
 P,Progressive Enhancement,Building web pages that work for everyone and enhance for capable browsers,
 P,Progressive Web App,A web application that uses modern web capabilities to deliver native app-like experiences to users,PWA
 P,Project Manager,A professional responsible for planning and executing projects,
-P,Prototype,An early model of a product used to test concepts and functionality,
+P,Prototype,An early model of a product used to test concepts and functionality,,
 P,Prototype Test,Testing a prototype with users to gather feedback and insights,
 P,Pull Request,A method of submitting code changes for review before merging,PR
 Q,Qualitative User Research,Research that focuses on understanding user behaviors and motivations,
@@ -577,7 +588,7 @@ R,Research Strategy,A high-level approach to conducting research,
 R,Resizable,Elements that can be adjusted in size by users,
 R,Response Time,The time it takes for a system to respond to user input,
 R,Responsive Breakpoints,Specific screen widths where responsive designs change their layout to accommodate different devices,
-R,Responsive Design,Design that adapts to different screen sizes and devices,
+R,Responsive Design,Design that adapts to different screen sizes and devices,,Mobile-first
 R,Retention,The ability to keep users engaged with a product over time,
 R,Return on Investment,A metric used to measure the profitability of an investment relative to its cost,ROI
 R,Reverse Prototype,A prototype that demonstrates what not to do,
@@ -585,6 +596,7 @@ R,RGB/RGBA,"Red, Green, Blue color model, with optional Alpha channel for transp
 R,RICE Method,"A prioritization framework: Reach, Impact, Confidence, Effort",RICE
 R,Right-aligned,Text alignment where text is aligned to the right margin,
 R,Roadmap,A strategic plan showing the direction and progress of a product,
+R,Router,A system that determines which content to display based on the URL,,
 R,Rowspan,An HTML attribute specifying how many rows a table cell should span,
 S,Sample Size,The number of participants in a research study,
 S,Scalable Vector Graphics,A vector image format for web graphics,SVG
@@ -597,6 +609,7 @@ S,Scroll Area,A region where content can be scrolled to view additional informat
 S,Scrolling,Moving through content that extends beyond the visible area,
 S,Scrum,An agile framework for managing product development,
 S,Search,The function that allows users to find specific content or information,
+S,SEO,Search Engine Optimization - improving visibility in search results,SEO,Keyword
 S,Search Engine Optimization,Improving visibility in search results,SEO
 S,Search Filter,Options that narrow down search results based on criteria,
 S,Secondary Colors,Colors created by mixing two primary colors,
@@ -605,6 +618,7 @@ S,Select,A dropdown menu that allows users to choose from a list of options,
 S,Selective Attention,The tendency to focus on certain information while ignoring other information,
 S,Sentence Case,Capitalization where only the first word and proper nouns are capitalized,
 S,Separator,A visual element that divides content into distinct sections,
+S,Server,A computer system that provides data or services to other computers,,Backend
 S,Server-side,Operations that occur on the server rather than the user's device,
 S,Service Blueprint,A diagram that visualizes the relationships between service components,
 S,Shade Colors,Colors created by adding black to a pure color,
@@ -677,13 +691,14 @@ T,Tree Testing,A usability technique for evaluating the findability of topics in
 T,Triad Colors,A color scheme using three colors evenly spaced around the color wheel,
 T,Tribalism,The tendency for people to form groups and favor their own group,
 T,Truncate,To shorten text or data by cutting off characters at a specified length,
-T,Typography,The art and technique of arranging type to make written language readable,
+T,Typography,The art and technique of arranging type to make written language readable,,
 U,UI Component,A reusable element of a user interface,
 U,UI Design,Focuses on the visual elements and interactive components that users see and interact with when using a digital product or service,
 U,UI Element,An individual part of a user interface,
 U,UI Kit,A collection of pre-designed user interface components,
 U,UI Pattern,A reusable solution for common interface design problems,
 U,UI Template,A pre-designed layout that can be customized for specific needs,
+U,UI,User Interface - the means by which users interact with a computer or application,UI
 U,Unit Testing,Testing individual components of software in isolation,
 U,Unmoderated Testing,Usability testing conducted without a facilitator present,
 U,Uppercase,Text written in capital letters,
@@ -722,6 +737,7 @@ U,UX Design,The process of creating meaningful user experiences,
 U,UX Documentation,Written materials that explain UX decisions and guidelines,
 U,UX Strategy,A plan for achieving business goals through great user experiences,
 U,UX Writing,The practice of writing copy that guides users through a product,
+U,UX,User Experience - the overall experience a person has when using a product,UX
 V,Value Proposition,A statement that explains the benefit a product provides to customers,
 V,Variant,A different version of a design component or element,
 V,Viability,The ability of a solution to be successful and sustainable,
@@ -732,6 +748,7 @@ V,Visual Design,"The use of imagery, color, shapes, typography, and form to enha
 V,Vlog,A blog that contains video content,
 V,Voice of Customer,Direct feedback and insights from customers about their experiences,VOC
 V,Voice User Interface,An interface that allows users to interact through voice commands,VUI
+V,Viewport,The visible area of a web page on a user's device,,Responsive
 W,W3C,"World Wide Web Consortium, the organization that develops web standards",W3C
 W,Waterfall,A sequential development methodology where each phase must be completed before the next,
 W,Wayfinding,The process of using spatial and environmental information to navigate,
@@ -745,56 +762,19 @@ W,White Space,Empty space around and between elements in a design,
 W,Whiteboard Challenge,A design exercise where candidates solve problems on a whiteboard,
 W,Whiteboarding,"Using a whiteboard to brainstorm, plan, or explain ideas",
 W,Widget,A small application or component that performs a specific function,
-W,Wireframe,A basic structural blueprint showing the layout of a webpage or app,
+W,Wireframe,A basic structural blueprint showing the layout of a webpage or app,,Prototype
 W,Wizard,A step-by-step interface that guides users through a complex process,
 W,Wizard-of-Oz Testing,Testing where a human secretly provides responses that appear to come from a computer,
 W,Word Cloud,A visual representation of text where word size indicates frequency or importance,
 W,Worst Idea,A brainstorming technique where participants intentionally generate bad ideas,
 X,X-axis,The horizontal axis in a coordinate system or data visualization that typically represents the independent variable or categories,
+X,XML,eXtensible Markup Language - a markup language for storing and transporting data,XML,
 Y,Y-axis,The vertical axis in a coordinate system or data visualization that typically represents the dependent variable or measured values,
+Y,YAML,YAML Ain't Markup Language - a human-readable data serialization standard,YAML,
 Z,Z-axis,The depth axis in a three-dimensional coordinate system that represents the third dimension perpendicular to both X and Y axes,
 Z,Z-fold,A paper folding technique where the document is folded in a zigzag pattern creating multiple panels that stack on top of each other,
 Z,Z-height,The perceived elevation or depth of an element in a user interface design system that determines its visual hierarchy and shadow effects,
 Z,Zeplin,A design-collaboration platform assisting teams in crafting visually captivating products,
 Z,Zip Disk,A removable storage medium that was popular in the 1990s for backing up and transferring files between computers,
-Z,Zoom,Interactive navigation control that lets users magnify content.,
-A,API,Application Programming Interface - a set of rules and protocols that allows different software programs to communicate and exchange data,API,
-B,Backend,"The server-side of an application that handles data storage, security, and business logic",,Frontend
-B,Bootstrap,"A popular CSS framework for developing responsive and mobile-first websites",,CSS
-B,Breadcrumb,A navigation aid that shows users their current location within a website's hierarchy,,Navigation
-B,Button,An interactive element that users can click to trigger an action,,
-C,Cache,A temporary storage location that stores frequently accessed data for quick retrieval,,
-C,CSS,Cascading Style Sheets - a language used to describe the presentation of web pages,CSS,HTML
-C,Component,Reusable UI elements that maintain consistency across a design system,,
-D,Database,An organized collection of structured information stored electronically,DB,
-D,DOM,Document Object Model - a programming interface for web documents,DOM,HTML
-D,Design System,A collection of reusable components and guidelines for consistent design,,Component
-E,Encryption,The process of converting information into a secret code to prevent unauthorized access,,
-E,Event,An action or occurrence that can be detected and handled by a program,,
-F,Frontend,The client-side of an application that users interact with directly,,Backend
-F,Framework,A platform for developing software applications that provides a foundation of pre-written code,,
-G,Grid,A structure of intersecting lines used to organize content and layout,,Layout
-H,HTML,HyperText Markup Language - the standard markup language for web pages,HTML,CSS
-H,HTTP,HyperText Transfer Protocol - the foundation of data communication on the web,HTTP,
-I,Interface,The point where two systems meet and interact,UI,
-J,JavaScript,A programming language commonly used for web development,JS,
-K,Keyword,A word or phrase that describes the content of a webpage for search engines,,SEO
-L,Layout,The arrangement of elements within a design,,Grid
-L,Link,A clickable element that navigates to another page or resource,,
-M,Mobile-first,A design approach that starts with mobile devices and scales up,,Responsive
-N,Navigation,The system that allows users to move through a website or application,,Breadcrumb
-O,Optimization,The process of making something as effective or functional as possible,,Performance
-P,Prototype,An early model of a product used to test concepts and functionality,,
-P,Performance,How fast and efficiently a website or application operates,,Optimization
-R,Responsive,Design that adapts to different screen sizes and devices,,Mobile-first
-R,Router,A system that determines which content to display based on the URL,,
-S,SEO,Search Engine Optimization - improving visibility in search results,SEO,Keyword
-S,Server,A computer system that provides data or services to other computers,,Backend
-T,Typography,The art and technique of arranging type to make written language readable,,
-U,UI,User Interface - the means by which users interact with a computer or application,UI,UX
-U,UX,User Experience - the overall experience a person has when using a product,UX,UI
-V,Viewport,The visible area of a web page on a user's device,,Responsive
-W,Wireframe,A basic structural blueprint showing the layout of a webpage or app,,Prototype
-X,XML,eXtensible Markup Language - a markup language for storing and transporting data,XML,
-Y,YAML,YAML Ain't Markup Language - a human-readable data serialization standard,YAML,
 Z,Z-index,A CSS property that controls the stacking order of elements,Z-index,CSS
+Z,Zoom,Interactive navigation control that lets users magnify content.,
