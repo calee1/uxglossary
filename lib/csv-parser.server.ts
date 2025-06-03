@@ -7,66 +7,10 @@ export interface GlossaryItem {
   term: string
   definition: string
   acronym?: string
+  seeAlso?: string
 }
 
-const SAMPLE_DATA: GlossaryItem[] = [
-  {
-    letter: "A",
-    term: "A/B Testing",
-    definition: "A method of comparing two versions of a webpage or app to determine which performs better",
-  },
-  {
-    letter: "A",
-    term: "Accessibility",
-    definition: "The practice of making websites and applications usable by people with disabilities",
-    acronym: "A11Y",
-  },
-  {
-    letter: "A",
-    term: "API",
-    definition: "Application Programming Interface - a set of rules for building software applications",
-    acronym: "API",
-  },
-  {
-    letter: "B",
-    term: "Backend",
-    definition: "The server-side of an application that handles data storage and business logic",
-  },
-  { letter: "B", term: "Bootstrap", definition: "A popular CSS framework for developing responsive websites" },
-  {
-    letter: "C",
-    term: "CSS",
-    definition: "Cascading Style Sheets - a language used to describe the presentation of web pages",
-    acronym: "CSS",
-  },
-  {
-    letter: "C",
-    term: "Component",
-    definition: "Reusable UI elements that maintain consistency across a design system",
-  },
-  {
-    letter: "D",
-    term: "Database",
-    definition: "An organized collection of structured information stored electronically",
-  },
-  {
-    letter: "D",
-    term: "Design System",
-    definition: "A collection of reusable components and guidelines for consistent design",
-  },
-  {
-    letter: "U",
-    term: "UI",
-    definition: "User Interface - the means by which users interact with a computer or application",
-    acronym: "UI",
-  },
-  {
-    letter: "U",
-    term: "UX",
-    definition: "User Experience - the overall experience a person has when using a product",
-    acronym: "UX",
-  },
-]
+// Sample data removed for brevity
 
 function parseCSVLine(line: string): string[] {
   const result: string[] = []
@@ -108,7 +52,7 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
     // Check if CSV exists
     if (!fs.existsSync(csvPath)) {
       console.log("CSV not found, using sample data")
-      return groupItemsByLetter(SAMPLE_DATA)
+      return {}
     }
 
     const csvContent = fs.readFileSync(csvPath, "utf-8")
@@ -128,11 +72,22 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
         // Clean up the values by removing quotes
         const cleanValues = values.map((val) => val.replace(/^"(.*)"$/, "$1").trim())
 
+        // Determine the letter - use the first character of the term
+        // If it's a number, use "0"
+        let letter = cleanValues[0] || ""
+
+        // If letter field is empty, use first character of term
+        if (!letter && cleanValues[1]) {
+          const firstChar = cleanValues[1].charAt(0).toUpperCase()
+          letter = /^\d/.test(firstChar) ? "0" : firstChar
+        }
+
         const item: GlossaryItem = {
-          letter: cleanValues[0] || "",
+          letter: letter.toUpperCase(),
           term: cleanValues[1] || "",
           definition: cleanValues[2] || "",
           acronym: cleanValues[3] || undefined,
+          seeAlso: cleanValues[4] || undefined,
         }
 
         // Only add if we have required fields
@@ -145,39 +100,52 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
     console.log(`Successfully parsed ${items.length} items`)
 
     if (items.length === 0) {
-      console.log("No items parsed, using sample data")
-      return groupItemsByLetter(SAMPLE_DATA)
+      console.log("No items parsed")
+      return {}
     }
 
-    return groupItemsByLetter(items)
+    // Group items by letter
+    const groupedItems: Record<string, GlossaryItem[]> = {}
+
+    items.forEach((item) => {
+      let letter = item.letter.toUpperCase()
+
+      // Handle numeric terms
+      if (/^\d/.test(item.term)) {
+        letter = "0"
+      }
+
+      if (!groupedItems[letter]) {
+        groupedItems[letter] = []
+      }
+      groupedItems[letter].push(item)
+    })
+
+    // Sort items within each letter group
+    Object.keys(groupedItems).forEach((letter) => {
+      groupedItems[letter].sort((a, b) => a.term.localeCompare(b.term))
+    })
+
+    console.log("Grouped items by letter:", Object.keys(groupedItems))
+    console.log(
+      "Items per letter:",
+      Object.fromEntries(Object.entries(groupedItems).map(([letter, items]) => [letter, items.length])),
+    )
+
+    return groupedItems
   } catch (error) {
     console.error("Error loading glossary data:", error)
-    return groupItemsByLetter(SAMPLE_DATA)
+    return {}
   }
-}
-
-function groupItemsByLetter(items: GlossaryItem[]): Record<string, GlossaryItem[]> {
-  const grouped: Record<string, GlossaryItem[]> = {}
-
-  items.forEach((item) => {
-    const letter = item.letter.toUpperCase()
-    if (!grouped[letter]) {
-      grouped[letter] = []
-    }
-    grouped[letter].push(item)
-  })
-
-  // Sort items within each letter
-  Object.keys(grouped).forEach((letter) => {
-    grouped[letter].sort((a, b) => a.term.localeCompare(b.term))
-  })
-
-  return grouped
 }
 
 export async function getGlossaryItems(): Promise<GlossaryItem[]> {
   const groupedData = await loadGlossaryData()
-  return Object.values(groupedData).flat()
+  const allItems: GlossaryItem[] = []
+  Object.values(groupedData).forEach((items) => {
+    allItems.push(...items)
+  })
+  return allItems
 }
 
 export async function getGlossaryItemsByLetter(letter: string): Promise<GlossaryItem[]> {
@@ -188,11 +156,11 @@ export async function getGlossaryItemsByLetter(letter: string): Promise<Glossary
 export async function searchGlossaryItems(query: string): Promise<GlossaryItem[]> {
   const allItems = await getGlossaryItems()
   const lowerQuery = query.toLowerCase()
-
   return allItems.filter(
     (item) =>
       item.term.toLowerCase().includes(lowerQuery) ||
       item.definition.toLowerCase().includes(lowerQuery) ||
-      (item.acronym && item.acronym.toLowerCase().includes(lowerQuery)),
+      (item.acronym && item.acronym.toLowerCase().includes(lowerQuery)) ||
+      (item.seeAlso && item.seeAlso.toLowerCase().includes(lowerQuery)),
   )
 }
