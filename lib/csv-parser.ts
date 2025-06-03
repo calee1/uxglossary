@@ -6,6 +6,7 @@ export interface GlossaryItem {
   term: string
   definition: string
   acronym?: string
+  seeAlso?: string // New field for related terms
 }
 
 export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
@@ -22,18 +23,18 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
         fs.mkdirSync(dataDir, { recursive: true })
       }
 
-      // Create a default CSV file with headers and sample data including acronyms
-      const defaultCsvContent = `letter,term,definition,acronym
-A,Algorithm,"A step-by-step procedure for solving a problem or completing a task",
-A,API,"Application Programming Interface - a set of protocols and tools for building software applications",API
-B,Backend,"The server-side of an application that handles data storage, security, and business logic",
-B,Bootstrap,"A popular CSS framework for developing responsive and mobile-first websites",
-C,Cache,"A temporary storage location that stores frequently accessed data for quick retrieval",
-C,CSS,"Cascading Style Sheets - a language used to describe the presentation of web pages",CSS
-D,Database,"An organized collection of structured information stored electronically",DB
-D,DOM,"Document Object Model - a programming interface for web documents",DOM
-E,Encryption,"The process of converting information into a secret code to prevent unauthorized access",
-E,Event,"An action or occurrence that can be detected and handled by a program",`
+      // Create a default CSV file with headers and sample data including acronyms and seeAlso
+      const defaultCsvContent = `letter,term,definition,acronym,seeAlso
+A,Algorithm,"A step-by-step procedure for solving a problem or completing a task",,
+A,API,"Application Programming Interface - a set of protocols and tools for building software applications",API,
+B,Backend,"The server-side of an application that handles data storage, security, and business logic",,Frontend
+B,Bootstrap,"A popular CSS framework for developing responsive and mobile-first websites",,
+C,Cache,"A temporary storage location that stores frequently accessed data for quick retrieval",,
+C,CSS,"Cascading Style Sheets - a language used to describe the presentation of web pages",CSS,HTML
+D,Database,"An organized collection of structured information stored electronically",DB,
+D,DOM,"Document Object Model - a programming interface for web documents",DOM,HTML
+E,Encryption,"The process of converting information into a secret code to prevent unauthorized access",,
+E,Event,"An action or occurrence that can be detected and handled by a program",,`
 
       fs.writeFileSync(csvPath, defaultCsvContent)
       console.log(`Created default glossary CSV file at: ${csvPath}`)
@@ -54,7 +55,8 @@ E,Event,"An action or occurrence that can be detected and handled by a program",
           letter: values[0].trim(),
           term: values[1].trim(),
           definition: values[2].trim(),
-          acronym: values[3]?.trim() || undefined, // Add acronym support
+          acronym: values[3]?.trim() || undefined,
+          seeAlso: values[4]?.trim() || undefined, // Add seeAlso support
         })
       }
     }
@@ -121,7 +123,8 @@ export async function searchGlossaryItems(query: string): Promise<GlossaryItem[]
     (item) =>
       item.term.toLowerCase().includes(lowerQuery) ||
       item.definition.toLowerCase().includes(lowerQuery) ||
-      (item.acronym && item.acronym.toLowerCase().includes(lowerQuery)),
+      (item.acronym && item.acronym.toLowerCase().includes(lowerQuery)) ||
+      (item.seeAlso && item.seeAlso.toLowerCase().includes(lowerQuery)),
   )
 }
 
@@ -161,9 +164,20 @@ export function parseCSV(csvContent: string): GlossaryItem[] {
         term: values[1].trim(),
         definition: values[2].trim(),
         acronym: values[3]?.trim() || undefined,
+        seeAlso: values[4]?.trim() || undefined,
       })
     }
   }
 
   return items
+}
+
+// Create a slug from a term for anchor links
+export function createTermSlug(term: string): string {
+  return term
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "") // Remove special characters
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/--+/g, "-") // Replace multiple hyphens with single hyphen
+    .replace(/^-+|-+$/g, "") // Remove leading/trailing hyphens
 }
