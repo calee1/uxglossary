@@ -12,11 +12,13 @@ interface LetterPageProps {
 }
 
 export default async function LetterPage({ params }: LetterPageProps) {
-  const letter = params.letter.toUpperCase()
-  const alphabet = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))
+  // Update the letter validation and processing:
+  const letter = params.letter === "0-9" ? "0" : params.letter.toUpperCase()
+  const displayLetter = params.letter === "0-9" ? "0-9" : params.letter.toUpperCase()
+  const alphabetWithNumbers = ["0", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))]
 
   // Validate letter
-  if (!alphabet.includes(letter)) {
+  if (!alphabetWithNumbers.includes(letter)) {
     notFound()
   }
 
@@ -74,8 +76,9 @@ export default async function LetterPage({ params }: LetterPageProps) {
           <span className="text-sm sm:text-base">{prevLetter || "Prev"}</span>
         </Link>
 
+        {/* In the center display section, update to show the display letter: */}
         <div className="text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">{letter}</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">{displayLetter}</h2>
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
             {items.length} {items.length === 1 ? "term" : "terms"}
           </p>
@@ -96,14 +99,17 @@ export default async function LetterPage({ params }: LetterPageProps) {
 
       {/* Alphabet navigation */}
       <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 lg:grid-cols-13 gap-1 sm:gap-2 justify-items-center my-4 sm:my-6 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        {alphabet.map((alphabetLetter) => {
+        {/* In the alphabet navigation section, update the mapping: */}
+        {alphabetWithNumbers.map((alphabetLetter) => {
           const hasContent = glossaryItems[alphabetLetter] && glossaryItems[alphabetLetter].length > 0
           const isCurrentLetter = alphabetLetter === letter
+          const displayLabel = alphabetLetter === "0" ? "0-9" : alphabetLetter
+          const linkPath = alphabetLetter === "0" ? "0-9" : alphabetLetter.toLowerCase()
 
           return (
             <Link
               key={alphabetLetter}
-              href={hasContent ? `/letter/${alphabetLetter.toLowerCase()}` : "#"}
+              href={hasContent ? `/letter/${linkPath}` : "#"}
               className={`
                 px-2 sm:px-3 py-1 rounded text-xs sm:text-sm transition-all duration-200 whitespace-nowrap
                 ${
@@ -115,7 +121,7 @@ export default async function LetterPage({ params }: LetterPageProps) {
                 }
               `}
             >
-              {alphabetLetter}
+              {displayLabel}
             </Link>
           )
         })}

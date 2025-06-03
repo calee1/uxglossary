@@ -63,7 +63,13 @@ E,Event,"An action or occurrence that can be detected and handled by a program",
     const groupedItems: Record<string, GlossaryItem[]> = {}
 
     items.forEach((item) => {
-      const letter = item.letter.toUpperCase()
+      let letter = item.letter.toUpperCase()
+
+      // Group all numeric terms under "0"
+      if (/^\d/.test(item.term)) {
+        letter = "0"
+      }
+
       if (!groupedItems[letter]) {
         groupedItems[letter] = []
       }

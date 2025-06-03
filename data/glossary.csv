@@ -1,4 +1,5 @@
 letter,term,definition,acronym
+0,4-color printing,Printing in CMYK or full-color,
 A,A/B Testing,A method of comparing two versions of a webpage or app to determine which performs better by showing different versions to different users,
 A,Above-the-fold,"The portion of a webpage that is visible without scrolling, derived from newspaper terminology",
 A,Absolute Positioning,A CSS positioning method where an element is positioned relative to its nearest positioned ancestor,

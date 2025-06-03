@@ -11,6 +11,12 @@ export default async function HomePage() {
   // Check if we have any glossary items
   const hasGlossaryItems = Object.keys(glossaryItems).length > 0
 
+  // Calculate if all letters have content
+  const allLettersHaveContent = Object.keys(glossaryItems).length === 26
+
+  // Create alphabet array with 0-9 first, then A-Z
+  const alphabetWithNumbers = ["0", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))]
+
   return (
     <main className="max-w-4xl mx-auto p-4 sm:p-6 border border-gray-200 dark:border-gray-700 rounded-lg my-4 sm:my-8 bg-white dark:bg-gray-800 transition-colors">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
@@ -61,12 +67,14 @@ export default async function HomePage() {
 
       {/* Alphabet navigation grid - more responsive */}
       <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 lg:grid-cols-13 gap-2 sm:gap-4 justify-center my-6 sm:my-8">
-        {alphabet.map((letter) => {
+        {alphabetWithNumbers.map((letter) => {
           const hasContent = glossaryItems[letter] && glossaryItems[letter].length > 0
+          const displayLabel = letter === "0" ? "0-9" : letter
+
           return (
             <Link
               key={letter}
-              href={hasContent ? `/letter/${letter.toLowerCase()}` : "#"}
+              href={hasContent ? `/letter/${letter === "0" ? "0-9" : letter.toLowerCase()}` : "#"}
               className={`
                 text-center p-2 sm:p-4 border-2 rounded-lg transition-all duration-200
                 ${
@@ -76,7 +84,7 @@ export default async function HomePage() {
                 }
               `}
             >
-              <div className="text-xl sm:text-2xl font-bold">{letter}</div>
+              <div className="text-xl sm:text-2xl font-bold">{displayLabel}</div>
               {hasContent && (
                 <div className="text-xs mt-1 whitespace-nowrap">
                   {glossaryItems[letter].length} {glossaryItems[letter].length === 1 ? "term" : "terms"}
@@ -89,16 +97,29 @@ export default async function HomePage() {
 
       {/* Statistics */}
       <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">
-          Glossary Statistics
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-          <div className="p-2">
-            <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {Object.keys(glossaryItems).length}
+        <div className="flex items-baseline gap-2 mb-3 sm:mb-4">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Glossary Statistics</h2>
+          <span className="text-xs sm:text-sm italic text-gray-500 dark:text-gray-400">
+            (Last updated:{" "}
+            {new Date().toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+            )
+          </span>
+        </div>
+        <div
+          className={`grid grid-cols-1 gap-4 text-center ${allLettersHaveContent ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}
+        >
+          {!allLettersHaveContent && (
+            <div className="p-2">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
+                {Object.keys(glossaryItems).length}
+              </div>
+              <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Letters with content</div>
             </div>
-            <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Letters with content</div>
-          </div>
+          )}
           <div className="p-2">
             <div className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
               {Object.values(glossaryItems).reduce((total, items) => total + items.length, 0)}
