@@ -547,6 +547,7 @@ P,Pull Request,A method of submitting code changes for review before merging,PR
 Q,Qualitative User Research,Research that focuses on understanding user behaviors and motivations,
 Q,Qualtrics,A platform for creating and distributing surveys and collecting data,
 Q,Quantitative User Research,Research that focuses on measuring and quantifying user behaviors,
+R,RACI,"A matrix that defines roles and responsibilities: Responsible, Accountable, Consulted, Informed",RACI
 R,Radio Button,A UI control that allows users to select one option from a group,
 R,Radio Group,A collection of radio buttons where only one can be selected,
 R,Rainstorming,A brainstorming technique that focuses on generating ideas without criticism,
@@ -561,7 +562,6 @@ R,Recency Bias,The tendency to give more weight to recent events or information,
 R,Redlining,The process of marking up designs with specifications for development,
 R,Refactoring,Restructuring existing code without changing its external behavior,
 R,Refinement,The agile practice of adding detail and estimates to backlog items,
-R,Remote,Work or testing conducted from different locations,
 R,Remote Testing,Usability testing conducted with participants in different locations,
 R,Repository,"A storage location for code, documents, or research data",
 R,Requirements,Specifications that define what a system should do,
@@ -572,7 +572,6 @@ R,Research Plan,A document outlining the objectives and methods for a research s
 R,Research Strategy,A high-level approach to conducting research,
 R,Resizable,Elements that can be adjusted in size by users,
 R,Response Time,The time it takes for a system to respond to user input,
-R,Responsible Accountable Consulted Informed,A matrix that defines roles and responsibilities,RACI
 R,Responsive Breakpoints,Specific screen widths where responsive designs change their layout to accommodate different devices,
 R,Responsive Design,Design that adapts to different screen sizes and devices,
 R,Retention,The ability to keep users engaged with a product over time,
