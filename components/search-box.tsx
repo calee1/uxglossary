@@ -11,7 +11,7 @@ interface SearchBoxProps {
   glossaryItems: Record<string, GlossaryItem[]>
 }
 
-export function SearchBox({ glossaryItems }: SearchBoxProps) {
+export function SearchBox({ glossaryItems = {} }: SearchBoxProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [suggestions, setSuggestions] = useState<GlossaryItem[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -20,21 +20,43 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Memoize the flattened glossary items to prevent recalculation on every render
-  const allItems = useMemo(() => Object.values(glossaryItems).flat(), [glossaryItems])
+  // Add proper null checks and default values
+  const allItems = useMemo(() => {
+    if (!glossaryItems || typeof glossaryItems !== "object") {
+      return []
+    }
+
+    try {
+      return Object.values(glossaryItems).flat().filter(Boolean)
+    } catch (error) {
+      console.error("Error flattening glossary items:", error)
+      return []
+    }
+  }, [glossaryItems])
 
   // Update suggestions when search term changes
   useEffect(() => {
-    if (searchTerm.length > 0) {
-      const filtered = allItems
-        .filter(
-          (item) =>
-            item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.definition.toLowerCase().includes(searchTerm.toLowerCase()),
-        )
-        .slice(0, 8) // Limit to 8 suggestions
-      setSuggestions(filtered)
-      setShowSuggestions(true)
-      setSelectedIndex(-1)
+    if (searchTerm.length > 0 && allItems.length > 0) {
+      try {
+        const filtered = allItems
+          .filter(
+            (item) =>
+              item &&
+              item.term &&
+              item.definition &&
+              (item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.definition.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (item.acronym && item.acronym.toLowerCase().includes(searchTerm.toLowerCase()))),
+          )
+          .slice(0, 8) // Limit to 8 suggestions
+        setSuggestions(filtered)
+        setShowSuggestions(true)
+        setSelectedIndex(-1)
+      } catch (error) {
+        console.error("Error filtering suggestions:", error)
+        setSuggestions([])
+        setShowSuggestions(false)
+      }
     } else {
       setSuggestions([])
       setShowSuggestions(false)
@@ -81,7 +103,9 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
   }
 
   const navigateToTerm = (item: GlossaryItem) => {
-    const letter = item.letter.toLowerCase()
+    if (!item || !item.term) return
+
+    const letter = item.letter?.toLowerCase() || item.term.charAt(0).toLowerCase()
     window.location.href = `/letter/${letter}#${item.term.toLowerCase().replace(/\s+/g, "-")}`
   }
 
@@ -94,27 +118,43 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
 
   // Memoize the filtered results count to prevent recalculation on every render
   const totalMatchCount = useMemo(() => {
-    if (!searchTerm) return 0
-    return allItems.filter(
-      (item) =>
-        item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.definition.toLowerCase().includes(searchTerm.toLowerCase()),
-    ).length
+    if (!searchTerm || allItems.length === 0) return 0
+
+    try {
+      return allItems.filter(
+        (item) =>
+          item &&
+          item.term &&
+          item.definition &&
+          (item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.definition.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (item.acronym && item.acronym.toLowerCase().includes(searchTerm.toLowerCase()))),
+      ).length
+    } catch (error) {
+      console.error("Error counting matches:", error)
+      return 0
+    }
   }, [searchTerm, allItems])
 
   const highlightMatch = (text: string, query: string) => {
-    if (!query) return text
-    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi")
-    const parts = text.split(regex)
-    return parts.map((part, index) =>
-      regex.test(part) ? (
-        <mark key={index} className="bg-yellow-200 dark:bg-yellow-800 px-1 rounded">
-          {part}
-        </mark>
-      ) : (
-        part
-      ),
-    )
+    if (!query || !text) return text
+
+    try {
+      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi")
+      const parts = text.split(regex)
+      return parts.map((part, index) =>
+        regex.test(part) ? (
+          <mark key={index} className="bg-yellow-200 dark:bg-yellow-800 px-1 rounded">
+            {part}
+          </mark>
+        ) : (
+          part
+        ),
+      )
+    } catch (error) {
+      console.error("Error highlighting text:", error)
+      return text
+    }
   }
 
   return (
@@ -151,7 +191,7 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
         <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-80 sm:max-h-96 overflow-y-auto">
           {suggestions.map((item, index) => (
             <button
-              key={`${item.letter}-${item.term}`}
+              key={`${item.letter}-${item.term}-${index}`}
               onClick={() => navigateToTerm(item)}
               className={`w-full text-left px-3 sm:px-4 py-2 sm:py-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors ${
                 index === selectedIndex ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700" : ""
@@ -159,19 +199,26 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-gray-900 dark:text-gray-100 mb-1 text-sm sm:text-base">
+                  <div className="font-semibold text-gray-900 dark:text-gray-100 mb-1 text-sm sm:text-base flex items-center gap-2">
                     {highlightMatch(item.term, searchTerm)}
+                    {item.acronym && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        {item.acronym}
+                      </span>
+                    )}
                   </div>
                   <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                     {highlightMatch(
-                      item.definition.length > 100 ? item.definition.substring(0, 100) + "..." : item.definition,
+                      item.definition && item.definition.length > 100
+                        ? item.definition.substring(0, 100) + "..."
+                        : item.definition || "",
                       searchTerm,
                     )}
                   </div>
                 </div>
                 <div className="ml-2 sm:ml-3 flex-shrink-0">
                   <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                    {item.letter}
+                    {item.letter || item.term?.charAt(0)?.toUpperCase() || "?"}
                   </span>
                 </div>
               </div>
@@ -186,12 +233,21 @@ export function SearchBox({ glossaryItems }: SearchBoxProps) {
       )}
 
       {/* No results message */}
-      {showSuggestions && searchTerm && suggestions.length === 0 && (
+      {showSuggestions && searchTerm && suggestions.length === 0 && allItems.length > 0 && (
         <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
           <div className="px-3 sm:px-4 py-4 sm:py-6 text-center text-gray-500 dark:text-gray-400">
             <Search className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
             <p className="text-xs sm:text-sm">No terms found for "{searchTerm}"</p>
             <p className="text-xs mt-1">Try a different search term or browse by letter below</p>
+          </div>
+        </div>
+      )}
+
+      {/* Loading state */}
+      {allItems.length === 0 && (
+        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
+          <div className="px-3 sm:px-4 py-4 sm:py-6 text-center text-gray-500 dark:text-gray-400">
+            <p className="text-xs sm:text-sm">Loading glossary data...</p>
           </div>
         </div>
       )}

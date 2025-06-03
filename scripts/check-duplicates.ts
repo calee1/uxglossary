@@ -1,107 +1,88 @@
 import fs from "fs"
 import path from "path"
+import { parse } from "csv-parse/sync"
 
 interface GlossaryItem {
-  letter: string
+  id: string
   term: string
   definition: string
+  acronym?: string
+  category?: string
 }
 
-// Parse CSV line handling quoted fields
-function parseCSVLine(line: string): string[] {
-  const result: string[] = []
-  let current = ""
-  let inQuotes = false
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i]
-
-    if (char === '"') {
-      inQuotes = !inQuotes
-    } else if (char === "," && !inQuotes) {
-      result.push(current)
-      current = ""
-    } else {
-      current += char
-    }
-  }
-
-  result.push(current)
-  return result
-}
-
-// Main function to check for duplicates
 async function checkDuplicates() {
   try {
-    console.log("Checking for duplicate terms in the glossary...")
+    const csvFilePath = path.join(process.cwd(), "data/glossary.csv")
+    const fileContent = fs.readFileSync(csvFilePath, "utf8")
 
-    // Load CSV file
-    const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
-    if (!fs.existsSync(csvPath)) {
-      console.error("CSV file not found at:", csvPath)
-      return
-    }
+    const records = parse(fileContent, {
+      columns: true,
+      skip_empty_lines: true,
+      trim: true,
+    }) as GlossaryItem[]
 
-    const csvContent = fs.readFileSync(csvPath, "utf-8")
-    const lines = csvContent.trim().split("\n")
+    // Check for duplicate terms
+    const terms = new Map<string, GlossaryItem[]>()
 
-    // Skip header row
-    const dataLines = lines.slice(1)
+    records.forEach((record) => {
+      const term = record.term.toLowerCase()
+      if (!terms.has(term)) {
+        terms.set(term, [])
+      }
+      terms.get(term)!.push(record)
+    })
 
-    // Parse all items
-    const items: GlossaryItem[] = []
-    for (const line of dataLines) {
-      if (!line.trim()) continue
+    // Check for duplicate acronyms
+    const acronyms = new Map<string, GlossaryItem[]>()
 
-      const values = parseCSVLine(line)
-      if (values.length >= 3) {
-        items.push({
-          letter: values[0].trim(),
-          term: values[1].trim(),
-          definition: values[2].trim(),
+    records.forEach((record) => {
+      if (record.acronym) {
+        const acronym = record.acronym.toLowerCase()
+        if (!acronyms.has(acronym)) {
+          acronyms.set(acronym, [])
+        }
+        acronyms.get(acronym)!.push(record)
+      }
+    })
+
+    let hasDuplicates = false
+
+    // Report duplicate terms
+    for (const [term, items] of terms.entries()) {
+      if (items.length > 1) {
+        hasDuplicates = true
+        console.log(`Duplicate term found: "${term}"`)
+        items.forEach((item) => {
+          console.log(`  ID: ${item.id}, Definition: ${item.definition.substring(0, 50)}...`)
         })
       }
     }
 
-    console.log(`Loaded ${items.length} items from CSV`)
-
-    // Track unique items and duplicates
-    const seen = new Map<string, GlossaryItem[]>() // key: letter+term (lowercase), value: array of matching items
-
-    // Find duplicates
-    for (const item of items) {
-      const key = `${item.letter.toUpperCase()}:${item.term.toLowerCase()}`
-
-      if (!seen.has(key)) {
-        seen.set(key, [])
-      }
-
-      seen.get(key)!.push(item)
-    }
-
-    // Report duplicates
-    let duplicateCount = 0
-    const duplicateTerms: string[] = []
-
-    for (const [key, matchingItems] of seen.entries()) {
-      if (matchingItems.length > 1) {
-        duplicateCount++
-        duplicateTerms.push(
-          `${matchingItems[0].letter}: ${matchingItems[0].term} (${matchingItems.length} occurrences)`,
-        )
+    // Report duplicate acronyms
+    for (const [acronym, items] of acronyms.entries()) {
+      if (items.length > 1) {
+        hasDuplicates = true
+        console.log(`Duplicate acronym found: "${acronym}"`)
+        items.forEach((item) => {
+          console.log(`  ID: ${item.id}, Term: ${item.term}`)
+        })
       }
     }
 
-    if (duplicateCount === 0) {
-      console.log("✅ No duplicates found in the glossary.")
-    } else {
-      console.log(`⚠️ Found ${duplicateCount} duplicate terms in the glossary:`)
-      duplicateTerms.forEach((term) => console.log(`- ${term}`))
+    if (!hasDuplicates) {
+      console.log("No duplicates found.")
     }
+
+    return hasDuplicates
   } catch (error) {
     console.error("Error checking duplicates:", error)
+    return false
   }
 }
 
-// Execute the function
-checkDuplicates()
+// Run the function if this script is executed directly
+if (require.main === module) {
+  checkDuplicates()
+}
+
+export { checkDuplicates }

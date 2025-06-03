@@ -5,6 +5,7 @@ export interface GlossaryItem {
   letter: string
   term: string
   definition: string
+  acronym?: string
 }
 
 export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
@@ -21,18 +22,18 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
         fs.mkdirSync(dataDir, { recursive: true })
       }
 
-      // Create a default CSV file with headers and sample data
-      const defaultCsvContent = `letter,term,definition
-A,Algorithm,"A step-by-step procedure for solving a problem or completing a task"
-A,API,"Application Programming Interface - a set of protocols and tools for building software applications"
-B,Backend,"The server-side of an application that handles data storage, security, and business logic"
-B,Bootstrap,"A popular CSS framework for developing responsive and mobile-first websites"
-C,Cache,"A temporary storage location that stores frequently accessed data for quick retrieval"
-C,CSS,"Cascading Style Sheets - a language used to describe the presentation of web pages"
-D,Database,"An organized collection of structured information stored electronically"
-D,DOM,"Document Object Model - a programming interface for web documents"
-E,Encryption,"The process of converting information into a secret code to prevent unauthorized access"
-E,Event,"An action or occurrence that can be detected and handled by a program"`
+      // Create a default CSV file with headers and sample data including acronyms
+      const defaultCsvContent = `letter,term,definition,acronym
+A,Algorithm,"A step-by-step procedure for solving a problem or completing a task",
+A,API,"Application Programming Interface - a set of protocols and tools for building software applications",API
+B,Backend,"The server-side of an application that handles data storage, security, and business logic",
+B,Bootstrap,"A popular CSS framework for developing responsive and mobile-first websites",
+C,Cache,"A temporary storage location that stores frequently accessed data for quick retrieval",
+C,CSS,"Cascading Style Sheets - a language used to describe the presentation of web pages",CSS
+D,Database,"An organized collection of structured information stored electronically",DB
+D,DOM,"Document Object Model - a programming interface for web documents",DOM
+E,Encryption,"The process of converting information into a secret code to prevent unauthorized access",
+E,Event,"An action or occurrence that can be detected and handled by a program",`
 
       fs.writeFileSync(csvPath, defaultCsvContent)
       console.log(`Created default glossary CSV file at: ${csvPath}`)
@@ -40,7 +41,7 @@ E,Event,"An action or occurrence that can be detected and handled by a program"`
 
     const csvContent = fs.readFileSync(csvPath, "utf-8")
 
-    // Rest of the function remains the same
+    // Parse CSV content
     const lines = csvContent.trim().split("\n")
     const headers = lines[0].split(",")
 
@@ -53,6 +54,7 @@ E,Event,"An action or occurrence that can be detected and handled by a program"`
           letter: values[0].trim(),
           term: values[1].trim(),
           definition: values[2].trim(),
+          acronym: values[3]?.trim() || undefined, // Add acronym support
         })
       }
     }
@@ -87,6 +89,36 @@ export async function loadLetterData(letter: string): Promise<GlossaryItem[]> {
   return allData[letter.toUpperCase()] || []
 }
 
+// Get all glossary items as a flat array
+export async function getGlossaryItems(): Promise<GlossaryItem[]> {
+  const groupedData = await loadGlossaryData()
+  const allItems: GlossaryItem[] = []
+
+  Object.values(groupedData).forEach((items) => {
+    allItems.push(...items)
+  })
+
+  return allItems
+}
+
+// Get glossary items by letter
+export async function getGlossaryItemsByLetter(letter: string): Promise<GlossaryItem[]> {
+  return loadLetterData(letter)
+}
+
+// Search glossary items
+export async function searchGlossaryItems(query: string): Promise<GlossaryItem[]> {
+  const allItems = await getGlossaryItems()
+  const lowerQuery = query.toLowerCase()
+
+  return allItems.filter(
+    (item) =>
+      item.term.toLowerCase().includes(lowerQuery) ||
+      item.definition.toLowerCase().includes(lowerQuery) ||
+      (item.acronym && item.acronym.toLowerCase().includes(lowerQuery)),
+  )
+}
+
 // Simple CSV line parser that handles quoted fields
 function parseCSVLine(line: string): string[] {
   const result: string[] = []
@@ -108,4 +140,24 @@ function parseCSVLine(line: string): string[] {
 
   result.push(current)
   return result
+}
+
+// Export parseCSV function for admin use
+export function parseCSV(csvContent: string): GlossaryItem[] {
+  const lines = csvContent.trim().split("\n")
+  const items: GlossaryItem[] = []
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = parseCSVLine(lines[i])
+    if (values.length >= 3) {
+      items.push({
+        letter: values[0].trim(),
+        term: values[1].trim(),
+        definition: values[2].trim(),
+        acronym: values[3]?.trim() || undefined,
+      })
+    }
+  }
+
+  return items
 }

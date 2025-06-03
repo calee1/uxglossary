@@ -11,11 +11,15 @@ interface LetterSearchProps {
   onFilteredItemsChange: (filteredItems: GlossaryItem[], searchTerm: string) => void
 }
 
-export function LetterSearch({ items, onFilteredItemsChange }: LetterSearchProps) {
+export function LetterSearch({ items = [], onFilteredItemsChange }: LetterSearchProps) {
   const [searchTerm, setSearchTerm] = useState("")
 
   // Filter items based on search term
   const filteredItems = useMemo(() => {
+    if (!items || !Array.isArray(items)) {
+      return []
+    }
+
     if (!searchTerm.trim()) {
       return items
     }
@@ -23,7 +27,8 @@ export function LetterSearch({ items, onFilteredItemsChange }: LetterSearchProps
     return items.filter(
       (item) =>
         item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.definition.toLowerCase().includes(searchTerm.toLowerCase()),
+        item.definition.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.acronym && item.acronym.toLowerCase().includes(searchTerm.toLowerCase())),
     )
   }, [items, searchTerm])
 
@@ -42,6 +47,8 @@ export function LetterSearch({ items, onFilteredItemsChange }: LetterSearchProps
     }
   }
 
+  const itemCount = items?.length || 0
+
   return (
     <div className="relative w-full max-w-2xl mx-auto mb-6 sm:mb-8">
       <div className="relative">
@@ -50,7 +57,7 @@ export function LetterSearch({ items, onFilteredItemsChange }: LetterSearchProps
         </div>
         <Input
           type="text"
-          placeholder={`Search ${items.length} terms on this page...`}
+          placeholder={`Search ${itemCount} terms on this page...`}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -74,11 +81,11 @@ export function LetterSearch({ items, onFilteredItemsChange }: LetterSearchProps
         <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
           {filteredItems.length === 0 ? (
             <span className="text-red-600 dark:text-red-400">No terms found for "{searchTerm}" on this page</span>
-          ) : filteredItems.length === items.length ? (
-            <span>Showing all {items.length} terms</span>
+          ) : filteredItems.length === itemCount ? (
+            <span>Showing all {itemCount} terms</span>
           ) : (
             <span>
-              Showing {filteredItems.length} of {items.length} terms matching "{searchTerm}"
+              Showing {filteredItems.length} of {itemCount} terms matching "{searchTerm}"
             </span>
           )}
         </div>

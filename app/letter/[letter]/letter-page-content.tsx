@@ -1,10 +1,9 @@
 "use client"
 
 import { useState, useCallback } from "react"
+import type { GlossaryItem } from "@/lib/csv-parser"
 import { LetterSearch } from "@/components/letter-search"
 import { HighlightedText } from "@/components/highlighted-text"
-import type { GlossaryItem } from "@/lib/csv-parser"
-import Link from "next/link"
 
 interface LetterPageContentProps {
   items: GlossaryItem[]
@@ -15,58 +14,55 @@ export function LetterPageContent({ items, letter }: LetterPageContentProps) {
   const [filteredItems, setFilteredItems] = useState<GlossaryItem[]>(items)
   const [searchTerm, setSearchTerm] = useState("")
 
-  const handleFilteredItemsChange = useCallback((filtered: GlossaryItem[], term: string) => {
-    setFilteredItems(filtered)
-    setSearchTerm(term)
+  const handleFilteredItemsChange = useCallback((newFilteredItems: GlossaryItem[], newSearchTerm: string) => {
+    setFilteredItems(newFilteredItems)
+    setSearchTerm(newSearchTerm)
   }, [])
+
+  if (!items || items.length === 0) {
+    return (
+      <div className="text-center py-8 sm:py-12">
+        <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300">No terms found for letter "{letter}".</p>
+      </div>
+    )
+  }
 
   return (
     <>
-      {/* Search box - now functional */}
+      {/* Search functionality */}
       <LetterSearch items={items} onFilteredItemsChange={handleFilteredItemsChange} />
 
-      {/* Content */}
-      <div className="mt-6 sm:mt-8">
-        {filteredItems.length === 0 ? (
-          <div className="text-center py-8 sm:py-12">
-            {searchTerm ? (
-              <div>
-                <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg mb-2">
-                  No terms found matching "{searchTerm}" on this page
-                </p>
-                <p className="text-gray-400 dark:text-gray-500 text-sm">
-                  Try a different search term or clear the search to see all {items.length} terms
-                </p>
-              </div>
-            ) : items.length === 0 ? (
-              <div>
-                <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg">
-                  No terms found for letter "{letter}"
-                </p>
-                <Link href="/" className="text-blue-500 dark:text-blue-400 hover:underline mt-3 sm:mt-4 inline-block">
-                  ← Back to main glossary
-                </Link>
-              </div>
-            ) : null}
+      {/* Terms list */}
+      <div className="space-y-4 sm:space-y-6">
+        {filteredItems.map((item, index) => (
+          <div
+            key={`${item.term}-${index}`}
+            className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+                <HighlightedText text={item.term} searchTerm={searchTerm} />
+                {item.acronym && (
+                  <span className="ml-2 text-sm font-normal text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded">
+                    <HighlightedText text={item.acronym} searchTerm={searchTerm} />
+                  </span>
+                )}
+              </h3>
+            </div>
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              <HighlightedText text={item.definition} searchTerm={searchTerm} />
+            </p>
           </div>
-        ) : (
-          <div className="space-y-4 sm:space-y-6">
-            {filteredItems.map((item, index) => (
-              <div
-                key={`${letter}-${index}`}
-                className="border-l-4 border-blue-200 dark:border-blue-600 pl-4 sm:pl-6 py-2"
-              >
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">
-                  <HighlightedText text={item.term} searchTerm={searchTerm} />
-                </h3>
-                <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-                  <HighlightedText text={item.definition} searchTerm={searchTerm} />
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
+        ))}
       </div>
+
+      {filteredItems.length === 0 && searchTerm && (
+        <div className="text-center py-8 sm:py-12">
+          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300">
+            No terms found matching "{searchTerm}" in letter "{letter}".
+          </p>
+        </div>
+      )}
     </>
   )
 }

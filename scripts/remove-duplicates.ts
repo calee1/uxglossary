@@ -1,130 +1,91 @@
 import fs from "fs"
 import path from "path"
+import { parse } from "csv-parse/sync"
+import { stringify } from "csv-stringify/sync"
 
 interface GlossaryItem {
-  letter: string
+  id: string
   term: string
   definition: string
+  acronym?: string
+  category?: string
 }
 
-// Parse CSV line handling quoted fields
-function parseCSVLine(line: string): string[] {
-  const result: string[] = []
-  let current = ""
-  let inQuotes = false
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i]
-
-    if (char === '"') {
-      inQuotes = !inQuotes
-    } else if (char === "," && !inQuotes) {
-      result.push(current)
-      current = ""
-    } else {
-      current += char
-    }
-  }
-
-  result.push(current)
-  return result
-}
-
-// Convert item to CSV line with proper escaping
-function itemToCSVLine(item: GlossaryItem): string {
-  const escapedDefinition =
-    item.definition.includes(",") || item.definition.includes('"') || item.definition.includes("\n")
-      ? `"${item.definition.replace(/"/g, '""')}"`
-      : item.definition
-
-  return `${item.letter},${item.term},${escapedDefinition}`
-}
-
-// Main function to remove duplicates
 async function removeDuplicates() {
   try {
-    console.log("Starting duplicate removal process...")
+    const csvFilePath = path.join(process.cwd(), "data/glossary.csv")
+    const fileContent = fs.readFileSync(csvFilePath, "utf8")
 
-    // Load CSV file
-    const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
-    if (!fs.existsSync(csvPath)) {
-      console.error("CSV file not found at:", csvPath)
-      return
-    }
+    const records = parse(fileContent, {
+      columns: true,
+      skip_empty_lines: true,
+      trim: true,
+    }) as GlossaryItem[]
 
-    const csvContent = fs.readFileSync(csvPath, "utf-8")
-    const lines = csvContent.trim().split("\n")
+    // Track terms we've seen
+    const seenTerms = new Map<string, string>() // term -> id
+    const seenAcronyms = new Map<string, string>() // acronym -> id
+    const uniqueRecords: GlossaryItem[] = []
+    const removedRecords: GlossaryItem[] = []
 
-    // Skip header row
-    const headerLine = lines[0]
-    const dataLines = lines.slice(1)
+    for (const record of records) {
+      const term = record.term.toLowerCase()
+      const acronym = record.acronym?.toLowerCase()
 
-    // Parse all items
-    const items: GlossaryItem[] = []
-    for (const line of dataLines) {
-      if (!line.trim()) continue
+      // Check if we've seen this term before
+      if (seenTerms.has(term)) {
+        console.log(`Removing duplicate term: "${record.term}" (ID: ${record.id})`)
+        removedRecords.push(record)
+        continue
+      }
 
-      const values = parseCSVLine(line)
-      if (values.length >= 3) {
-        items.push({
-          letter: values[0].trim(),
-          term: values[1].trim(),
-          definition: values[2].trim(),
-        })
+      // Check if we've seen this acronym before (only if it exists)
+      if (acronym && seenAcronyms.has(acronym)) {
+        console.log(`Removing duplicate acronym: "${record.acronym}" (ID: ${record.id})`)
+        removedRecords.push(record)
+        continue
+      }
+
+      // This is a unique record
+      uniqueRecords.push(record)
+      seenTerms.set(term, record.id)
+      if (acronym) {
+        seenAcronyms.set(acronym, record.id)
       }
     }
 
-    console.log(`Loaded ${items.length} items from CSV`)
+    // Create backup of original file
+    const backupPath = `${csvFilePath}.backup-${Date.now()}`
+    fs.copyFileSync(csvFilePath, backupPath)
+    console.log(`Backup created at: ${backupPath}`)
 
-    // Track unique items and duplicates
-    const uniqueItems: GlossaryItem[] = []
-    const duplicates: GlossaryItem[] = []
-    const seen = new Map<string, number>() // key: letter+term (lowercase), value: index in uniqueItems
-
-    // Find duplicates
-    for (const item of items) {
-      const key = `${item.letter.toUpperCase()}:${item.term.toLowerCase()}`
-
-      if (seen.has(key)) {
-        duplicates.push(item)
-        console.log(`Found duplicate: ${item.letter} - ${item.term}`)
-      } else {
-        seen.set(key, uniqueItems.length)
-        uniqueItems.push(item)
-      }
-    }
-
-    console.log(`Found ${duplicates.length} duplicates`)
-
-    if (duplicates.length === 0) {
-      console.log("No duplicates found. No changes needed.")
-      return
-    }
-
-    // Sort items by letter and term
-    uniqueItems.sort((a, b) => {
-      if (a.letter !== b.letter) {
-        return a.letter.localeCompare(b.letter)
-      }
-      return a.term.localeCompare(b.term)
+    // Write the unique records back to the CSV file
+    const csvData = stringify(uniqueRecords, {
+      header: true,
+      columns: ["id", "term", "definition", "acronym", "category"],
     })
 
-    // Create new CSV content
-    let newCsvContent = headerLine + "\n"
-    for (const item of uniqueItems) {
-      newCsvContent += itemToCSVLine(item) + "\n"
+    fs.writeFileSync(csvFilePath, csvData, "utf8")
+
+    console.log(`Removed ${removedRecords.length} duplicate entries.`)
+    console.log(`Kept ${uniqueRecords.length} unique entries.`)
+
+    return {
+      removed: removedRecords,
+      kept: uniqueRecords,
     }
-
-    // Write back to file
-    fs.writeFileSync(csvPath, newCsvContent)
-
-    console.log(`Successfully removed ${duplicates.length} duplicates. New item count: ${uniqueItems.length}`)
-    console.log("Duplicates removed:")
-    duplicates.forEach((item) => console.log(`- ${item.letter}: ${item.term}`))
   } catch (error) {
     console.error("Error removing duplicates:", error)
+    return {
+      removed: [],
+      kept: [],
+    }
   }
 }
 
-// Execute the function
-removeDuplicates()
+// Run the function if this script is executed directly
+if (require.main === module) {
+  removeDuplicates()
+}
+
+export { removeDuplicates }
