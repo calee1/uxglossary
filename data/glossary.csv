@@ -430,7 +430,7 @@ L,Loss Aversion,The tendency to prefer avoiding losses over acquiring equivalent
 L,Low-fidelity,"Prototypes or designs with basic, simplified appearance and functionality",
 L,Lowercase,Text written in small letters rather than capital letters,
 M,Machine Learning,AI that enables computers to learn and improve from experience,ML
-M,macOS,A Unix-based operating system developed and marketed by Apple since 2001 for Mac computers (previously OS X and originally Mac OS X),macOS
+M,macOS,Apple's operating system for Mac computers,macOS
 M,Margin,The space outside the border of an element,
 M,Market Research,The process of gathering information about target markets and customers,
 M,Market-fit,The degree to which a product satisfies market demand,
@@ -444,7 +444,6 @@ M,Message Testing,Research method to evaluate the effectiveness of communication
 M,Metadata,Data that provides information about other data,
 M,Micro Copy,Small pieces of text that guide users through interactions,
 M,Micro Interaction,"Small, contained product moments that accomplish a single task",
-M,Micro-interactions,Small,
 M,Microsoft Blend,A user interface design tool for creating web and desktop applications,
 M,Mind Map,A visual representation of information showing relationships between concepts,
 M,Mind Mapping,The process of creating visual diagrams to organize information,
