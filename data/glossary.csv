@@ -8,6 +8,7 @@ A,Accessibility,The practice of making websites and applications usable by peopl
 A,Accessibility Audit,A systematic evaluation of a product's accessibility compliance and usability for people with disabilities,
 A,Accessibility Evaluation,The process of testing and assessing how well a product meets accessibility standards and guidelines,
 A,Accessibility Training,Education programs designed to teach teams about inclusive design and accessibility best practices,
+A,Accessible Rich Internet Applications,"A  set of HTML attributes designed to improve the accessibility of web content for users with disabilities, particularly those who rely on assistive technologies like screen readers.",ARIA
 A,Accordion Component,A UI element that allows users to expand and collapse content sections to save space,
 A,Acrobat Adobe,Adobe's PDF creation and editing software suite,
 A,Active Listening,A communication technique that involves fully concentrating on and understanding what users are saying,
@@ -43,7 +44,6 @@ A,API Design,Creating user-friendly application programming interfaces that are 
 A,Applet,A small application designed to perform a specific function within a larger program,
 A,Application,A software program designed to perform specific tasks for users,
 A,Application Programming Interface,A set of rules and protocols that allows different software programs to communicate and exchange data,API
-A,ARIA,"Accessible Rich Internet Applications, a set of attributes that define ways to make web content more accessible",ARIA
 A,Artificial General Intelligence,AI that matches or exceeds human cognitive abilities across all domains,AGI
 A,Artificial Intelligence,Computer systems that can perform tasks typically requiring human intelligence,AI
 A,Artificial Intelligence Optimization,The process of improving AI systems for better performance and efficiency,AIO
