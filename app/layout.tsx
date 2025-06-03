@@ -5,8 +5,8 @@ import { Copyright } from "lucide-react"
 import { ThemeProvider } from "@/components/theme-provider"
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
+  title: "UX Glossary",
+  description: "A comprehensive glossary of UX terms and definitions",
   generator: "v0.dev",
 }
 
@@ -18,10 +18,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 transition-colors">
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950 transition-colors">
             <div className="flex-grow">{children}</div>
-            <footer className="py-4 px-6 border-t border-gray-200 dark:border-gray-700 flex items-center justify-center gap-1.5 text-sm text-gray-900 dark:text-gray-100">
+            <footer className="py-4 px-6 border-t border-gray-200 dark:border-gray-800 flex items-center justify-center gap-1.5 text-sm text-gray-900 dark:text-gray-100">
               <Copyright className="h-4 w-4 text-gray-500 dark:text-gray-400" />
               <span>
                 copyright{" "}

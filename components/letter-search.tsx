@@ -8,7 +8,7 @@ import type { GlossaryItem } from "@/lib/csv-parser"
 
 interface LetterSearchProps {
   items: GlossaryItem[]
-  onFilteredItemsChange: (filteredItems: GlossaryItem[], searchTerm: string) => void
+  onFilteredItemsChange?: (filteredItems: GlossaryItem[], searchTerm: string) => void
 }
 
 export function LetterSearch({ items = [], onFilteredItemsChange }: LetterSearchProps) {
@@ -28,13 +28,16 @@ export function LetterSearch({ items = [], onFilteredItemsChange }: LetterSearch
       (item) =>
         item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.definition.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item.acronym && item.acronym.toLowerCase().includes(searchTerm.toLowerCase())),
+        (item.acronym && item.acronym.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.seeAlso && item.seeAlso.toLowerCase().includes(searchTerm.toLowerCase())),
     )
   }, [items, searchTerm])
 
   // Update parent component when filtered items change
   useEffect(() => {
-    onFilteredItemsChange(filteredItems, searchTerm)
+    if (onFilteredItemsChange) {
+      onFilteredItemsChange(filteredItems, searchTerm)
+    }
   }, [filteredItems, searchTerm, onFilteredItemsChange])
 
   const clearSearch = () => {

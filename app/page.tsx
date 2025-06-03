@@ -4,9 +4,16 @@ import { SearchBox } from "@/components/search-box"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export default async function HomePage() {
-  // Load glossary data to see which letters have content
-  const glossaryItems = await loadGlossaryData()
-  const alphabet = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))
+  // Load glossary data with error handling
+  let glossaryItems: Record<string, any[]> = {}
+
+  try {
+    const data = await loadGlossaryData()
+    glossaryItems = data || {}
+  } catch (error) {
+    console.error("Failed to load glossary data:", error)
+    glossaryItems = {}
+  }
 
   // Check if we have any glossary items
   const hasGlossaryItems = Object.keys(glossaryItems).length > 0
@@ -53,7 +60,7 @@ export default async function HomePage() {
       </div>
 
       {/* Search Box */}
-      <SearchBox glossaryItems={glossaryItems} />
+      <SearchBox />
 
       {!hasGlossaryItems && (
         <div className="p-4 sm:p-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg mb-6 sm:mb-8">
@@ -68,7 +75,8 @@ export default async function HomePage() {
       {/* Alphabet navigation grid - more responsive */}
       <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 lg:grid-cols-13 gap-2 sm:gap-4 justify-center my-6 sm:my-8">
         {alphabetWithNumbers.map((letter) => {
-          const hasContent = glossaryItems[letter] && glossaryItems[letter].length > 0
+          const hasContent =
+            glossaryItems[letter] && Array.isArray(glossaryItems[letter]) && glossaryItems[letter].length > 0
           const displayLabel = letter === "0" ? "0-9" : letter
 
           return (
@@ -122,15 +130,20 @@ export default async function HomePage() {
           )}
           <div className="p-2">
             <div className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
-              {Object.values(glossaryItems).reduce((total, items) => total + items.length, 0)}
+              {Object.values(glossaryItems).reduce(
+                (total, items) => total + (Array.isArray(items) ? items.length : 0),
+                0,
+              )}
             </div>
             <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Total terms</div>
           </div>
           <div className="p-2">
             <div className="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400">
               {Math.round(
-                Object.values(glossaryItems).reduce((total, items) => total + items.length, 0) /
-                  Math.max(1, Object.keys(glossaryItems).length),
+                Object.values(glossaryItems).reduce(
+                  (total, items) => total + (Array.isArray(items) ? items.length : 0),
+                  0,
+                ) / Math.max(1, Object.keys(glossaryItems).length),
               )}
             </div>
             <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Average terms per letter</div>

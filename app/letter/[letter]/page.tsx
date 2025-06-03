@@ -128,7 +128,7 @@ export default async function LetterPage({ params }: LetterPageProps) {
       </div>
 
       {/* Client-side content with search functionality */}
-      <LetterPageContent items={items} letter={letter} />
+      <LetterPageContent items={items} letter={letter} allItems={glossaryItems} />
 
       {/* Navigation footer */}
       <div className="flex justify-between items-center mt-8 sm:mt-12 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
