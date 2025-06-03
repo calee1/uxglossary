@@ -584,7 +584,6 @@ R,Right-aligned,Text alignment where text is aligned to the right margin,
 R,Roadmap,A strategic plan showing the direction and progress of a product,
 R,Rowspan,An HTML attribute specifying how many rows a table cell should span,
 S,Sample Size,The number of participants in a research study,
-S,SASS,"Syntactically Awesome Style Sheets, a CSS preprocessor",SASS
 S,Scannability,How easily users can quickly scan and understand content,
 S,Scenario,A narrative describing how users might interact with a product,
 S,Screen Flow,The sequence of screens users navigate through in an application,
