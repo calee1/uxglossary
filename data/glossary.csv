@@ -585,7 +585,6 @@ R,Roadmap,A strategic plan showing the direction and progress of a product,
 R,Rowspan,An HTML attribute specifying how many rows a table cell should span,
 S,Sample Size,The number of participants in a research study,
 S,SASS,"Syntactically Awesome Style Sheets, a CSS preprocessor",SASS
-S,Sassy CSS,"A powerful extension of CSS that introduces features like variables, nesting, and mixins, making it easier to write and maintain complex stylesheets",SCSS
 S,Scannability,How easily users can quickly scan and understand content,
 S,Scenario,A narrative describing how users might interact with a product,
 S,Screen Flow,The sequence of screens users navigate through in an application,
@@ -594,7 +593,6 @@ S,Screener,A survey used to identify qualified research participants,
 S,Scroll Area,A region where content can be scrolled to view additional information,
 S,Scrolling,Moving through content that extends beyond the visible area,
 S,Scrum,An agile framework for managing product development,
-S,SDK,"Software Development Kit, tools for building applications",SDK
 S,Search,The function that allows users to find specific content or information,
 S,Search Filter,Options that narrow down search results based on criteria,
 S,Secondary Colors,Colors created by mixing two primary colors,
@@ -618,6 +616,7 @@ S,Slider,A UI control that allows users to select a value from a range,
 S,Smart TV,A television with integrated internet and interactive features,
 S,Software,Computer programs and applications,
 S,Software as a Service,Cloud-based software delivery model,SaaS
+S,Software Development Kit,Tools for building applications,SDK
 S,Software-as-a-Service,A software delivery model where applications are hosted in the cloud,
 S,Sort Ascending,Arranging data from lowest to highest value,
 S,Sort Descending,Arranging data from highest to lowest value,
