@@ -17,7 +17,6 @@ export default async function HomePage() {
         <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-3">
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">UX Glossary</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 italic mt-1">work in progress - June 2025</p>
           </div>
           <span className="text-base sm:text-lg mt-1 md:mt-0 text-gray-900 dark:text-gray-100">
             By:{" "}
