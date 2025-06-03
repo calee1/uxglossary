@@ -10,102 +10,87 @@ export interface GlossaryItem {
   seeAlso?: string
 }
 
-// Sample data removed for brevity
-
 function parseCSVLine(line: string): string[] {
   const result: string[] = []
   let current = ""
   let inQuotes = false
-  let i = 0
 
-  while (i < line.length) {
+  for (let i = 0; i < line.length; i++) {
     const char = line[i]
 
     if (char === '"') {
       if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
         // Handle escaped quotes
         current += '"'
-        i += 2
+        i++ // Skip next quote
       } else {
         // Toggle quote state
         inQuotes = !inQuotes
-        i++
       }
     } else if (char === "," && !inQuotes) {
       result.push(current.trim())
       current = ""
-      i++
     } else {
       current += char
-      i++
     }
   }
 
   result.push(current.trim())
-  return result
+  return result.map((val) => val.replace(/^"(.*)"$/, "$1"))
 }
 
 export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
   try {
     const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
 
-    // Check if CSV exists
     if (!fs.existsSync(csvPath)) {
-      console.log("CSV not found, using sample data")
+      console.log("CSV file not found at:", csvPath)
       return {}
     }
 
     const csvContent = fs.readFileSync(csvPath, "utf-8")
     const lines = csvContent.trim().split("\n")
-    const items: GlossaryItem[] = []
 
-    console.log(`Processing ${lines.length} lines from CSV`)
+    console.log(`CSV has ${lines.length} lines`)
+
+    if (lines.length < 2) {
+      console.log("CSV file is empty or has no data rows")
+      return {}
+    }
+
+    const items: GlossaryItem[] = []
 
     // Skip header row (index 0)
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim()
-      if (!line) continue // Skip empty lines
+      if (!line) continue
 
-      const values = parseCSVLine(line)
+      try {
+        const values = parseCSVLine(line)
 
-      if (values.length >= 3) {
-        // Clean up the values by removing quotes
-        const cleanValues = values.map((val) => val.replace(/^"(.*)"$/, "$1").trim())
+        if (values.length >= 3) {
+          const item: GlossaryItem = {
+            letter: values[0] || "",
+            term: values[1] || "",
+            definition: values[2] || "",
+            acronym: values[3] || undefined,
+            seeAlso: values[4] || undefined,
+          }
 
-        // Determine the letter - use the first character of the term
-        // If it's a number, use "0"
-        let letter = cleanValues[0] || ""
-
-        // If letter field is empty, use first character of term
-        if (!letter && cleanValues[1]) {
-          const firstChar = cleanValues[1].charAt(0).toUpperCase()
-          letter = /^\d/.test(firstChar) ? "0" : firstChar
+          // Only add if we have the essential fields
+          if (item.letter && item.term && item.definition) {
+            items.push(item)
+          }
         }
-
-        const item: GlossaryItem = {
-          letter: letter.toUpperCase(),
-          term: cleanValues[1] || "",
-          definition: cleanValues[2] || "",
-          acronym: cleanValues[3] || undefined,
-          seeAlso: cleanValues[4] || undefined,
-        }
-
-        // Only add if we have required fields
-        if (item.letter && item.term && item.definition) {
-          items.push(item)
-        }
+      } catch (error) {
+        console.error(`Error parsing line ${i}:`, error)
       }
     }
 
-    console.log(`Successfully parsed ${items.length} items`)
+    console.log(`Parsed ${items.length} items from CSV`)
 
-    if (items.length === 0) {
-      console.log("No items parsed")
-      return {}
-    }
-
-    // Group items by letter
-    const groupedItems: Record<string, GlossaryItem[]> = {}
+    // Group by letter
+    const grouped: Record<string, GlossaryItem[]> = {}
 
     items.forEach((item) => {
       let letter = item.letter.toUpperCase()
@@ -115,42 +100,41 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
         letter = "0"
       }
 
-      if (!groupedItems[letter]) {
-        groupedItems[letter] = []
+      if (!grouped[letter]) {
+        grouped[letter] = []
       }
-      groupedItems[letter].push(item)
+      grouped[letter].push(item)
     })
 
-    // Sort items within each letter group
-    Object.keys(groupedItems).forEach((letter) => {
-      groupedItems[letter].sort((a, b) => a.term.localeCompare(b.term))
+    // Sort within each group
+    Object.keys(grouped).forEach((letter) => {
+      grouped[letter].sort((a, b) => a.term.localeCompare(b.term))
     })
 
-    console.log("Grouped items by letter:", Object.keys(groupedItems))
     console.log(
-      "Items per letter:",
-      Object.fromEntries(Object.entries(groupedItems).map(([letter, items]) => [letter, items.length])),
+      "Final grouping:",
+      Object.keys(grouped)
+        .map((k) => `${k}: ${grouped[k].length}`)
+        .join(", "),
     )
 
-    return groupedItems
+    return grouped
   } catch (error) {
-    console.error("Error loading glossary data:", error)
+    console.error("Error in loadGlossaryData:", error)
     return {}
   }
 }
 
 export async function getGlossaryItems(): Promise<GlossaryItem[]> {
   const groupedData = await loadGlossaryData()
-  const allItems: GlossaryItem[] = []
-  Object.values(groupedData).forEach((items) => {
-    allItems.push(...items)
-  })
-  return allItems
+  return Object.values(groupedData).flat()
 }
 
 export async function getGlossaryItemsByLetter(letter: string): Promise<GlossaryItem[]> {
   const allData = await loadGlossaryData()
-  return allData[letter.toUpperCase()] || []
+  const items = allData[letter.toUpperCase()] || []
+  console.log(`getGlossaryItemsByLetter(${letter}) returning ${items.length} items`)
+  return items
 }
 
 export async function searchGlossaryItems(query: string): Promise<GlossaryItem[]> {
