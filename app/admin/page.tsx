@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import { DialogTrigger } from "@/components/ui/dialog"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -8,291 +8,620 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { toast } from "@/components/ui/use-toast"
-import type { GlossaryItem } from "@/lib/csv-parser"
 import { DiagnosticPanel } from "./diagnostic-panel"
 import { DownloadButton } from "./download-button"
 import { SetupWizard } from "./setup-wizard"
+import Link from "next/link"
+import { LogOut, Plus, Edit, Trash2, Search, CheckCircle } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+interface GlossaryItem2 {
+  letter: string
+  term: string
+  definition: string
+  acronym?: string
+}
 
 export default function AdminPage() {
+  const [isLoading, setIsLoading] = useState(true)
+  const [items, setItems] = useState<GlossaryItem2[]>([])
+  const [filteredItems, setFilteredItems] = useState<GlossaryItem2[]>([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedLetter, setSelectedLetter] = useState("all")
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [editingItem, setEditingItem] = useState<GlossaryItem2 | null>(null)
+  const [editingIndex, setEditingIndex] = useState(-1)
+  const [letterCounts, setLetterCounts] = useState<Record<string, number>>({})
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const [debugInfo, setDebugInfo] = useState<any>(null)
+  const [showSetupWizard, setShowSetupWizard] = useState(false)
+  const [githubConfigured, setGithubConfigured] = useState(false)
   const router = useRouter()
-  const [items, setItems] = useState<GlossaryItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [currentItem, setCurrentItem] = useState<GlossaryItem | null>(null)
-  const [isSetupComplete, setIsSetupComplete] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
+
+  // Form state
+  const [newItem, setNewItem] = useState<GlossaryItem2>({
+    letter: "A",
+    term: "",
+    definition: "",
+    acronym: "",
+  })
 
   useEffect(() => {
-    checkAuth()
-    fetchGlossaryItems()
-  }, [])
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/admin/check-auth")
-      if (!res.ok) {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/admin/check-auth")
+        if (!response.ok) {
+          router.push("/admin/login")
+        } else {
+          setIsLoading(false)
+          await checkGitHubSetup()
+          loadGlossaryItems()
+        }
+      } catch (error) {
+        console.error("Auth check error:", error)
         router.push("/admin/login")
       }
-    } catch (error) {
-      console.error("Auth check failed:", error)
-      router.push("/admin/login")
     }
-  }
 
-  const fetchGlossaryItems = async () => {
+    checkAuth()
+  }, [router])
+
+  const checkGitHubSetup = async () => {
     try {
-      setLoading(true)
-      const res = await fetch("/api/admin/glossary-items")
-      if (!res.ok) {
-        throw new Error("Failed to fetch glossary items")
+      const response = await fetch("/api/admin/debug")
+      const data = await response.json()
+
+      // Check if GitHub is properly configured
+      const hasToken = data.environment?.hasGithubToken
+      const hasRepo = data.environment?.githubRepo
+      const repoAccessOk = data.tests?.repoAccess?.ok
+
+      const isConfigured = hasToken && hasRepo && repoAccessOk
+      setGithubConfigured(isConfigured)
+
+      if (!isConfigured) {
+        setShowSetupWizard(true)
       }
-      const data = await res.json()
-      setItems(data.items || [])
-      setIsSetupComplete(true)
     } catch (error) {
-      console.error("Error fetching glossary items:", error)
-      setError("Failed to load glossary items")
-      setIsSetupComplete(false)
-    } finally {
-      setLoading(false)
+      console.error("GitHub setup check failed:", error)
+      setShowSetupWizard(true)
     }
   }
 
-  const handleAddItem = () => {
-    setCurrentItem({
-      id: "",
-      term: "",
-      definition: "",
-      acronym: "",
-      category: "",
-    })
-    setIsEditing(false)
-    setIsDialogOpen(true)
-  }
-
-  const handleEditItem = (item: GlossaryItem) => {
-    setCurrentItem(item)
-    setIsEditing(true)
-    setIsDialogOpen(true)
-  }
-
-  const handleDeleteItem = async (item: GlossaryItem) => {
-    if (!confirm(`Are you sure you want to delete "${item.term}"?`)) {
-      return
-    }
-
+  const loadGlossaryItems = async () => {
     try {
-      const res = await fetch("/api/admin/glossary-items", {
-        method: "POST",
+      console.log("Fetching glossary items...")
+      const response = await fetch("/api/admin/glossary-items", {
+        cache: "no-store",
         headers: {
-          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
         },
-        body: JSON.stringify({
-          action: "delete",
-          item,
-        }),
       })
 
-      if (!res.ok) {
-        throw new Error("Failed to delete item")
+      console.log("Response status:", response.status)
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log("Received data:", data)
+
+        setItems(data)
+        setFilteredItems(data)
+        setLoadError(null)
+
+        // Calculate letter counts
+        const counts: Record<string, number> = {}
+        data.forEach((item: GlossaryItem2) => {
+          counts[item.letter] = (counts[item.letter] || 0) + 1
+        })
+        setLetterCounts(counts)
+
+        console.log(`Successfully loaded ${data.length} glossary items`)
+      } else {
+        const errorText = await response.text()
+        console.error("Failed to load items:", response.status, errorText)
+        setLoadError(`Failed to load items: ${response.status} - ${errorText}`)
       }
-
-      toast({
-        title: "Success",
-        description: `"${item.term}" has been deleted.`,
-      })
-
-      fetchGlossaryItems()
     } catch (error) {
-      console.error("Error deleting item:", error)
-      toast({
-        title: "Error",
-        description: "Failed to delete item.",
-        variant: "destructive",
-      })
+      console.error("Error loading items:", error)
+      setLoadError(`Error loading items: ${error instanceof Error ? error.message : "Unknown error"}`)
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!currentItem) return
+  useEffect(() => {
+    let filtered = items
 
-    try {
-      const action = isEditing ? "update" : "add"
-      const res = await fetch("/api/admin/glossary-items", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action,
-          item: currentItem,
-        }),
-      })
-
-      if (!res.ok) {
-        throw new Error(`Failed to ${action} item`)
-      }
-
-      toast({
-        title: "Success",
-        description: `"${currentItem.term}" has been ${isEditing ? "updated" : "added"}.`,
-      })
-
-      setIsDialogOpen(false)
-      fetchGlossaryItems()
-    } catch (error) {
-      console.error(`Error ${isEditing ? "updating" : "adding"} item:`, error)
-      toast({
-        title: "Error",
-        description: `Failed to ${isEditing ? "update" : "add"} item.`,
-        variant: "destructive",
-      })
+    if (selectedLetter !== "all") {
+      filtered = filtered.filter((item) => item.letter === selectedLetter)
     }
-  }
+
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (item) =>
+          item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.definition.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (item.acronym && item.acronym.toLowerCase().includes(searchTerm.toLowerCase())),
+      )
+    }
+
+    setFilteredItems(filtered)
+  }, [items, searchTerm, selectedLetter])
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/admin/logout")
-      router.push("/admin/login")
+      await fetch("/api/admin/logout", { method: "POST" })
+      router.push("/")
     } catch (error) {
-      console.error("Logout failed:", error)
+      console.error("Logout error:", error)
     }
   }
 
-  if (!isSetupComplete) {
-    return <SetupWizard onComplete={() => setIsSetupComplete(true)} />
+  const runDebugTest = async () => {
+    try {
+      const response = await fetch("/api/admin/debug")
+      const data = await response.json()
+      setDebugInfo(data)
+      console.log("Debug info:", data)
+    } catch (error) {
+      console.error("Debug error:", error)
+      alert("Debug failed - check console for details")
+    }
   }
 
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>
+  const handleSetupComplete = () => {
+    setShowSetupWizard(false)
+    setGithubConfigured(true)
+    loadGlossaryItems()
   }
 
-  if (error) {
+  const handleAddItem = async () => {
+    if (!newItem.term || !newItem.definition) {
+      alert("Please fill in both term and definition")
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      const response = await fetch("/api/admin/glossary-items", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newItem),
+      })
+
+      const responseData = await response.json()
+
+      if (response.ok) {
+        // Wait a moment for GitHub to process the change
+        setTimeout(async () => {
+          await loadGlossaryItems()
+          setNewItem({ letter: "A", term: "", definition: "", acronym: "" })
+          setIsAddDialogOpen(false)
+          setIsSaving(false)
+          alert("Item added successfully and saved to repository!")
+        }, 2000)
+      } else {
+        setIsSaving(false)
+        alert(`Error adding item: ${responseData.error || "Unknown error"}`)
+        if (responseData.details) {
+          console.error("Error details:", responseData.details)
+        }
+      }
+    } catch (error) {
+      setIsSaving(false)
+      console.error("Error adding item:", error)
+      alert("Error adding item")
+    }
+  }
+
+  const handleEditItem = async () => {
+    if (!editingItem?.term || !editingItem?.definition) {
+      alert("Please fill in both term and definition")
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      const response = await fetch("/api/admin/glossary-items", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ index: editingIndex, item: editingItem }),
+      })
+
+      if (response.ok) {
+        // Wait a moment for GitHub to process the change
+        setTimeout(async () => {
+          await loadGlossaryItems()
+          setEditingItem(null)
+          setEditingIndex(-1)
+          setIsEditDialogOpen(false)
+          setIsSaving(false)
+          alert("Item updated successfully and saved to repository!")
+        }, 2000)
+      } else {
+        setIsSaving(false)
+        const errorData = await response.json()
+        alert(`Error updating item: ${errorData.error || "Unknown error"}`)
+      }
+    } catch (error) {
+      setIsSaving(false)
+      console.error("Error updating item:", error)
+      alert("Error updating item")
+    }
+  }
+
+  const handleDeleteItem = async (index: number, term: string) => {
+    if (!confirm(`Are you sure you want to delete "${term}"?`)) {
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      const response = await fetch("/api/admin/glossary-items", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ index }),
+      })
+
+      if (response.ok) {
+        // Wait a moment for GitHub to process the change
+        setTimeout(async () => {
+          await loadGlossaryItems()
+          setIsSaving(false)
+          alert("Item deleted successfully and saved to repository!")
+        }, 2000)
+      } else {
+        setIsSaving(false)
+        const errorData = await response.json()
+        alert(`Error deleting item: ${errorData.error || "Unknown error"}`)
+      }
+    } catch (error) {
+      setIsSaving(false)
+      console.error("Error deleting item:", error)
+      alert("Error deleting item")
+    }
+  }
+
+  const openEditDialog = (item: GlossaryItem2, index: number) => {
+    setEditingItem({ ...item })
+    setEditingIndex(index)
+    setIsEditDialogOpen(true)
+  }
+
+  if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <p className="text-red-500 mb-4">{error}</p>
-        <Button onClick={fetchGlossaryItems}>Retry</Button>
+      <div className="max-w-4xl mx-auto p-6 text-center">
+        <p>Loading admin panel...</p>
       </div>
     )
   }
 
-  return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Glossary Admin</h1>
-        <div className="flex gap-2">
-          <DownloadButton />
-          <Button variant="outline" onClick={handleLogout}>
+  // Show setup wizard if GitHub isn't configured
+  if (showSetupWizard) {
+    return (
+      <main className="max-w-6xl mx-auto p-4 md:p-6 my-8">
+        <div className="flex justify-between items-center mb-6">
+          <Link href="/" className="text-blue-500 hover:underline text-sm">
+            ← Back to UX Glossary
+          </Link>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+          >
+            <LogOut className="h-4 w-4 mr-1" />
             Logout
           </Button>
         </div>
+
+        <SetupWizard onComplete={handleSetupComplete} />
+      </main>
+    )
+  }
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
+  const nonEmptyLetters = letters.filter((letter) => letterCounts[letter] > 0)
+  const totalTerms = items.length
+  const avgTermsPerLetter = nonEmptyLetters.length > 0 ? Math.round(totalTerms / nonEmptyLetters.length) : 0
+
+  return (
+    <main className="max-w-4xl mx-auto p-4 sm:p-6 my-4 sm:my-8">
+      <div className="flex justify-between items-center mb-6">
+        <Link href="/" className="text-blue-500 hover:underline text-sm">
+          ← Back to UX Glossary
+        </Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleLogout}
+          className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+        >
+          <LogOut className="h-4 w-4 mr-1" />
+          Logout
+        </Button>
       </div>
 
-      <div className="mb-6">
-        <Button onClick={handleAddItem}>Add New Term</Button>
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">Admin Panel</h1>
+        <p className="text-gray-600 dark:text-gray-300">Manage your UX Glossary content and settings.</p>
       </div>
 
+      {/* GitHub Integration Status */}
+      <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <h3 className="font-semibold text-green-800 dark:text-green-300">GitHub Integration Active</h3>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => setShowSetupWizard(true)}>
+            Reconfigure
+          </Button>
+        </div>
+        <p className="text-sm text-green-700 dark:text-green-400 mt-1">
+          Changes are automatically saved to your GitHub repository.
+        </p>
+      </div>
+
+      {/* Add the DiagnosticPanel here */}
+      <DiagnosticPanel />
+
+      {/* Saving Indicator */}
+      {isSaving && (
+        <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          <div className="flex items-center gap-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600 dark:border-yellow-400"></div>
+            <span className="text-yellow-800 dark:text-yellow-300 font-medium">Saving changes to repository...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Actions */}
+      <div className="grid gap-4 md:gap-6 md:grid-cols-3 mb-8">
+        <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-green-800 dark:text-green-300 text-lg">Quick Add</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+                  disabled={isSaving}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add New Term
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Add New Glossary Term</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium dark:text-gray-200">Term</label>
+                    <Input
+                      value={newItem.term}
+                      onChange={(e) => {
+                        const term = e.target.value
+                        const letter = term.charAt(0).toUpperCase() || "A"
+                        setNewItem({ ...newItem, term, letter })
+                      }}
+                      placeholder="Enter term name"
+                      disabled={isSaving}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium dark:text-gray-200">Acronym (optional)</label>
+                    <Input
+                      value={newItem.acronym || ""}
+                      onChange={(e) => setNewItem({ ...newItem, acronym: e.target.value })}
+                      placeholder="Enter acronym (e.g., API, UX, HCI)"
+                      disabled={isSaving}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium dark:text-gray-200">Definition</label>
+                    <Textarea
+                      value={newItem.definition}
+                      onChange={(e) => setNewItem({ ...newItem, definition: e.target.value })}
+                      placeholder="Enter definition"
+                      rows={3}
+                      disabled={isSaving}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} disabled={isSaving}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleAddItem} className="flex-1" disabled={isSaving}>
+                      {isSaving ? "Saving..." : "Add Term"}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-blue-800 dark:text-blue-300 text-lg">Download CSV</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DownloadButton />
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-gray-800 dark:text-gray-200 text-lg">Stats</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{nonEmptyLetters.length}</div>
+                <div className="text-gray-600 dark:text-gray-300 text-sm">Letters</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">{totalTerms}</div>
+                <div className="text-gray-600 dark:text-gray-300 text-sm">Total Terms</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{avgTermsPerLetter}</div>
+                <div className="text-gray-600 dark:text-gray-300 text-sm">Avg/Letter</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Search and Filter */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Glossary Items ({items.length})</CardTitle>
+          <CardTitle className="text-lg dark:text-gray-100">Manage Existing Terms</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Term</TableHead>
-                  <TableHead>Acronym</TableHead>
-                  <TableHead>Definition</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.id}</TableCell>
-                    <TableCell>{item.term}</TableCell>
-                    <TableCell>{item.acronym || "-"}</TableCell>
-                    <TableCell className="max-w-md truncate">{item.definition}</TableCell>
-                    <TableCell>{item.category || "-"}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handleEditItem(item)}>
-                          Edit
-                        </Button>
-                        <Button variant="destructive" size="sm" onClick={() => handleDeleteItem(item)}>
-                          Delete
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+          <div className="flex flex-col md:flex-row gap-4 mb-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+              <Input
+                placeholder="Search terms, definitions, or acronyms..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={selectedLetter} onValueChange={setSelectedLetter}>
+              <SelectTrigger className="w-full md:w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Letters</SelectItem>
+                {letters.map((letter) => (
+                  <SelectItem key={letter} value={letter}>
+                    {letter} {letterCounts[letter] ? `(${letterCounts[letter]})` : ""}
+                  </SelectItem>
                 ))}
-              </TableBody>
-            </Table>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Items List */}
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {filteredItems.length > 0 ? (
+              filteredItems.map((item, index) => {
+                const originalIndex = items.findIndex((i) => i.term === item.term && i.letter === item.letter)
+                return (
+                  <div
+                    key={`${item.letter}-${item.term}-${index}`}
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded font-medium">
+                          {item.letter}
+                        </span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100 truncate">{item.term}</span>
+                        {item.acronym && (
+                          <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded font-medium">
+                            {item.acronym}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{item.definition}</p>
+                    </div>
+                    <div className="flex gap-2 ml-4">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openEditDialog(item, originalIndex)}
+                        disabled={isSaving}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeleteItem(originalIndex, item.term)}
+                        className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                        disabled={isSaving}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )
+              })
+            ) : (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                {items.length === 0 ? (
+                  <div>
+                    <p className="mb-2">No glossary terms found.</p>
+                    <p className="text-sm">Add your first term using the "Add New Term" button above.</p>
+                  </div>
+                ) : (
+                  <p>No terms found matching your search criteria.</p>
+                )}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      <DiagnosticPanel />
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{isEditing ? "Edit Term" : "Add New Term"}</DialogTitle>
+            <DialogTitle>Edit Glossary Term</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid w-full items-center gap-2">
-              <Label htmlFor="term">Term</Label>
-              <Input
-                id="term"
-                value={currentItem?.term || ""}
-                onChange={(e) => setCurrentItem((prev) => (prev ? { ...prev, term: e.target.value } : null))}
-                required
-              />
+          {editingItem && (
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium dark:text-gray-200">Term</label>
+                <Input
+                  value={editingItem.term}
+                  onChange={(e) => {
+                    const term = e.target.value
+                    const letter = term.charAt(0).toUpperCase() || editingItem.letter
+                    setEditingItem({ ...editingItem, term, letter })
+                  }}
+                  placeholder="Enter term name"
+                  disabled={isSaving}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium dark:text-gray-200">Acronym (optional)</label>
+                <Input
+                  value={editingItem.acronym || ""}
+                  onChange={(e) => setEditingItem({ ...editingItem, acronym: e.target.value })}
+                  placeholder="Enter acronym (e.g., API, UX, HCI)"
+                  disabled={isSaving}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium dark:text-gray-200">Definition</label>
+                <Textarea
+                  value={editingItem.definition}
+                  onChange={(e) => setEditingItem({ ...editingItem, definition: e.target.value })}
+                  placeholder="Enter definition"
+                  rows={3}
+                  disabled={isSaving}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} disabled={isSaving}>
+                  Cancel
+                </Button>
+                <Button onClick={handleEditItem} className="flex-1" disabled={isSaving}>
+                  {isSaving ? "Saving..." : "Update Term"}
+                </Button>
+              </div>
             </div>
-            <div className="grid w-full items-center gap-2">
-              <Label htmlFor="acronym">Acronym (optional)</Label>
-              <Input
-                id="acronym"
-                value={currentItem?.acronym || ""}
-                onChange={(e) => setCurrentItem((prev) => (prev ? { ...prev, acronym: e.target.value } : null))}
-              />
-            </div>
-            <div className="grid w-full items-center gap-2">
-              <Label htmlFor="definition">Definition</Label>
-              <Textarea
-                id="definition"
-                value={currentItem?.definition || ""}
-                onChange={(e) => setCurrentItem((prev) => (prev ? { ...prev, definition: e.target.value } : null))}
-                required
-                rows={5}
-              />
-            </div>
-            <div className="grid w-full items-center gap-2">
-              <Label htmlFor="category">Category (optional)</Label>
-              <Input
-                id="category"
-                value={currentItem?.category || ""}
-                onChange={(e) => setCurrentItem((prev) => (prev ? { ...prev, category: e.target.value } : null))}
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">{isEditing ? "Update" : "Add"}</Button>
-            </div>
-          </form>
+          )}
         </DialogContent>
       </Dialog>
-    </div>
+    </main>
   )
 }
