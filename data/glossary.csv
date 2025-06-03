@@ -126,7 +126,6 @@ B,Byte,A unit of digital information consisting of 8 bits,
 C,Cache,Temporary storage that keeps frequently accessed data for quick retrieval,
 C,Call to Action,A prompt that encourages users to take a specific action,CTA
 C,Cannibalization,When a new product reduces sales of an existing product from the same company,
-C,CAPTCHA,A security feature that verifies human users by presenting challenges difficult for bots,CAPTCHA
 C,Caption,"Descriptive text that accompanies an image, video, or other media",
 C,Carbon Copy,An email feature that sends copies to additional recipients,CC
 C,Card,A UI component that groups related information in a contained format,
@@ -177,6 +176,7 @@ C,Commits,Saved changes to a code repository with a descriptive message,
 C,Competitor Analysis,The process of evaluating competitors' strengths and weaknesses,
 C,Competitor Benchmarking,Comparing your product's performance against competitors' products,
 C,Complementary Colors,Colors that are opposite each other on the color wheel,
+C,Completely Automated Public Turing test to tell Computers and Humans Apart,A challenge-response test used in computing to determine whether a user is a human or a computer,CAPTCHA
 C,Component Library,A collection of reusable UI components with defined standards for consistent implementation across products,
 C,Component State,"The various conditions a UI component can be in, such as hover or selected",
 C,Component Variants,Different versions of a UI component for different use cases,
