@@ -514,7 +514,6 @@ export default function AdminPage() {
               filteredItems.map((item, index) => {
                 const originalIndex = items.findIndex((i) => i.term === item.term && i.letter === item.letter)
                 const isTermTruncated = item.term.length > 30
-                const isDefinitionTruncated = item.definition.length > 100
 
                 return (
                   <div
@@ -538,12 +537,7 @@ export default function AdminPage() {
                           </span>
                         )}
                       </div>
-                      <p
-                        className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2"
-                        title={isDefinitionTruncated ? item.definition : undefined}
-                      >
-                        {item.definition}
-                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{item.definition}</p>
                     </div>
                     <div className="flex gap-2 ml-4">
                       <Button
