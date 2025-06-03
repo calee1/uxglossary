@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
-import { getGlossaryItems } from "@/lib/csv-parser"
 
 export async function GET() {
   try {
+    // Dynamic import to avoid build-time issues
+    const { getGlossaryItems } = await import("@/lib/csv-parser.server")
     const items = await getGlossaryItems()
     return NextResponse.json(items)
   } catch (error) {

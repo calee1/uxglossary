@@ -2,10 +2,16 @@
 
 import { useState, useCallback } from "react"
 import Link from "next/link"
-import type { GlossaryItem } from "@/lib/csv-parser"
 import { LetterSearch } from "@/components/letter-search"
 import { HighlightedText } from "@/components/highlighted-text"
-import { createTermSlug } from "@/lib/csv-parser"
+
+interface GlossaryItem {
+  letter: string
+  term: string
+  definition: string
+  acronym?: string
+  seeAlso?: string
+}
 
 interface LetterPageContentProps {
   items: GlossaryItem[]
@@ -21,6 +27,16 @@ export function LetterPageContent({ items, letter, allItems = {} }: LetterPageCo
     setFilteredItems(newFilteredItems)
     setSearchTerm(newSearchTerm)
   }, [])
+
+  // Function to create term slug
+  const createTermSlug = (term: string): string => {
+    return term
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/--+/g, "-")
+      .replace(/^-+|-+$/g, "")
+  }
 
   // Function to check if a term exists in the glossary
   const findTermInGlossary = (termName: string): { letter: string; slug: string } | null => {
@@ -78,7 +94,7 @@ export function LetterPageContent({ items, letter, allItems = {} }: LetterPageCo
     )
   }
 
-  const displayLetter = letter === "0-9" ? "0-9" : letter.toUpperCase()
+  const displayLetter = letter === "0" ? "0-9" : letter.toUpperCase()
 
   return (
     <>

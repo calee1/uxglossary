@@ -4,7 +4,14 @@ import type React from "react"
 import { useState, useEffect, useMemo } from "react"
 import { Input } from "@/components/ui/input"
 import { Search, X } from "lucide-react"
-import type { GlossaryItem } from "@/lib/csv-parser"
+
+interface GlossaryItem {
+  letter: string
+  term: string
+  definition: string
+  acronym?: string
+  seeAlso?: string
+}
 
 interface LetterSearchProps {
   items: GlossaryItem[]

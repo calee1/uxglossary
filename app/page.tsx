@@ -1,27 +1,22 @@
 import Link from "next/link"
-import { loadGlossaryData } from "@/lib/csv-parser"
 import { SearchBox } from "@/components/search-box"
 import { ThemeToggle } from "@/components/theme-toggle"
 
-export default async function HomePage() {
-  // Load glossary data with error handling
-  let glossaryItems: Record<string, any[]> = {}
-
+async function loadGlossaryDataSafe() {
   try {
-    const data = await loadGlossaryData()
-    glossaryItems = data || {}
+    // Dynamic import to avoid build-time issues
+    const { loadGlossaryData } = await import("@/lib/csv-parser.server")
+    return await loadGlossaryData()
   } catch (error) {
     console.error("Failed to load glossary data:", error)
-    glossaryItems = {}
+    return {}
   }
+}
 
-  // Check if we have any glossary items
+export default async function HomePage() {
+  const glossaryItems = await loadGlossaryDataSafe()
   const hasGlossaryItems = Object.keys(glossaryItems).length > 0
-
-  // Calculate if all letters have content
   const allLettersHaveContent = Object.keys(glossaryItems).length === 26
-
-  // Create alphabet array with 0-9 first, then A-Z
   const alphabetWithNumbers = ["0", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))]
 
   return (
@@ -59,7 +54,6 @@ export default async function HomePage() {
         </p>
       </div>
 
-      {/* Search Box */}
       <SearchBox />
 
       {!hasGlossaryItems && (
@@ -72,7 +66,6 @@ export default async function HomePage() {
         </div>
       )}
 
-      {/* Alphabet navigation grid - more responsive */}
       <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 lg:grid-cols-13 gap-2 sm:gap-4 justify-center my-6 sm:my-8">
         {alphabetWithNumbers.map((letter) => {
           const hasContent =
@@ -103,7 +96,6 @@ export default async function HomePage() {
         })}
       </div>
 
-      {/* Statistics */}
       <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <div className="flex items-baseline gap-2 mb-3 sm:mb-4">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Glossary Statistics</h2>

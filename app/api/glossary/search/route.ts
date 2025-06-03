@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { searchGlossaryItems } from "@/lib/csv-parser"
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,6 +9,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Query parameter 'q' is required" }, { status: 400 })
     }
 
+    // Dynamic import to avoid build-time issues
+    const { searchGlossaryItems } = await import("@/lib/csv-parser.server")
     const results = await searchGlossaryItems(query)
     return NextResponse.json(results)
   } catch (error) {

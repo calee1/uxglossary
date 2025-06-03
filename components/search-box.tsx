@@ -59,6 +59,15 @@ export function SearchBox() {
     setShowResults(false)
   }
 
+  const createTermSlug = (term: string): string => {
+    return term
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/--+/g, "-")
+      .replace(/^-+|-+$/g, "")
+  }
+
   return (
     <div className="relative w-full max-w-2xl mx-auto mb-6 sm:mb-8">
       <div className="relative">
@@ -91,18 +100,18 @@ export function SearchBox() {
               {results.slice(0, 10).map((item, index) => (
                 <Link
                   key={index}
-                  href={`/letter/${item.letter.toLowerCase()}#${item.term.toLowerCase().replace(/\s+/g, "-")}`}
+                  href={`/letter/${item.letter === "0" ? "0-9" : item.letter.toLowerCase()}#${createTermSlug(item.term)}`}
                   className="block p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors"
                   onClick={() => setShowResults(false)}
                 >
                   <div className="font-medium text-gray-900 dark:text-white">
-                    <HighlightedText text={item.term} highlight={query} />
+                    <HighlightedText text={item.term} searchTerm={query} />
                     {item.acronym && (
                       <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">({item.acronym})</span>
                     )}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
-                    <HighlightedText text={item.definition} highlight={query} />
+                    <HighlightedText text={item.definition} searchTerm={query} />
                   </div>
                 </Link>
               ))}

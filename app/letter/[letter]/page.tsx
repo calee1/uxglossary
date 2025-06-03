@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { loadGlossaryData } from "@/lib/csv-parser"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LetterPageContent } from "./letter-page-content"
@@ -11,22 +10,28 @@ interface LetterPageProps {
   }
 }
 
+async function loadGlossaryDataSafe() {
+  try {
+    const { loadGlossaryData } = await import("@/lib/csv-parser.server")
+    return await loadGlossaryData()
+  } catch (error) {
+    console.error("Failed to load glossary data:", error)
+    return {}
+  }
+}
+
 export default async function LetterPage({ params }: LetterPageProps) {
-  // Update the letter validation and processing:
   const letter = params.letter === "0-9" ? "0" : params.letter.toUpperCase()
   const displayLetter = params.letter === "0-9" ? "0-9" : params.letter.toUpperCase()
   const alphabetWithNumbers = ["0", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))]
 
-  // Validate letter
   if (!alphabetWithNumbers.includes(letter)) {
     notFound()
   }
 
-  // Load glossary data
-  const glossaryItems = await loadGlossaryData()
+  const glossaryItems = await loadGlossaryDataSafe()
   const items = glossaryItems[letter] || []
 
-  // Get previous and next letters with content
   const lettersWithContent = Object.keys(glossaryItems).sort()
   const currentIndex = lettersWithContent.indexOf(letter)
   const prevLetter = currentIndex > 0 ? lettersWithContent[currentIndex - 1] : null
@@ -34,7 +39,6 @@ export default async function LetterPage({ params }: LetterPageProps) {
 
   return (
     <main className="max-w-4xl mx-auto p-4 sm:p-6 border border-gray-200 dark:border-gray-700 rounded-lg my-4 sm:my-8 bg-white dark:bg-gray-800 transition-colors">
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-3">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">UX Glossary</h1>
@@ -62,7 +66,6 @@ export default async function LetterPage({ params }: LetterPageProps) {
         </div>
       </div>
 
-      {/* Letter navigation */}
       <div className="flex items-center justify-between mb-6">
         <Link
           href={prevLetter ? `/letter/${prevLetter.toLowerCase()}` : "#"}
@@ -76,7 +79,6 @@ export default async function LetterPage({ params }: LetterPageProps) {
           <span className="text-sm sm:text-base">{prevLetter || "Prev"}</span>
         </Link>
 
-        {/* In the center display section, update to show the display letter: */}
         <div className="text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">{displayLetter}</h2>
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
@@ -97,9 +99,7 @@ export default async function LetterPage({ params }: LetterPageProps) {
         </Link>
       </div>
 
-      {/* Alphabet navigation */}
       <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 lg:grid-cols-13 gap-1 sm:gap-2 justify-items-center my-4 sm:my-6 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        {/* In the alphabet navigation section, update the mapping: */}
         {alphabetWithNumbers.map((alphabetLetter) => {
           const hasContent = glossaryItems[alphabetLetter] && glossaryItems[alphabetLetter].length > 0
           const isCurrentLetter = alphabetLetter === letter
@@ -127,10 +127,8 @@ export default async function LetterPage({ params }: LetterPageProps) {
         })}
       </div>
 
-      {/* Client-side content with search functionality */}
       <LetterPageContent items={items} letter={letter} allItems={glossaryItems} />
 
-      {/* Navigation footer */}
       <div className="flex justify-between items-center mt-8 sm:mt-12 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
         <Link
           href={prevLetter ? `/letter/${prevLetter.toLowerCase()}` : "#"}

@@ -1,7 +1,8 @@
 export interface GlossaryItem {
+  letter: string
   term: string
   definition: string
-  category?: string
+  acronym?: string
   seeAlso?: string
 }
 
@@ -9,9 +10,11 @@ export interface GlossaryData {
   [letter: string]: GlossaryItem[]
 }
 
-export interface GlossaryStats {
-  totalTerms: number
-  totalLetters: number
-  lastUpdated: string
-  categories: number
+export function createTermSlug(term: string): string {
+  return term
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/--+/g, "-")
+    .replace(/^-+|-+$/g, "")
 }
