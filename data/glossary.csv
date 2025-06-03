@@ -28,6 +28,7 @@ A,Alignment,The arrangement of elements along a common line or edge to create vi
 A,Alpha Channel,The transparency information in an image that determines which parts are opaque or transparent,
 A,Alt Text,Alternative text. Descriptive text that provides information about images for screen readers and accessibility,
 A,Alternative Text,Descriptive text that provides information about images for screen readers and accessibility,
+A,American Standard Code for Information Interchange,A character encoding standard,ASCII
 A,Analog,Relating to or using signals or information represented by continuously variable physical quantities,
 A,Analogous Colors,Colors that are adjacent to each other on the color wheel and create harmonious color schemes,
 A,Analytics,The systematic analysis of data to gain insights about user behavior and product performance,
@@ -47,7 +48,6 @@ A,Application Programming Interface,A set of rules and protocols that allows dif
 A,Artificial General Intelligence,AI that matches or exceeds human cognitive abilities across all domains,AGI
 A,Artificial Intelligence,Computer systems that can perform tasks typically requiring human intelligence,AI
 A,Artificial Intelligence Optimization,The process of improving AI systems for better performance and efficiency,AIO
-A,ASCII,"American Standard Code for Information Interchange, a character encoding standard",ASCII
 A,Aspect Ratio,The proportional relationship between the width and height of an image or screen,
 A,Assistive Technology,Tools and devices that help people with disabilities interact with technology,AT
 A,Asynchronous,Operations that can occur independently without waiting for other operations to complete,
