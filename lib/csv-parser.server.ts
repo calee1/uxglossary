@@ -68,11 +68,44 @@ const SAMPLE_DATA: GlossaryItem[] = [
   },
 ]
 
+function parseCSVLine(line: string): string[] {
+  const result: string[] = []
+  let current = ""
+  let inQuotes = false
+  let i = 0
+
+  while (i < line.length) {
+    const char = line[i]
+
+    if (char === '"') {
+      if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
+        // Handle escaped quotes
+        current += '"'
+        i += 2
+      } else {
+        // Toggle quote state
+        inQuotes = !inQuotes
+        i++
+      }
+    } else if (char === "," && !inQuotes) {
+      result.push(current.trim())
+      current = ""
+      i++
+    } else {
+      current += char
+      i++
+    }
+  }
+
+  result.push(current.trim())
+  return result
+}
+
 export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
   try {
     const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
 
-    // Check if CSV exists, if not use sample data
+    // Check if CSV exists
     if (!fs.existsSync(csvPath)) {
       console.log("CSV not found, using sample data")
       return groupItemsByLetter(SAMPLE_DATA)
@@ -82,24 +115,41 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
     const lines = csvContent.trim().split("\n")
     const items: GlossaryItem[] = []
 
-    // Skip header row
+    console.log(`Processing ${lines.length} lines from CSV`)
+
+    // Skip header row (index 0)
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim()
-      if (!line) continue
+      if (!line) continue // Skip empty lines
 
-      const [letter, term, definition, acronym] = line.split(",").map((s) => s.trim())
+      const values = parseCSVLine(line)
 
-      if (letter && term && definition) {
-        items.push({
-          letter: letter.toUpperCase(),
-          term,
-          definition,
-          acronym: acronym || undefined,
-        })
+      if (values.length >= 3) {
+        // Clean up the values by removing quotes
+        const cleanValues = values.map((val) => val.replace(/^"(.*)"$/, "$1").trim())
+
+        const item: GlossaryItem = {
+          letter: cleanValues[0] || "",
+          term: cleanValues[1] || "",
+          definition: cleanValues[2] || "",
+          acronym: cleanValues[3] || undefined,
+        }
+
+        // Only add if we have required fields
+        if (item.letter && item.term && item.definition) {
+          items.push(item)
+        }
       }
     }
 
-    return groupItemsByLetter(items.length > 0 ? items : SAMPLE_DATA)
+    console.log(`Successfully parsed ${items.length} items`)
+
+    if (items.length === 0) {
+      console.log("No items parsed, using sample data")
+      return groupItemsByLetter(SAMPLE_DATA)
+    }
+
+    return groupItemsByLetter(items)
   } catch (error) {
     console.error("Error loading glossary data:", error)
     return groupItemsByLetter(SAMPLE_DATA)

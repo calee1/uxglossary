@@ -17,6 +17,10 @@ export default async function HomePage() {
   const hasGlossaryItems = Object.keys(glossaryItems).length > 0
   const alphabet = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))
 
+  // Add debugging
+  const totalTerms = Object.values(glossaryItems).reduce((total, items) => total + items.length, 0)
+  console.log(`Homepage: Found ${totalTerms} total terms across ${Object.keys(glossaryItems).length} letters`)
+
   return (
     <main className="max-w-4xl mx-auto p-6 border border-gray-200 dark:border-gray-700 rounded-lg my-8 bg-white dark:bg-gray-800">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
@@ -95,17 +99,12 @@ export default async function HomePage() {
             <div className="text-gray-600 dark:text-gray-300">Letters with content</div>
           </div>
           <div className="p-2">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {Object.values(glossaryItems).reduce((total, items) => total + items.length, 0)}
-            </div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{totalTerms}</div>
             <div className="text-gray-600 dark:text-gray-300">Total terms</div>
           </div>
           <div className="p-2">
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {Math.round(
-                Object.values(glossaryItems).reduce((total, items) => total + items.length, 0) /
-                  Math.max(1, Object.keys(glossaryItems).length),
-              )}
+              {Math.round(totalTerms / Math.max(1, Object.keys(glossaryItems).length))}
             </div>
             <div className="text-gray-600 dark:text-gray-300">Average terms per letter</div>
           </div>
