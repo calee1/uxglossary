@@ -430,7 +430,7 @@ L,Loss Aversion,The tendency to prefer avoiding losses over acquiring equivalent
 L,Low-fidelity,"Prototypes or designs with basic, simplified appearance and functionality",
 L,Lowercase,Text written in small letters rather than capital letters,
 M,Machine Learning,AI that enables computers to learn and improve from experience,ML
-M,macOS,A Unix-based operating system developed and marketed by Apple since 2001 for Mac computers (previously OS X and originally Mac OS X),macOS
+M,macOS,Apple's operating system for Mac computers,macOS
 M,Margin,The space outside the border of an element,
 M,Market Research,The process of gathering information about target markets and customers,
 M,Market-fit,The degree to which a product satisfies market demand,
@@ -443,8 +443,7 @@ M,Menu Bar,A horizontal bar containing menu options,
 M,Message Testing,Research method to evaluate the effectiveness of communication,
 M,Metadata,Data that provides information about other data,
 M,Micro Copy,Small pieces of text that guide users through interactions,
-M,Micro-interaction,"Small, contained product moments that accomplish a single task",
-M,Micro-interactions,Small,
+M,Micro Interaction,"Small, contained product moments that accomplish a single task",
 M,Microsoft Blend,A user interface design tool for creating web and desktop applications,
 M,Mind Map,A visual representation of information showing relationships between concepts,
 M,Mind Mapping,The process of creating visual diagrams to organize information,
@@ -455,7 +454,6 @@ M,Mobile-first Design,A design approach that starts with mobile devices and scal
 M,Mockup,A static representation of a design showing visual elements,
 M,Modal,A dialog box that requires user interaction before returning to the main interface,
 M,Moderated Testing,Usability testing conducted with a facilitator present to guide participants and ask questions,
-M,Moderated Testing,Usability testing with a facilitator guiding the session,
 M,Moderator,A person who facilitates usability testing sessions,
 M,Modes,Different states or configurations of an interface,
 M,Molecules,Groups of atoms that function together as a unit in atomic design,
