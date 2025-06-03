@@ -639,7 +639,7 @@ S,SUS,"System Usability Scale, a standardized questionnaire for measuring usabil
 S,SVG,"Scalable Vector Graphics, a vector image format for web graphics",SVG
 S,Switch,A UI control that toggles between two states,
 S,SWOT Analysis,"A strategic planning technique: Strengths, Weaknesses, Opportunities, Threats",SWOT
-S,Syntactically Awesome Style Sheets,A CSS preprocessor,SASS
+S,Syntactically Awesome Style Sheets,A preprocessor scripting language that is interpreted or compiled into CSS,SASS
 T,Tab,A UI element that allows users to switch between different views or sections,
 T,Table,A structured arrangement of data in rows and columns,
 T,Table Footer,"The bottom section of a table, often containing summary information",
