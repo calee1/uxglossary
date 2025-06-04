@@ -54,7 +54,7 @@ A,"Assistive Technology","Tools and devices that help people with disabilities i
 A,"Asynchronous","Operations that can occur independently without waiting for other operations to complete",async
 A,"Asynchronous JavaScript and XML","A web development technique that allows web pages to update content without reloading the entire page",AJAX
 A,"Atomic Design","A methodology for creating design systems by breaking interfaces down into basic building blocks: atoms",
-A,"Atoms","The smallest functional units in atomic design methodology",
+A,"Atoms","The smallest functional units in atomic design methodology, like a button or headline.",
 A,"Attribute","A characteristic or property of an HTML element that provides additional information",
 A,"Audio Player","A software component or device used to play audio files",
 A,"Augmented Reality","Technology that overlays digital information onto the real world",AR
