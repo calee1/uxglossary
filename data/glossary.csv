@@ -715,6 +715,7 @@ U,User Acceptance Testing,Testing to determine if a system meets business requir
 U,User Delight,Positive emotional responses that exceed user expectations,
 U,User Engagement,The level of involvement and interaction users have with a product,
 U,User Experience,The overall experience a person has when using a product,UX
+U,User Experience,The overall experience a person has when using a product,UX
 U,User Feedback,Information provided by users about their experience with a product,
 U,User Flow,The path taken by users to complete a task in an application,
 U,User Groups,Collections of users with similar characteristics or needs,
@@ -732,7 +733,6 @@ U,User Testing,Evaluating a product by observing real users as they attempt to u
 U,User Testing Script,A guide for conducting consistent user testing sessions,
 U,User-centered Design,A design approach that focuses on users' needs throughout the design process,UCD
 U,User-initiated Triggers,Actions that users take to start a process or interaction,
-U,UX,User Experience - the overall experience a person has when using a product,UX
 U,UX Audit,A systematic evaluation of a product's user experience,
 U,UX Debt,The accumulated usability problems that need to be addressed,
 U,UX Deliverables,The outputs and artifacts produced during the UX design process,
