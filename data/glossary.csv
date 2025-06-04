@@ -771,7 +771,7 @@ W,"Worst Idea","A brainstorming technique where participants intentionally gener
 X,"X-axis","The horizontal axis in a coordinate system or data visualization that typically represents the independent variable or categories",
 X,"XML","eXtensible Markup Language - a markup language for storing and transporting data",XML
 Y,"Y-axis","The vertical axis in a coordinate system or data visualization that typically represents the dependent variable or measured values",
-Y,"YAML","YAML Ain't Markup Language - a human-readable data serialization standard",YAML
+Y,"YAML Ain't Markup Language","A human-readable data serialization language primarily used for configuration files and data exchange",YAML
 Z,"Z-axis","The depth axis in a three-dimensional coordinate system that represents the third dimension perpendicular to both X and Y axes",
 Z,"Z-fold","A paper folding technique where the document is folded in a zigzag pattern creating multiple panels that stack on top of each other",
 Z,"Z-height","The perceived elevation or depth of an element in a user interface design system that determines its visual hierarchy and shadow effects",
