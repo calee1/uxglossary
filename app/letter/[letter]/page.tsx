@@ -29,9 +29,29 @@ export default async function LetterPage({ params }: LetterPageProps) {
   }
 
   const glossaryItems = await loadGlossaryDataSafe()
-  const items = glossaryItems[letter] || []
 
-  console.log(`Letter page for "${letter}" has ${items.length} items`)
+  // Debug: Let's see what keys are available
+  console.log(`Letter page debug:`)
+  console.log(`- Requested letter: "${letter}"`)
+  console.log(`- Available keys in data:`, Object.keys(glossaryItems))
+  console.log(`- Data for letter "${letter}":`, glossaryItems[letter]?.length || 0, "items")
+
+  // Try different ways to find the data
+  let items = glossaryItems[letter] || []
+
+  // If no items found, try lowercase
+  if (items.length === 0) {
+    items = glossaryItems[letter.toLowerCase()] || []
+    console.log(`- Tried lowercase "${letter.toLowerCase()}":`, items.length, "items")
+  }
+
+  // If still no items, let's see what we actually have
+  if (items.length === 0) {
+    console.log(
+      `- All available data:`,
+      Object.entries(glossaryItems).map(([k, v]) => `${k}: ${v.length}`),
+    )
+  }
 
   return (
     <main className="max-w-4xl mx-auto p-6 border border-gray-200 dark:border-gray-700 rounded-lg my-8 bg-white dark:bg-gray-800">
@@ -65,10 +85,33 @@ export default async function LetterPage({ params }: LetterPageProps) {
         </p>
       </div>
 
+      {/* Debug info */}
+      <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-sm">
+        <strong>Debug Info:</strong>
+        <br />
+        Requested: "{letter}" | Available keys: {Object.keys(glossaryItems).join(", ")} | Found: {items.length} items
+      </div>
+
       {items.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-lg text-gray-600 dark:text-gray-300">No terms found for letter "{displayLetter}".</p>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Debug: Looking for letter "{letter}" in data</p>
+
+          {/* Show what letters we do have */}
+          <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded">
+            <p className="text-sm font-medium mb-2">Available letters with data:</p>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {Object.entries(glossaryItems).map(([key, items]) => (
+                <Link
+                  key={key}
+                  href={`/letter/${key === "0" ? "0-9" : key.toLowerCase()}`}
+                  className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs"
+                >
+                  {key === "0" ? "0-9" : key} ({items.length})
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       ) : (
         <div className="space-y-6">
