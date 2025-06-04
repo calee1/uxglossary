@@ -9,15 +9,22 @@ interface LetterPageProps {
   }
 }
 
+// Modify the loadGlossaryDataSafe function to be more robust
+
 async function loadGlossaryDataSafe() {
   try {
+    console.log("Letter page: Starting to load glossary data...")
     const { loadGlossaryData } = await import("@/lib/csv-parser.server")
+    console.log("Letter page: Import successful, calling function...")
     const data = await loadGlossaryData()
-    console.log("Letter page: Loaded data with keys:", Object.keys(data))
-    console.log("Letter page: Sample data from A:", data.A?.slice(0, 2))
+    console.log("Letter page: Function completed, data keys:", Object.keys(data))
+    console.log(
+      "Letter page: Total terms:",
+      Object.values(data).reduce((sum, items) => sum + items.length, 0),
+    )
     return data
   } catch (error) {
-    console.error("Failed to load glossary data:", error)
+    console.error("Letter page: Failed to load glossary data:", error)
     return {}
   }
 }

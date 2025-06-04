@@ -47,7 +47,9 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
     console.log("CSV path:", csvPath)
 
     if (!fs.existsSync(csvPath)) {
-      console.log("CSV file does not exist")
+      console.error("CSV file does not exist at path:", csvPath)
+      console.log("Current directory:", process.cwd())
+      console.log("Directory contents:", fs.readdirSync(process.cwd()))
       return {}
     }
 
@@ -60,7 +62,7 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
     console.log("Total lines:", lines.length)
 
     if (lines.length < 2) {
-      console.log("Not enough lines in CSV")
+      console.error("Not enough lines in CSV, only found:", lines.length)
       return {}
     }
 
@@ -74,7 +76,6 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
 
       try {
         const values = parseCSVLine(line)
-        console.log(`Line ${i}: parsed ${values.length} values:`, values.slice(0, 2))
 
         // Your CSV has 4 columns: letter,term,definition,acronym
         if (values.length >= 3) {
@@ -106,7 +107,7 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
     console.log("Total valid items parsed:", items.length)
 
     if (items.length === 0) {
-      console.log("No valid items found")
+      console.error("No valid items found in CSV")
       return {}
     }
 
@@ -132,9 +133,12 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
       grouped[letter].sort((a, b) => a.term.localeCompare(b.term))
     })
 
+    console.log("Final grouped data:", Object.keys(grouped))
     console.log(
-      "Final grouped data:",
-      Object.keys(grouped).map((letter) => `${letter}: ${grouped[letter].length}`),
+      "Letter counts:",
+      Object.keys(grouped)
+        .map((letter) => `${letter}: ${grouped[letter].length}`)
+        .join(", "),
     )
     console.log("=== LOAD GLOSSARY DATA END ===")
 
