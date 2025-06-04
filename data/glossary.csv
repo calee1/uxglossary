@@ -41,8 +41,8 @@ A,Anonymization,The process of removing personally identifiable information from
 A,Ant Design,A UI design language and React component library for building enterprise-level web applications,
 A,Anti-aliasing,A technique used to smooth jagged edges in digital images and text,
 A,Anticipatory Design,Design that predicts user needs and takes action before the user explicitly requests it,
-A,API Design,Creating user-friendly application programming interfaces that are intuitive and well-documented,
 A,API,Application Programming Interface - a set of rules for building software applications,API
+A,API Design,Creating user-friendly application programming interfaces that are intuitive and well-documented,
 A,Applet,A small application designed to perform a specific function within a larger program,
 A,Application,A software program designed to perform specific tasks for users,
 A,Application Programming Interface,A set of rules and protocols that allows different software programs to communicate and exchange data,API
@@ -51,7 +51,7 @@ A,Artificial Intelligence,Computer systems that can perform tasks typically requ
 A,Artificial Intelligence Optimization,The process of improving AI systems for better performance and efficiency,AIO
 A,ASCII,"American Standard Code for Information Interchange, a character encoding standard",ASCII
 A,Aspect Ratio,The proportional relationship between the width and height of an image or screen,
-A,Assistive Technology,Tools and devices that help people with disabilities interact with technology,AT
+A,Assistive Technology,"Tools and devices that help people with disabilities interact with technology, like a screen reader",AT
 A,Asynchronous,Operations that can occur independently without waiting for other operations to complete,async
 A,Asynchronous JavaScript and XML,A web development technique that allows web pages to update content without reloading the entire page,AJAX
 A,Atomic Design,A methodology for creating design systems by breaking interfaces down into basic building blocks: atoms,
@@ -67,8 +67,8 @@ A,Axure,"A prototyping tool for creating wireframes, mockups, and interactive pr
 B,B2C,"Business-to-Consumer, referring to transactions between companies and individual customers",B2C
 B,B2G,"Business-to-Government, referring to transactions between companies and government entities",B2G
 B,Backdrop,A background layer or surface that appears behind other interface elements,
-B,Background,The area behind the main content or the underlying layer of a design,
 B,Backend,The server-side of an application that handles data storage and business logic,
+B,Background,The area behind the main content or the underlying layer of a design,
 B,Backlog,"A prioritized list of features, user stories, or tasks to be completed in future iterations",
 B,Badge,"A small visual indicator that displays status, notifications, or achievements",
 B,Bait and Switch,A deceptive practice where users are lured with one offer but presented with another,
@@ -98,9 +98,9 @@ B,Body,The main content area of a webpage or document,
 B,Body Text,"The main text content of a document, typically in a standard readable font size",
 B,Bookmark,A saved link to a webpage for easy future access,
 B,Boolean,A data type that can have one of two values: true or false,
+B,Bootstrap,A popular CSS framework for developing responsive websites,
 B,Border,A line or boundary that surrounds an element to define its edges,
 B,Border Style,"The visual appearance of a border, such as solid, dashed, or dotted",
-B,Bootstrap,A popular CSS framework for developing responsive websites,
 B,Bottleneck,"A point in a process where the flow is restricted, causing delays or limitations",
 B,Bounce,When a user visits a website and leaves without interacting with any other pages,
 B,Bounce Rate,The percentage of visitors who navigate away from a site after viewing only one page,
@@ -181,10 +181,10 @@ C,Competitor Analysis,The process of evaluating competitors' strengths and weakn
 C,Competitor Benchmarking,Comparing your product's performance against competitors' products,
 C,Complementary Colors,Colors that are opposite each other on the color wheel,
 C,Completely Automated Public Turing test to tell Computers and Humans Apart,A challenge-response test used in computing to determine whether a user is a human or a computer,CAPTCHA
+C,Component,Reusable UI elements that maintain consistency across a design system,
 C,Component Library,A collection of reusable UI components with defined standards for consistent implementation across products,
 C,Component State,"The various conditions a UI component can be in, such as hover or selected",
 C,Component Variants,Different versions of a UI component for different use cases,
-C,Component,Reusable UI elements that maintain consistency across a design system,
 C,Components,Reusable UI elements that maintain consistency across a design system,
 C,Compound Colors,Colors created by mixing multiple base colors,
 C,Concatenate,The process of joining two or more strings or data elements together end-to-end to form a single combined element,
@@ -609,7 +609,6 @@ S,Scroll Area,A region where content can be scrolled to view additional informat
 S,Scrolling,Moving through content that extends beyond the visible area,
 S,Scrum,An agile framework for managing product development,
 S,Search,The function that allows users to find specific content or information,
-S,SEO,Search Engine Optimization - improving visibility in search results,SEO
 S,Search Engine Optimization,Improving visibility in search results,SEO
 S,Search Filter,Options that narrow down search results based on criteria,
 S,Secondary Colors,Colors created by mixing two primary colors,
@@ -617,6 +616,7 @@ S,Segmentation,Dividing users into groups based on shared characteristics,
 S,Select,A dropdown menu that allows users to choose from a list of options,
 S,Selective Attention,The tendency to focus on certain information while ignoring other information,
 S,Sentence Case,Capitalization where only the first word and proper nouns are capitalized,
+S,SEO,Search Engine Optimization - improving visibility in search results,SEO
 S,Separator,A visual element that divides content into distinct sections,
 S,Server,A computer system that provides data or services to other computers,
 S,Server-side,Operations that occur on the server rather than the user's device,
@@ -692,13 +692,13 @@ T,Triad Colors,A color scheme using three colors evenly spaced around the color 
 T,Tribalism,The tendency for people to form groups and favor their own group,
 T,Truncate,To shorten text or data by cutting off characters at a specified length,
 T,Typography,The art and technique of arranging type to make written language readable,
+U,UI,User Interface - the means by which users interact with a computer or application,UI
 U,UI Component,A reusable element of a user interface,
 U,UI Design,Focuses on the visual elements and interactive components that users see and interact with when using a digital product or service,
 U,UI Element,An individual part of a user interface,
 U,UI Kit,A collection of pre-designed user interface components,
 U,UI Pattern,A reusable solution for common interface design problems,
 U,UI Template,A pre-designed layout that can be customized for specific needs,
-U,UI,User Interface - the means by which users interact with a computer or application,UI
 U,Unit Testing,Testing individual components of software in isolation,
 U,Unmoderated Testing,Usability testing conducted without a facilitator present,
 U,Uppercase,Text written in capital letters,
@@ -730,6 +730,7 @@ U,User Testing,Evaluating a product by observing real users as they attempt to u
 U,User Testing Script,A guide for conducting consistent user testing sessions,
 U,User-centered Design,A design approach that focuses on users' needs throughout the design process,UCD
 U,User-initiated Triggers,Actions that users take to start a process or interaction,
+U,UX,User Experience - the overall experience a person has when using a product,UX
 U,UX Audit,A systematic evaluation of a product's user experience,
 U,UX Debt,The accumulated usability problems that need to be addressed,
 U,UX Deliverables,The outputs and artifacts produced during the UX design process,
@@ -737,18 +738,17 @@ U,UX Design,The process of creating meaningful user experiences,
 U,UX Documentation,Written materials that explain UX decisions and guidelines,
 U,UX Strategy,A plan for achieving business goals through great user experiences,
 U,UX Writing,The practice of writing copy that guides users through a product,
-U,UX,User Experience - the overall experience a person has when using a product,UX
 V,Value Proposition,A statement that explains the benefit a product provides to customers,
 V,Variant,A different version of a design component or element,
 V,Viability,The ability of a solution to be successful and sustainable,
 V,Video Player,A software component for playing video content,
+V,Viewport,The visible area of a web page on a user's device,
 V,Virtual Reality,"Technology that creates immersive, computer-generated environments",VR
 V,Visual Attention,The cognitive process of selectively concentrating on visual information,
 V,Visual Design,"The use of imagery, color, shapes, typography, and form to enhance usability",
 V,Vlog,A blog that contains video content,
 V,Voice of Customer,Direct feedback and insights from customers about their experiences,VOC
 V,Voice User Interface,An interface that allows users to interact through voice commands,VUI
-V,Viewport,The visible area of a web page on a user's device,
 W,W3C,"World Wide Web Consortium, the organization that develops web standards",W3C
 W,Waterfall,A sequential development methodology where each phase must be completed before the next,
 W,Wayfinding,The process of using spatial and environmental information to navigate,
@@ -774,7 +774,7 @@ Y,YAML,YAML Ain't Markup Language - a human-readable data serialization standard
 Z,Z-axis,The depth axis in a three-dimensional coordinate system that represents the third dimension perpendicular to both X and Y axes,
 Z,Z-fold,A paper folding technique where the document is folded in a zigzag pattern creating multiple panels that stack on top of each other,
 Z,Z-height,The perceived elevation or depth of an element in a user interface design system that determines its visual hierarchy and shadow effects,
+Z,Z-index,A CSS property that controls the stacking order of elements,Z-index
 Z,Zeplin,A design-collaboration platform assisting teams in crafting visually captivating products,
 Z,Zip Disk,A removable storage medium that was popular in the 1990s for backing up and transferring files between computers,
-Z,Z-index,A CSS property that controls the stacking order of elements,Z-index
 Z,Zoom,Interactive navigation control that lets users magnify content.,
