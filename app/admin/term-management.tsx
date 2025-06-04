@@ -12,6 +12,7 @@ interface GlossaryItem {
   term: string
   definition: string
   acronym?: string
+  originalTerm?: string // Add this to track the original term name
 }
 
 // Move TermForm outside the main component to prevent recreation on each render
@@ -141,7 +142,8 @@ export function TermManagement() {
         setShowAddForm(false)
         setNewTerm({ letter: "", term: "", definition: "", acronym: "" })
       } else {
-        alert("Failed to add term")
+        const error = await response.json()
+        alert(`Failed to add term: ${error.error || "Unknown error"}`)
       }
     } catch (error) {
       console.error("Error adding term:", error)
@@ -153,17 +155,32 @@ export function TermManagement() {
     if (!editingTerm) return
 
     try {
+      // Send the update with the original term for identification
+      const termToUpdate = {
+        letter: editingTerm.letter,
+        term: editingTerm.term.trim(),
+        definition: editingTerm.definition.trim(),
+        acronym: editingTerm.acronym?.trim() || undefined,
+        originalTerm: editingTerm.originalTerm, // This is the key for finding the term
+      }
+
+      console.log("Sending update request:", termToUpdate)
+
       const response = await fetch("/api/admin/terms", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editingTerm),
+        body: JSON.stringify(termToUpdate),
       })
+
+      const result = await response.json()
+      console.log("Update response:", result)
 
       if (response.ok) {
         await loadTerms()
         setEditingTerm(null)
       } else {
-        alert("Failed to update term")
+        console.error("Update failed:", result)
+        alert(`Failed to update term: ${result.error || "Unknown error"}`)
       }
     } catch (error) {
       console.error("Error updating term:", error)
@@ -184,7 +201,8 @@ export function TermManagement() {
       if (response.ok) {
         await loadTerms()
       } else {
-        alert("Failed to delete term")
+        const error = await response.json()
+        alert(`Failed to delete term: ${error.error || "Unknown error"}`)
       }
     } catch (error) {
       console.error("Error deleting term:", error)
@@ -208,6 +226,14 @@ export function TermManagement() {
 
   const handleCancelEdit = useCallback(() => {
     setEditingTerm(null)
+  }, [])
+
+  const handleStartEdit = useCallback((term: GlossaryItem) => {
+    // Store the original term name for identification during update
+    setEditingTerm({
+      ...term,
+      originalTerm: term.term, // This is crucial - store the original term name
+    })
   }, [])
 
   if (isLoading) {
@@ -249,12 +275,12 @@ export function TermManagement() {
       {/* Edit Form */}
       {editingTerm && (
         <TermForm
-          key={`edit-form-${editingTerm.term}`}
+          key={`edit-form-${editingTerm.originalTerm || editingTerm.term}`}
           term={editingTerm}
           onChange={handleEditTermChange}
           onSave={handleEditTerm}
           onCancel={handleCancelEdit}
-          title="Edit Term"
+          title={`Edit Term: ${editingTerm.originalTerm || editingTerm.term}`}
         />
       )}
 
@@ -299,12 +325,7 @@ export function TermManagement() {
                   <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">{term.definition}</p>
                 </div>
                 <div className="flex gap-2 ml-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setEditingTerm({ ...term })}
-                    disabled={!!editingTerm}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => handleStartEdit(term)} disabled={!!editingTerm}>
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button

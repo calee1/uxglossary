@@ -175,7 +175,9 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const updatedTerm: GlossaryItem = await request.json()
+    const updatedTerm: GlossaryItem & { originalTerm?: string } = await request.json()
+
+    console.log("PUT request received:", updatedTerm)
 
     // Validate required fields
     if (!updatedTerm.term || !updatedTerm.definition) {
@@ -184,24 +186,43 @@ export async function PUT(request: NextRequest) {
 
     // Load existing terms
     const terms = loadAllTerms()
+    console.log("Loaded terms count:", terms.length)
 
-    // Find and update the term
-    const termIndex = terms.findIndex((t) => t.term.toLowerCase() === updatedTerm.term.toLowerCase())
+    // Find the term to update - use originalTerm if provided, otherwise use current term
+    const searchTerm = updatedTerm.originalTerm || updatedTerm.term
+    const termIndex = terms.findIndex(
+      (t) =>
+        t.term.toLowerCase() === searchTerm.toLowerCase() ||
+        (t.term.toLowerCase() === updatedTerm.term.toLowerCase() && t.letter === updatedTerm.letter),
+    )
+
+    console.log("Searching for term:", searchTerm)
+    console.log("Term index found:", termIndex)
 
     if (termIndex === -1) {
+      console.log("Available terms:", terms.map((t) => `${t.letter}: ${t.term}`).slice(0, 10))
       return NextResponse.json({ error: "Term not found" }, { status: 404 })
     }
 
-    // Update the term
-    terms[termIndex] = updatedTerm
+    // Update the term (remove originalTerm from the saved data)
+    const { originalTerm, ...termToSave } = updatedTerm
+    terms[termIndex] = termToSave
+
+    console.log("Updated term:", terms[termIndex])
 
     // Save to file
     saveAllTerms(terms)
 
-    return NextResponse.json({ success: true, term: updatedTerm })
+    return NextResponse.json({ success: true, term: termToSave })
   } catch (error) {
     console.error("Error updating term:", error)
-    return NextResponse.json({ error: "Failed to update term" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Failed to update term",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
   }
 }
 
