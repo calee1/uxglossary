@@ -577,6 +577,7 @@ R,"Recency Bias","The tendency to give more weight to recent events or informati
 R,"Redlining","The process of marking up designs with specifications for development",
 R,"Refactoring","Restructuring existing code without changing its external behavior",
 R,"Refinement","The agile practice of adding detail and estimates to backlog items",
+R,"Relative Positioning","In CSS positioning, when an element is positioned relative to its normal position in the document flow.",
 R,"Remote Testing","Usability testing conducted with participants in different locations",
 R,"Repository","A storage location for code, documents, or research data",
 R,"Requirements","Specifications that define what a system should do",
