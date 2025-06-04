@@ -11,6 +11,7 @@ import { DownloadButton } from "./download-button"
 import { SetupWizard } from "./setup-wizard"
 import { TermManagement } from "./term-management"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { CSVUpload } from "./csv-upload"
 
 type AdminView = "dashboard" | "terms" | "setup"
 
@@ -99,6 +100,14 @@ export default function AdminPage() {
                       Export the complete glossary as a CSV file for backup or external use.
                     </p>
                     <DownloadButton />
+                  </div>
+
+                  <div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                    <h3 className="font-semibold text-orange-800 dark:text-orange-200 mb-2">Upload CSV</h3>
+                    <p className="text-sm text-orange-700 dark:text-orange-300 mb-3">
+                      Bulk upload or update glossary terms using a CSV file.
+                    </p>
+                    <CSVUpload />
                   </div>
                 </CardContent>
               </Card>

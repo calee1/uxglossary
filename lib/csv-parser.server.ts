@@ -10,6 +10,46 @@ export interface GlossaryItem {
   seeAlso?: string
 }
 
+// Enhanced CSV parser that properly handles quoted fields
+function parseCSVLine(line: string): string[] {
+  const values: string[] = []
+  let current = ""
+  let inQuotes = false
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i]
+
+    if (char === '"') {
+      if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
+        // Handle escaped quotes (double quotes within quoted field)
+        current += '"'
+        i++ // Skip the next quote
+      } else {
+        // Toggle quote state
+        inQuotes = !inQuotes
+      }
+    } else if (char === "," && !inQuotes) {
+      // Field separator outside of quotes
+      values.push(current.trim())
+      current = ""
+    } else {
+      current += char
+    }
+  }
+
+  // Add the last field
+  values.push(current.trim())
+
+  // Clean up quoted values - remove surrounding quotes but keep internal content
+  return values.map((val) => {
+    const trimmed = val.trim()
+    if (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length >= 2) {
+      return trimmed.slice(1, -1) // Remove surrounding quotes
+    }
+    return trimmed
+  })
+}
+
 export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
   try {
     console.log("=== LOAD GLOSSARY DATA START ===")
@@ -45,35 +85,15 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
       if (!line) continue
 
       try {
-        // Simple CSV parsing - handle quotes properly
-        const values: string[] = []
-        let current = ""
-        let inQuotes = false
+        const values = parseCSVLine(line)
 
-        for (let j = 0; j < line.length; j++) {
-          const char = line[j]
-
-          if (char === '"') {
-            inQuotes = !inQuotes
-          } else if (char === "," && !inQuotes) {
-            values.push(current.trim())
-            current = ""
-          } else {
-            current += char
-          }
-        }
-        values.push(current.trim())
-
-        // Remove surrounding quotes
-        const cleanValues = values.map((v) => v.replace(/^"(.*)"$/, "$1"))
-
-        if (cleanValues.length >= 3 && cleanValues[0] && cleanValues[1] && cleanValues[2]) {
-          const letter = cleanValues[0].toUpperCase()
+        if (values.length >= 3 && values[0] && values[1] && values[2]) {
+          const letter = values[0].toUpperCase()
           const item: GlossaryItem = {
             letter: letter,
-            term: cleanValues[1],
-            definition: cleanValues[2],
-            acronym: cleanValues[3] || undefined,
+            term: values[1],
+            definition: values[2],
+            acronym: values[3] || undefined,
           }
 
           // Handle numeric entries
@@ -89,6 +109,9 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
           if (groupLetter === "A" && grouped[groupLetter].length <= 3) {
             console.log(`A item ${grouped[groupLetter].length}:`, item.term)
           }
+        } else {
+          console.log(`Skipping line ${i}: insufficient data or empty fields`)
+          errorCount++
         }
       } catch (error) {
         errorCount++

@@ -12,6 +12,7 @@ export function HomeClient() {
   const [glossaryItems, setGlossaryItems] = useState<GlossaryData>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null)
 
   const alphabet = ["0-9", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))]
   const totalTerms = Object.values(glossaryItems).reduce((total, items) => total + items.length, 0)
@@ -40,6 +41,13 @@ export function HomeClient() {
         })
 
         setGlossaryItems(grouped)
+
+        // Add this after the existing fetch in the useEffect
+        const lastUpdatedResponse = await fetch("/api/glossary/last-updated")
+        if (lastUpdatedResponse.ok) {
+          const { lastUpdated: date } = await lastUpdatedResponse.json()
+          setLastUpdated(date)
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load glossary data")
       } finally {
@@ -113,7 +121,12 @@ export function HomeClient() {
       </div>
 
       <div className="mt-12 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Glossary Statistics</h2>
+        <div className="flex justify-between items-start mb-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Glossary Statistics</h2>
+          {lastUpdated && (
+            <p className="text-gray-500 dark:text-gray-400 italic text-sm">Last updated: {lastUpdated}</p>
+          )}
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
           <div className="p-2">
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">

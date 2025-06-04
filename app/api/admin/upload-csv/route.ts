@@ -83,7 +83,6 @@ async function loadTermsFromGitHub(): Promise<{ terms: GlossaryItem[]; sha?: str
   }
 
   try {
-    // Get the current file from GitHub
     const response = await fetch(
       `https://api.github.com/repos/${githubRepo}/contents/data/glossary.csv?ref=${githubBranch}`,
       {
@@ -97,7 +96,6 @@ async function loadTermsFromGitHub(): Promise<{ terms: GlossaryItem[]; sha?: str
 
     if (!response.ok) {
       if (response.status === 404) {
-        // File doesn't exist yet, return empty
         return { terms: [] }
       }
       throw new Error(`GitHub API error: ${response.status}`)
@@ -161,12 +159,11 @@ async function saveTermsToGitHub(terms: GlossaryItem[], sha?: string): Promise<v
 
   // Prepare the commit data
   const commitData: any = {
-    message: `Update glossary: ${new Date().toISOString()}`,
+    message: `Bulk update glossary via CSV upload: ${new Date().toISOString()}`,
     content: Buffer.from(csvContent).toString("base64"),
     branch: githubBranch,
   }
 
-  // Include SHA if updating existing file
   if (sha) {
     commitData.sha = sha
   }
@@ -195,190 +192,166 @@ async function saveTermsToGitHub(terms: GlossaryItem[], sha?: string): Promise<v
   }
 }
 
-// POST - Add new term
 export async function POST(request: NextRequest) {
   if (!isAuthenticated()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {
-    const newTerm: GlossaryItem = await request.json()
+    const formData = await request.formData()
+    const file = formData.get("csv") as File
 
-    // Validate required fields
-    if (!newTerm.term || !newTerm.definition) {
-      return NextResponse.json({ error: "Term and definition are required" }, { status: 400 })
-    }
-
-    // Load existing terms from GitHub
-    const { terms, sha } = await loadTermsFromGitHub()
-
-    // Check for duplicates
-    const existingTerm = terms.find((t) => t.term.toLowerCase() === newTerm.term.toLowerCase())
-    if (existingTerm) {
-      return NextResponse.json({ error: "Term already exists" }, { status: 409 })
-    }
-
-    // Determine letter if not provided
-    if (!newTerm.letter) {
-      const firstChar = newTerm.term.charAt(0).toUpperCase()
-      newTerm.letter = /\d/.test(firstChar) ? "0" : firstChar
-    }
-
-    // Add new term
-    terms.push(newTerm)
-
-    // Save to GitHub
-    await saveTermsToGitHub(terms, sha)
-
-    return NextResponse.json({ success: true, term: newTerm })
-  } catch (error) {
-    console.error("Error adding term:", error)
-    return NextResponse.json(
-      {
-        error: "Failed to add term",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
-    )
-  }
-}
-
-// PUT - Update existing term
-export async function PUT(request: NextRequest) {
-  if (!isAuthenticated()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  try {
-    const updatedTerm: GlossaryItem & { originalTerm?: string } = await request.json()
-
-    console.log("=== PUT REQUEST DEBUG ===")
-    console.log("Received data:", JSON.stringify(updatedTerm, null, 2))
-
-    // Validate required fields
-    if (!updatedTerm.term || !updatedTerm.definition) {
-      console.log("Validation failed: missing term or definition")
-      return NextResponse.json({ error: "Term and definition are required" }, { status: 400 })
-    }
-
-    // Load existing terms from GitHub
-    const { terms, sha } = await loadTermsFromGitHub()
-    console.log("Total terms loaded from GitHub:", terms.length)
-
-    // Find the term to update - use originalTerm if provided, otherwise use current term
-    const searchTerm = updatedTerm.originalTerm || updatedTerm.term
-    console.log("Searching for term:", searchTerm)
-
-    // Try multiple search strategies
-    let termIndex = -1
-
-    // Strategy 1: Exact match with originalTerm
-    if (updatedTerm.originalTerm) {
-      termIndex = terms.findIndex((t) => t.term === updatedTerm.originalTerm)
-      console.log("Strategy 1 (exact originalTerm match):", termIndex)
-    }
-
-    // Strategy 2: Case-insensitive match with originalTerm
-    if (termIndex === -1 && updatedTerm.originalTerm) {
-      termIndex = terms.findIndex((t) => t.term.toLowerCase() === updatedTerm.originalTerm.toLowerCase())
-      console.log("Strategy 2 (case-insensitive originalTerm):", termIndex)
-    }
-
-    // Strategy 3: Exact match with current term
-    if (termIndex === -1) {
-      termIndex = terms.findIndex((t) => t.term === updatedTerm.term)
-      console.log("Strategy 3 (exact current term):", termIndex)
-    }
-
-    // Strategy 4: Case-insensitive match with current term
-    if (termIndex === -1) {
-      termIndex = terms.findIndex((t) => t.term.toLowerCase() === updatedTerm.term.toLowerCase())
-      console.log("Strategy 4 (case-insensitive current term):", termIndex)
-    }
-
-    console.log("Final term index found:", termIndex)
-
-    if (termIndex === -1) {
-      console.log("TERM NOT FOUND!")
-      console.log("Available terms matching letter", updatedTerm.letter, ":")
-      const matchingLetterTerms = terms.filter((t) => t.letter === updatedTerm.letter)
-      console.log(matchingLetterTerms.map((t) => `"${t.term}"`))
-
+    if (!file) {
       return NextResponse.json(
         {
-          error: "Term not found",
-          debug: {
-            searchTerm,
-            availableTermsForLetter: matchingLetterTerms.map((t) => t.term),
-            totalTerms: terms.length,
-          },
+          success: false,
+          message: "No file provided",
         },
-        { status: 404 },
+        { status: 400 },
       )
     }
 
-    console.log("Found term at index", termIndex, ":", terms[termIndex])
+    if (!file.name.endsWith(".csv")) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "File must be a CSV",
+        },
+        { status: 400 },
+      )
+    }
 
-    // Update the term (remove originalTerm from the saved data)
-    const { originalTerm, ...termToSave } = updatedTerm
-    const oldTerm = { ...terms[termIndex] }
-    terms[termIndex] = termToSave
+    // Read and parse the CSV file
+    const csvContent = await file.text()
+    const lines = csvContent.trim().split("\n")
 
-    console.log("Old term:", oldTerm)
-    console.log("New term:", terms[termIndex])
+    if (lines.length < 2) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "CSV file must have at least a header and one data row",
+        },
+        { status: 400 },
+      )
+    }
 
-    // Save to GitHub
-    await saveTermsToGitHub(terms, sha)
-    console.log("Terms saved successfully to GitHub")
+    // Validate header - check for quoted format
+    const header = lines[0].toLowerCase().trim()
+    const expectedFormats = [
+      'letter,"term","definition",acronym',
+      "letter,term,definition,acronym",
+      '"letter","term","definition","acronym"',
+    ]
 
-    return NextResponse.json({ success: true, term: termToSave })
-  } catch (error) {
-    console.error("Error updating term:", error)
-    return NextResponse.json(
-      {
-        error: "Failed to update term",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
+    const headerValid = expectedFormats.some(
+      (format) => header === format || (header.includes('"term"') && header.includes('"definition"')),
     )
-  }
-}
 
-// DELETE - Remove term
-export async function DELETE(request: NextRequest) {
-  if (!isAuthenticated()) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  try {
-    const { term: termName } = await request.json()
-
-    if (!termName) {
-      return NextResponse.json({ error: "Term name is required" }, { status: 400 })
+    if (!headerValid) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `CSV header must be in format: letter,"term","definition",acronym`,
+        },
+        { status: 400 },
+      )
     }
 
-    // Load existing terms from GitHub
-    const { terms, sha } = await loadTermsFromGitHub()
+    // Parse CSV data
+    const newTerms: GlossaryItem[] = []
+    const errors: string[] = []
 
-    // Find and remove the term
-    const termIndex = terms.findIndex((t) => t.term.toLowerCase() === termName.toLowerCase())
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim()
+      if (!line) continue
 
-    if (termIndex === -1) {
-      return NextResponse.json({ error: "Term not found" }, { status: 404 })
+      try {
+        const values = parseCSVLine(line)
+
+        if (values.length < 3) {
+          errors.push(`Line ${i + 1}: Missing required columns`)
+          continue
+        }
+
+        const [letter, term, definition, acronym] = values
+
+        if (!letter || !term || !definition) {
+          errors.push(`Line ${i + 1}: Letter, term, and definition are required`)
+          continue
+        }
+
+        // Validate letter
+        const normalizedLetter = letter.toUpperCase()
+        if (!/^[A-Z0]$/.test(normalizedLetter)) {
+          errors.push(`Line ${i + 1}: Letter must be A-Z or 0`)
+          continue
+        }
+
+        newTerms.push({
+          letter: normalizedLetter,
+          term: term.trim(),
+          definition: definition.trim(),
+          acronym: acronym?.trim() || undefined,
+        })
+      } catch (error) {
+        errors.push(`Line ${i + 1}: Parse error - ${error}`)
+      }
     }
 
-    const deletedTerm = terms[termIndex]
-    terms.splice(termIndex, 1)
+    if (newTerms.length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "No valid terms found in CSV",
+          errors,
+        },
+        { status: 400 },
+      )
+    }
+
+    // Load existing terms
+    const { terms: existingTerms, sha } = await loadTermsFromGitHub()
+
+    // Merge terms (update existing, add new)
+    const termMap = new Map<string, GlossaryItem>()
+    let addedCount = 0
+    let updatedCount = 0
+
+    // Add existing terms to map
+    existingTerms.forEach((term) => {
+      termMap.set(term.term.toLowerCase(), term)
+    })
+
+    // Process new terms
+    newTerms.forEach((newTerm) => {
+      const key = newTerm.term.toLowerCase()
+      if (termMap.has(key)) {
+        updatedCount++
+      } else {
+        addedCount++
+      }
+      termMap.set(key, newTerm)
+    })
+
+    // Convert back to array
+    const finalTerms = Array.from(termMap.values())
 
     // Save to GitHub
-    await saveTermsToGitHub(terms, sha)
+    await saveTermsToGitHub(finalTerms, sha)
 
-    return NextResponse.json({ success: true, deletedTerm })
+    return NextResponse.json({
+      success: true,
+      message: `Successfully processed ${newTerms.length} terms from CSV`,
+      added: addedCount,
+      updated: updatedCount,
+      errors: errors.length > 0 ? errors : undefined,
+    })
   } catch (error) {
-    console.error("Error deleting term:", error)
+    console.error("Error processing CSV upload:", error)
     return NextResponse.json(
       {
-        error: "Failed to delete term",
+        success: false,
+        message: "Failed to process CSV file",
         details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 },
