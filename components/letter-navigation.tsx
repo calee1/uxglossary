@@ -38,11 +38,7 @@ export function LetterNavigation({ currentLetter }: LetterNavigationProps) {
         )}
       </div>
 
-      <div className="flex-1 text-center">
-        <span className="text-2xl font-bold text-gray-900 dark:text-white">
-          {currentLetter === "0" ? "0-9" : currentLetter.toUpperCase()}
-        </span>
-      </div>
+      <div className="flex-1 text-center">{/* Empty center - letter title is now handled by LetterPageClient */}</div>
 
       <div className="flex-1 text-right">
         {nextLetter && (
