@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LetterNavigation } from "@/components/letter-navigation"
 import { LetterPageClient } from "./letter-page-client"
 
 interface LetterPageProps {
@@ -46,7 +47,13 @@ export default function LetterPage({ params }: LetterPageProps) {
         </div>
       </div>
 
+      {/* Letter Navigation */}
+      <LetterNavigation currentLetter={params.letter} />
+
       <LetterPageClient letter={params.letter} />
+
+      {/* Bottom Letter Navigation */}
+      <LetterNavigation currentLetter={params.letter} />
 
       <div className="mt-12 text-center">
         <Link href="/" className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
