@@ -10,15 +10,10 @@ interface LetterPageProps {
 }
 
 export default function LetterPage({ params }: LetterPageProps) {
-  console.log("Letter page rendering with params:", params)
-
   const letter = params.letter === "0-9" ? "0" : params.letter.toUpperCase()
-  const displayLetter = params.letter === "0-9" ? "0-9" : params.letter.toUpperCase()
-
   const alphabet = ["0", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))]
 
   if (!alphabet.includes(letter)) {
-    console.log("Letter not in alphabet, showing 404")
     notFound()
   }
 

@@ -28,18 +28,13 @@ export function LetterPageClient({ letter }: LetterPageClientProps) {
     async function loadData() {
       try {
         setLoading(true)
-        console.log("Client: Loading data for letter:", letter)
-
-        // First, try the new dedicated API
         const response = await fetch(`/api/glossary/letter/${letter}`)
 
         if (!response.ok) {
-          throw new Error(`API error: ${response.status}`)
+          throw new Error(`Failed to load data`)
         }
 
         const data = await response.json()
-        console.log("Client: Received data:", data)
-
         setItems(data.items || [])
 
         // Build allItems object for cross-references
@@ -53,8 +48,7 @@ export function LetterPageClient({ letter }: LetterPageClientProps) {
         })
         setAllItems(allItemsObj)
       } catch (err) {
-        console.error("Client: Error loading data:", err)
-        setError(err instanceof Error ? err.message : "Unknown error")
+        setError(err instanceof Error ? err.message : "Failed to load glossary data")
       } finally {
         setLoading(false)
       }
@@ -65,7 +59,7 @@ export function LetterPageClient({ letter }: LetterPageClientProps) {
 
   if (loading) {
     return (
-      <div className="text-center py-8">
+      <div className="text-center py-12">
         <div className="text-lg text-gray-600 dark:text-gray-300">Loading {displayLetter} terms...</div>
       </div>
     )
@@ -73,14 +67,14 @@ export function LetterPageClient({ letter }: LetterPageClientProps) {
 
   if (error) {
     return (
-      <div className="text-center py-8">
-        <div className="text-lg text-red-600 dark:text-red-400">Error: {error}</div>
+      <div className="text-center py-12">
+        <div className="text-lg text-red-600 dark:text-red-400">Error loading terms</div>
         <div className="mt-4">
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
           >
-            Retry
+            Try Again
           </button>
         </div>
       </div>
@@ -94,19 +88,6 @@ export function LetterPageClient({ letter }: LetterPageClientProps) {
         <p className="text-gray-600 dark:text-gray-300">
           {items.length} {items.length === 1 ? "term" : "terms"}
         </p>
-      </div>
-
-      {/* Debug info */}
-      <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-sm">
-        <strong>Client Debug:</strong>
-        <br />
-        <strong>Letter:</strong> {letter} → {lookupLetter}
-        <br />
-        <strong>Items loaded:</strong> {items.length}
-        <br />
-        <strong>First item:</strong> {items[0]?.term || "None"}
-        <br />
-        <strong>API endpoint:</strong> /api/glossary/letter/{letter}
       </div>
 
       <LetterPageContent items={items} letter={lookupLetter} allItems={allItems} />

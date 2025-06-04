@@ -19,9 +19,6 @@ interface LetterSearchProps {
 }
 
 export function LetterSearch({ items = [], onFilteredItemsChange }: LetterSearchProps) {
-  // Add console log at the beginning of the component
-  console.log("LetterSearch component rendering with", items?.length || 0, "items")
-
   const [searchTerm, setSearchTerm] = useState("")
 
   // Filter items based on search term
@@ -64,18 +61,6 @@ export function LetterSearch({ items = [], onFilteredItemsChange }: LetterSearch
 
   return (
     <div className="relative w-full max-w-2xl mx-auto mb-6 sm:mb-8">
-      {/* Add debug output at the beginning of the return statement */}
-      <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded text-sm">
-        <strong>Search Debug:</strong> Received {items?.length || 0} items
-        {items?.length > 0 && (
-          <>
-            <br />
-            <strong>First item:</strong> {items[0].term}
-            <br />
-            <strong>Last item:</strong> {items[items.length - 1].term}
-          </>
-        )}
-      </div>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500" />

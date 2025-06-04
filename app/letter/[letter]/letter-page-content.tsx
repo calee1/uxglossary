@@ -20,9 +20,6 @@ interface LetterPageContentProps {
 }
 
 export function LetterPageContent({ items, letter, allItems = {} }: LetterPageContentProps) {
-  // Add console log at the beginning of the component
-  console.log("LetterPageContent rendering with", items?.length || 0, "items for letter", letter)
-
   const [filteredItems, setFilteredItems] = useState<GlossaryItem[]>(items)
   const [searchTerm, setSearchTerm] = useState("")
 
@@ -101,19 +98,6 @@ export function LetterPageContent({ items, letter, allItems = {} }: LetterPageCo
 
   return (
     <>
-      {/* Add debug output at the beginning of the return statement, right after the opening fragment */}
-      <div className="mb-4 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded text-sm">
-        <strong>Content Debug:</strong> Received {items?.length || 0} items for letter {letter}
-        {items?.length > 0 && (
-          <>
-            <br />
-            <strong>First item:</strong> {items[0].term}
-            <br />
-            <strong>Last item:</strong> {items[items.length - 1].term}
-          </>
-        )}
-      </div>
-
       {/* Search functionality */}
       <LetterSearch items={items} onFilteredItemsChange={handleFilteredItemsChange} />
 
