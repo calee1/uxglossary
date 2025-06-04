@@ -77,6 +77,26 @@ export default async function HomePage() {
         </Link>
       </div>
 
+      {hasGlossaryItems && (
+        <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-sm">
+          <strong>Data Verification:</strong>
+          <ul className="mt-2">
+            <li>
+              <strong>Letters:</strong> {Object.keys(glossaryItems).join(", ")}
+            </li>
+            <li>
+              <strong>First A term:</strong> {glossaryItems["A"]?.[0]?.term || "None"}
+            </li>
+            <li>
+              <strong>First B term:</strong> {glossaryItems["B"]?.[0]?.term || "None"}
+            </li>
+            <li>
+              <strong>First C term:</strong> {glossaryItems["C"]?.[0]?.term || "None"}
+            </li>
+          </ul>
+        </div>
+      )}
+
       {!hasGlossaryItems && (
         <div className="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-8">
           <h3 className="text-red-800 dark:text-red-200 font-medium text-lg mb-2">No Data Found</h3>

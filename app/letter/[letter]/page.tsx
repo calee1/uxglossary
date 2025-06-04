@@ -85,6 +85,22 @@ export default async function LetterPage({ params }: LetterPageProps) {
         </div>
       )}
 
+      {process.env.NODE_ENV === "development" && (
+        <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-sm">
+          <strong>Debug:</strong> Letter page for "{letter}" ({displayLetter})
+          <br />
+          <strong>Items count:</strong> {items.length}
+          <br />
+          {items.length > 0 && (
+            <>
+              <strong>First item:</strong> {items[0].term}
+              <br />
+              <strong>Last item:</strong> {items[items.length - 1].term}
+            </>
+          )}
+        </div>
+      )}
+
       <LetterPageContent items={items} letter={letter} allItems={glossaryItems} />
 
       <div className="mt-12 text-center">
