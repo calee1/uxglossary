@@ -768,8 +768,8 @@ W,"Wizard-of-Oz Testing","Testing where a human secretly provides responses that
 W,"Word Cloud","A visual representation of text where word size indicates frequency or importance",
 W,"World Wide Web Consortium","The organization that develops web standards",W3C
 W,"Worst Idea","A brainstorming technique where participants intentionally generate bad ideas",
+X,"eXtensible Markup Language","A markup language for storing and transporting data",XML
 X,"X-axis","The horizontal axis in a coordinate system or data visualization that typically represents the independent variable or categories",
-X,"XML","eXtensible Markup Language - a markup language for storing and transporting data",XML
 Y,"Y-axis","The vertical axis in a coordinate system or data visualization that typically represents the dependent variable or measured values",
 Y,"YAML Ain't Markup Language","A human-readable data serialization language primarily used for configuration files and data exchange",YAML
 Z,"Z-axis","The depth axis in a three-dimensional coordinate system that represents the third dimension perpendicular to both X and Y axes",
