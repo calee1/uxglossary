@@ -63,7 +63,6 @@ A,"Auto-complete","A feature that predicts and suggests completions for partiall
 A,"Auto-suggest","A feature that provides suggestions or recommendations as users type",
 A,"Avatar","A graphical representation of a user or character in digital interfaces",
 A,"Axure","A prototyping tool for creating wireframes, mockups, and interactive prototypes",
-B,"B2C","Business-to-Consumer, referring to transactions between companies and individual customers",B2C
 B,"Backdrop","A background layer or surface that appears behind other interface elements",
 B,"Backend","The server-side of an application that handles data storage and business logic",
 B,"Background","The area behind the main content or the underlying layer of a design",
@@ -122,6 +121,7 @@ B,"Build","The process of compiling source code into executable software",
 B,"Business Analyst","A professional who analyzes business processes and requirements",BA
 B,"Business Requirements Document","A formal document that outlines the business needs for a project",BRD
 B,"Business-to-Business","Referring to transactions between companies",B2B
+B,"Business-to-Consumer","Referring to transactions between companies and individual customers",B2C
 B,"Business-to-Government","Referring to transactions between companies and government entities",B2G
 B,"Button","An interactive element that users can click to trigger an action",
 B,"Byte","A unit of digital information consisting of 8 bits",
