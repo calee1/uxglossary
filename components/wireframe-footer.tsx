@@ -25,6 +25,18 @@ export function WireframeFooter() {
         >
           wireframe
         </button>
+        <span className="text-gray-500 dark:text-gray-400">|</span>
+        <span className="text-gray-500 dark:text-gray-400">
+          To help keep this going:{" "}
+          <a
+            href="https://buymeacoffee.com/calee607"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:underline transition-colors"
+          >
+            Buy Me a Coffee
+          </a>
+        </span>
       </footer>
       <WireframeModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
