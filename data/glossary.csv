@@ -2,7 +2,7 @@ letter,"term","definition",acronym
 0,"4-color printing","Printing in CMYK or full-color",
 A,"A/B Testing","A method of comparing two versions of a webpage or app to determine which performs better",
 A,"Above-the-fold","The portion of a webpage that is visible without scrolling, derived from newspaper terminology",
-A,"Absolute Positioning","A CSS positioning method where an element is positioned relative to its nearest positioned ancestor",
+A,"Absolute Positioning","A CSS positioning method which allows you to remove an element from the normal document flow and position it precisely on the page, relative to its nearest positioned ancestor",
 A,"Abstraction Layer","A way of hiding the implementation details of a particular set of functionality to simplify complex systems",
 A,"Accent Colors","Secondary colors used sparingly to highlight important elements and create visual interest",
 A,"Accessibility","The practice of making websites and applications usable by people with disabilities",A11Y
