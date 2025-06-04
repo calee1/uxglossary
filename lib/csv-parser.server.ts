@@ -41,20 +41,31 @@ function parseCSVLine(line: string): string[] {
 
 export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
   try {
+    console.log("=== LOAD GLOSSARY DATA START ===")
+
     const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
+    console.log("CSV path:", csvPath)
 
     if (!fs.existsSync(csvPath)) {
+      console.log("CSV file does not exist")
       return {}
     }
 
+    console.log("Reading CSV file...")
     const csvContent = fs.readFileSync(csvPath, "utf-8")
+    console.log("CSV content length:", csvContent.length)
+    console.log("First 200 chars:", csvContent.substring(0, 200))
+
     const lines = csvContent.trim().split("\n")
+    console.log("Total lines:", lines.length)
 
     if (lines.length < 2) {
+      console.log("Not enough lines in CSV")
       return {}
     }
 
     const items: GlossaryItem[] = []
+    console.log("Processing lines...")
 
     // Process each data line (skip header at index 0)
     for (let i = 1; i < lines.length; i++) {
@@ -63,6 +74,7 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
 
       try {
         const values = parseCSVLine(line)
+        console.log(`Line ${i}: parsed ${values.length} values:`, values.slice(0, 2))
 
         // Your CSV has 4 columns: letter,term,definition,acronym
         if (values.length >= 3) {
@@ -79,15 +91,22 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
           // Validate essential fields
           if (item.letter && item.term && item.definition) {
             items.push(item)
+          } else {
+            console.log(`Line ${i}: Missing essential fields`, item)
           }
+        } else {
+          console.log(`Line ${i}: Not enough values (${values.length})`)
         }
       } catch (error) {
-        // Silently skip problematic lines
+        console.log(`Line ${i}: Parse error:`, error)
         continue
       }
     }
 
+    console.log("Total valid items parsed:", items.length)
+
     if (items.length === 0) {
+      console.log("No valid items found")
       return {}
     }
 
@@ -113,8 +132,15 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
       grouped[letter].sort((a, b) => a.term.localeCompare(b.term))
     })
 
+    console.log(
+      "Final grouped data:",
+      Object.keys(grouped).map((letter) => `${letter}: ${grouped[letter].length}`),
+    )
+    console.log("=== LOAD GLOSSARY DATA END ===")
+
     return grouped
   } catch (error) {
+    console.error("Load glossary data error:", error)
     return {}
   }
 }
