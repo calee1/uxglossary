@@ -43,18 +43,38 @@ export async function GET(request: Request, { params }: { params: { letter: stri
       if (!line) continue
 
       try {
-        const values = line.split(",").map((v) => v.trim())
+        // Parse CSV line properly handling quotes
+        const values: string[] = []
+        let current = ""
+        let inQuotes = false
 
-        if (values.length >= 3) {
-          const itemLetter = values[0].toUpperCase()
+        for (let j = 0; j < line.length; j++) {
+          const char = line[j]
+
+          if (char === '"') {
+            inQuotes = !inQuotes
+          } else if (char === "," && !inQuotes) {
+            values.push(current.trim())
+            current = ""
+          } else {
+            current += char
+          }
+        }
+        values.push(current.trim())
+
+        // Clean up quoted values
+        const cleanValues = values.map((v) => v.replace(/^"(.*)"$/, "$1"))
+
+        if (cleanValues.length >= 3) {
+          const itemLetter = cleanValues[0].toUpperCase()
 
           // Only include items for the requested letter
           if (itemLetter === letter) {
             items.push({
               letter: itemLetter,
-              term: values[1],
-              definition: values[2],
-              acronym: values[3] || undefined,
+              term: cleanValues[1],
+              definition: cleanValues[2],
+              acronym: cleanValues[3] || undefined,
             })
           }
         }
