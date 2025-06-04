@@ -694,7 +694,6 @@ T,Triad Colors,A color scheme using three colors evenly spaced around the color 
 T,Tribalism,The tendency for people to form groups and favor their own group,
 T,Truncate,To shorten text or data by cutting off characters at a specified length,
 T,Typography,The art and technique of arranging type to make written language readable,
-U,UI,User Interface - the means by which users interact with a computer or application,UI
 U,UI Component,A reusable element of a user interface,
 U,UI Design,Focuses on the visual elements and interactive components that users see and interact with when using a digital product or service,
 U,UI Element,An individual part of a user interface,
@@ -721,6 +720,7 @@ U,User Flow,The path taken by users to complete a task in an application,
 U,User Groups,Collections of users with similar characteristics or needs,
 U,User Insights,"Understanding gained about user behaviors, needs, and motivations",
 U,User Interactions,The ways users engage with and manipulate interface elements,
+U,User Interface,The means by which users interact with a computer or application,UI
 U,User Interface,The means by which users interact with a computer or application,UI
 U,User Journey,The complete experience a user has with a product over time,
 U,User Journey Map,A visual representation of the user's experience across touchpoints,
