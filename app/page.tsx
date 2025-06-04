@@ -16,10 +16,7 @@ export default async function HomePage() {
   const glossaryItems = await loadGlossaryDataSafe()
   const hasGlossaryItems = Object.keys(glossaryItems).length > 0
   const alphabet = ["0-9", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))]
-
-  // Add debugging
   const totalTerms = Object.values(glossaryItems).reduce((total, items) => total + items.length, 0)
-  console.log(`Homepage: Found ${totalTerms} total terms across ${Object.keys(glossaryItems).length} letters`)
 
   return (
     <main className="max-w-4xl mx-auto p-6 border border-gray-200 dark:border-gray-700 rounded-lg my-8 bg-white dark:bg-gray-800">

@@ -40,24 +40,17 @@ function parseCSVLine(line: string): string[] {
 }
 
 export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
-  console.log("=== loadGlossaryData START ===")
-
   try {
     const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
-    console.log("CSV path:", csvPath)
 
     if (!fs.existsSync(csvPath)) {
-      console.log("CSV file not found")
       return {}
     }
 
     const csvContent = fs.readFileSync(csvPath, "utf-8")
     const lines = csvContent.trim().split("\n")
-    console.log("Total lines:", lines.length)
-    console.log("Header:", lines[0])
 
     if (lines.length < 2) {
-      console.log("No data rows found")
       return {}
     }
 
@@ -77,8 +70,7 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
             letter: values[0] || "",
             term: values[1] || "",
             definition: values[2] || "",
-            acronym: values[3] || undefined, // 4th column
-            // seeAlso is not in your CSV, so leave undefined
+            acronym: values[3] || undefined,
           }
 
           // Clean up empty strings
@@ -87,35 +79,15 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
           // Validate essential fields
           if (item.letter && item.term && item.definition) {
             items.push(item)
-
-            // Log first few items for debugging
-            if (i <= 5) {
-              console.log(`Item ${i}:`, {
-                letter: item.letter,
-                term: item.term,
-                definition: item.definition.substring(0, 30) + "...",
-                acronym: item.acronym,
-              })
-            }
-          } else {
-            console.log(`Line ${i}: missing essential fields`, {
-              letter: item.letter,
-              term: item.term,
-              hasDefinition: !!item.definition,
-            })
           }
-        } else {
-          console.log(`Line ${i}: only ${values.length} columns, need at least 3`)
         }
       } catch (error) {
-        console.error(`Error parsing line ${i}:`, error)
+        // Silently skip problematic lines
+        continue
       }
     }
 
-    console.log(`Successfully parsed ${items.length} items`)
-
     if (items.length === 0) {
-      console.log("No valid items found")
       return {}
     }
 
@@ -141,17 +113,8 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
       grouped[letter].sort((a, b) => a.term.localeCompare(b.term))
     })
 
-    const summary = Object.entries(grouped)
-      .map(([letter, items]) => `${letter}:${items.length}`)
-      .join(", ")
-    console.log("Final grouping:", summary)
-    console.log("=== loadGlossaryData SUCCESS ===")
-
     return grouped
   } catch (error) {
-    console.error("=== loadGlossaryData ERROR ===")
-    console.error("Error:", error)
-    console.log("=== loadGlossaryData ERROR END ===")
     return {}
   }
 }
@@ -163,9 +126,7 @@ export async function getGlossaryItems(): Promise<GlossaryItem[]> {
 
 export async function getGlossaryItemsByLetter(letter: string): Promise<GlossaryItem[]> {
   const allData = await loadGlossaryData()
-  const items = allData[letter.toUpperCase()] || []
-  console.log(`getGlossaryItemsByLetter(${letter}) returning ${items.length} items`)
-  return items
+  return allData[letter.toUpperCase()] || []
 }
 
 export async function searchGlossaryItems(query: string): Promise<GlossaryItem[]> {
