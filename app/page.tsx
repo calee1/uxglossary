@@ -15,7 +15,7 @@ async function loadGlossaryDataSafe() {
 export default async function HomePage() {
   const glossaryItems = await loadGlossaryDataSafe()
   const hasGlossaryItems = Object.keys(glossaryItems).length > 0
-  const alphabet = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))
+  const alphabet = ["0-9", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))]
 
   // Add debugging
   const totalTerms = Object.values(glossaryItems).reduce((total, items) => total + items.length, 0)
@@ -61,9 +61,11 @@ export default async function HomePage() {
         </div>
       )}
 
-      <div className="grid grid-cols-6 md:grid-cols-13 gap-4 justify-center my-8">
+      <div className="grid grid-cols-6 md:grid-cols-9 gap-4 justify-center my-8">
         {alphabet.map((letter) => {
-          const hasContent = glossaryItems[letter] && glossaryItems[letter].length > 0
+          // For checking if content exists, use "0" for "0-9"
+          const dataKey = letter === "0-9" ? "0" : letter
+          const hasContent = glossaryItems[dataKey] && glossaryItems[dataKey].length > 0
 
           return (
             <Link
@@ -81,7 +83,7 @@ export default async function HomePage() {
               <div className="text-2xl font-bold">{letter}</div>
               {hasContent && (
                 <div className="text-xs mt-1">
-                  {glossaryItems[letter].length} {glossaryItems[letter].length === 1 ? "term" : "terms"}
+                  {glossaryItems[dataKey].length} {glossaryItems[dataKey].length === 1 ? "term" : "terms"}
                 </div>
               )}
             </Link>

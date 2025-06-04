@@ -125,8 +125,8 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
     items.forEach((item) => {
       let letter = item.letter.toUpperCase()
 
-      // Handle numeric terms - if term starts with number, group under "0"
-      if (/^\d/.test(item.term)) {
+      // Handle numeric terms - if letter is "0" OR term starts with number, group under "0"
+      if (letter === "0" || /^\d/.test(item.term)) {
         letter = "0"
       }
 
