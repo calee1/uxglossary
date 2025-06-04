@@ -184,7 +184,6 @@ C,"Component","Reusable UI elements that maintain consistency across a design sy
 C,"Component Library","A collection of reusable UI components with defined standards for consistent implementation across products",
 C,"Component State","The various conditions a UI component can be in, such as hover or selected",
 C,"Component Variants","Different versions of a UI component for different use cases",
-C,"Components","Reusable UI elements that maintain consistency across a design system",
 C,"Compound Colors","Colors created by mixing multiple base colors",
 C,"Concatenate","The process of joining two or more strings or data elements together end-to-end to form a single combined element",
 C,"Concept Testing","Evaluating ideas or concepts with users before full development",
