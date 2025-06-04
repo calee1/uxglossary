@@ -749,7 +749,6 @@ V,Visual Design,"The use of imagery, color, shapes, typography, and form to enha
 V,Vlog,A blog that contains video content,
 V,Voice of Customer,Direct feedback and insights from customers about their experiences,VOC
 V,Voice User Interface,An interface that allows users to interact through voice commands,VUI
-W,W3C,"World Wide Web Consortium, the organization that develops web standards",W3C
 W,Waterfall,A sequential development methodology where each phase must be completed before the next,
 W,Wayfinding,The process of using spatial and environmental information to navigate,
 W,WCAG,"Web Content Accessibility Guidelines, standards for web accessibility",WCAG
@@ -766,6 +765,7 @@ W,Wireframe,A basic structural blueprint showing the layout of a webpage or app,
 W,Wizard,A step-by-step interface that guides users through a complex process,
 W,Wizard-of-Oz Testing,Testing where a human secretly provides responses that appear to come from a computer,
 W,Word Cloud,A visual representation of text where word size indicates frequency or importance,
+W,World Wide Web Consortium,The organization that develops web standards,W3C
 W,Worst Idea,A brainstorming technique where participants intentionally generate bad ideas,
 X,X-axis,The horizontal axis in a coordinate system or data visualization that typically represents the independent variable or categories,
 X,XML,eXtensible Markup Language - a markup language for storing and transporting data,XML
