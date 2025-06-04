@@ -10,35 +10,6 @@ export interface GlossaryItem {
   seeAlso?: string
 }
 
-function parseCSVLine(line: string): string[] {
-  const result: string[] = []
-  let current = ""
-  let inQuotes = false
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i]
-
-    if (char === '"') {
-      if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
-        // Handle escaped quotes
-        current += '"'
-        i++ // Skip next quote
-      } else {
-        // Toggle quote state
-        inQuotes = !inQuotes
-      }
-    } else if (char === "," && !inQuotes) {
-      result.push(current.trim())
-      current = ""
-    } else {
-      current += char
-    }
-  }
-
-  result.push(current.trim())
-  return result.map((val) => val.replace(/^"(.*)"$/, "$1"))
-}
-
 export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
   try {
     console.log("=== LOAD GLOSSARY DATA START ===")
@@ -48,100 +19,99 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
 
     if (!fs.existsSync(csvPath)) {
       console.error("CSV file does not exist at path:", csvPath)
-      console.log("Current directory:", process.cwd())
-      console.log("Directory contents:", fs.readdirSync(process.cwd()))
       return {}
     }
 
-    console.log("Reading CSV file...")
     const csvContent = fs.readFileSync(csvPath, "utf-8")
-    console.log("CSV content length:", csvContent.length)
-    console.log("First 200 chars:", csvContent.substring(0, 200))
-
     const lines = csvContent.trim().split("\n")
-    console.log("Total lines:", lines.length)
+
+    console.log("CSV loaded - total lines:", lines.length)
+    console.log("Header:", lines[0])
+    console.log("Sample line 1:", lines[1])
+    console.log("Sample line 2:", lines[2])
 
     if (lines.length < 2) {
-      console.error("Not enough lines in CSV, only found:", lines.length)
+      console.error("Not enough lines in CSV")
       return {}
     }
 
-    const items: GlossaryItem[] = []
-    console.log("Processing lines...")
+    const grouped: Record<string, GlossaryItem[]> = {}
+    let processedCount = 0
+    let errorCount = 0
 
-    // Process each data line (skip header at index 0)
+    // Process each line (skip header)
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim()
       if (!line) continue
 
       try {
-        const values = parseCSVLine(line)
+        // Simple CSV parsing - handle quotes properly
+        const values: string[] = []
+        let current = ""
+        let inQuotes = false
 
-        // Your CSV has 4 columns: letter,term,definition,acronym
-        if (values.length >= 3) {
-          const item: GlossaryItem = {
-            letter: values[0] || "",
-            term: values[1] || "",
-            definition: values[2] || "",
-            acronym: values[3] || undefined,
-          }
+        for (let j = 0; j < line.length; j++) {
+          const char = line[j]
 
-          // Clean up empty strings
-          if (item.acronym === "") item.acronym = undefined
-
-          // Validate essential fields
-          if (item.letter && item.term && item.definition) {
-            items.push(item)
+          if (char === '"') {
+            inQuotes = !inQuotes
+          } else if (char === "," && !inQuotes) {
+            values.push(current.trim())
+            current = ""
           } else {
-            console.log(`Line ${i}: Missing essential fields`, item)
+            current += char
           }
-        } else {
-          console.log(`Line ${i}: Not enough values (${values.length})`)
+        }
+        values.push(current.trim())
+
+        // Remove surrounding quotes
+        const cleanValues = values.map((v) => v.replace(/^"(.*)"$/, "$1"))
+
+        if (cleanValues.length >= 3 && cleanValues[0] && cleanValues[1] && cleanValues[2]) {
+          const letter = cleanValues[0].toUpperCase()
+          const item: GlossaryItem = {
+            letter: letter,
+            term: cleanValues[1],
+            definition: cleanValues[2],
+            acronym: cleanValues[3] || undefined,
+          }
+
+          // Handle numeric entries
+          const groupLetter = letter === "0" || /^\d/.test(item.term) ? "0" : letter
+
+          if (!grouped[groupLetter]) {
+            grouped[groupLetter] = []
+          }
+          grouped[groupLetter].push(item)
+          processedCount++
+
+          // Log first few A items for debugging
+          if (groupLetter === "A" && grouped[groupLetter].length <= 3) {
+            console.log(`A item ${grouped[groupLetter].length}:`, item.term)
+          }
         }
       } catch (error) {
-        console.log(`Line ${i}: Parse error:`, error)
-        continue
+        errorCount++
+        if (errorCount <= 5) {
+          console.log(`Parse error on line ${i}:`, error)
+        }
       }
     }
 
-    console.log("Total valid items parsed:", items.length)
-
-    if (items.length === 0) {
-      console.error("No valid items found in CSV")
-      return {}
-    }
-
-    // Group by letter
-    const grouped: Record<string, GlossaryItem[]> = {}
-
-    items.forEach((item) => {
-      let letter = item.letter.toUpperCase()
-
-      // Handle numeric terms - if letter is "0" OR term starts with number, group under "0"
-      if (letter === "0" || /^\d/.test(item.term)) {
-        letter = "0"
-      }
-
-      if (!grouped[letter]) {
-        grouped[letter] = []
-      }
-      grouped[letter].push(item)
-    })
-
-    // Sort items within each letter group
+    // Sort items within each group
     Object.keys(grouped).forEach((letter) => {
       grouped[letter].sort((a, b) => a.term.localeCompare(b.term))
     })
 
-    console.log("Final grouped data:", Object.keys(grouped))
-    console.log(
-      "Letter counts:",
-      Object.keys(grouped)
-        .map((letter) => `${letter}: ${grouped[letter].length}`)
-        .join(", "),
-    )
-    console.log("=== LOAD GLOSSARY DATA END ===")
+    console.log("Processing complete:")
+    console.log("- Processed items:", processedCount)
+    console.log("- Parse errors:", errorCount)
+    console.log("- Letters found:", Object.keys(grouped).sort())
+    console.log("- A items:", grouped["A"]?.length || 0)
+    console.log("- B items:", grouped["B"]?.length || 0)
+    console.log("- C items:", grouped["C"]?.length || 0)
 
+    console.log("=== LOAD GLOSSARY DATA END ===")
     return grouped
   } catch (error) {
     console.error("Load glossary data error:", error)
