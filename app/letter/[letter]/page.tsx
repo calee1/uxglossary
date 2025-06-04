@@ -14,6 +14,7 @@ async function loadGlossaryDataSafe() {
     const { loadGlossaryData } = await import("@/lib/csv-parser.server")
     const data = await loadGlossaryData()
     console.log("Letter page: Loaded data with keys:", Object.keys(data))
+    console.log("Letter page: Sample data from A:", data.A?.slice(0, 2))
     return data
   } catch (error) {
     console.error("Failed to load glossary data:", error)
@@ -22,12 +23,17 @@ async function loadGlossaryDataSafe() {
 }
 
 export default async function LetterPage({ params }: LetterPageProps) {
+  console.log("Letter page params:", params)
+
   const letter = params.letter === "0-9" ? "0" : params.letter.toUpperCase()
   const displayLetter = params.letter === "0-9" ? "0-9" : params.letter.toUpperCase()
+
+  console.log("Letter page: URL param =", params.letter, "| Lookup key =", letter, "| Display =", displayLetter)
 
   const alphabet = ["0", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))]
 
   if (!alphabet.includes(letter)) {
+    console.log("Letter not in alphabet, showing 404")
     notFound()
   }
 
@@ -35,6 +41,9 @@ export default async function LetterPage({ params }: LetterPageProps) {
   const items = glossaryItems[letter] || []
 
   console.log(`Letter page for "${letter}": Found ${items.length} items`)
+  console.log("Available letters in data:", Object.keys(glossaryItems))
+  console.log("Looking for letter:", letter)
+  console.log("Items for this letter:", items.slice(0, 3))
 
   return (
     <main className="max-w-4xl mx-auto p-6 border border-gray-200 dark:border-gray-700 rounded-lg my-8 bg-white dark:bg-gray-800">
@@ -72,32 +81,38 @@ export default async function LetterPage({ params }: LetterPageProps) {
         </p>
       </div>
 
-      {/* Temporary debug info */}
-      {process.env.NODE_ENV === "development" && items.length === 0 && (
-        <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-sm">
-          <strong>Debug:</strong> No items found for letter "{letter}"
+      {/* Enhanced debug info */}
+      <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-sm">
+        <strong>Debug Info:</strong>
+        <br />
+        <strong>URL Parameter:</strong> {params.letter}
+        <br />
+        <strong>Lookup Key:</strong> {letter}
+        <br />
+        <strong>Available Letters:</strong> {Object.keys(glossaryItems).join(", ")}
+        <br />
+        <strong>Items Found:</strong> {items.length}
+        <br />
+        {Object.keys(glossaryItems).length > 0 && (
+          <>
+            <strong>Sample from A:</strong> {glossaryItems["A"]?.[0]?.term || "No A data"}
+            <br />
+            <strong>Sample from B:</strong> {glossaryItems["B"]?.[0]?.term || "No B data"}
+          </>
+        )}
+      </div>
+
+      {items.length === 0 && (
+        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-sm">
+          <strong>No Items Found:</strong>
+          <br />
+          Looking for letter: "{letter}"
           <br />
           Available letters: {Object.keys(glossaryItems).join(", ")}
           <br />
           <Link href="/api/debug-data" className="text-blue-600 hover:underline">
             Check raw data
           </Link>
-        </div>
-      )}
-
-      {process.env.NODE_ENV === "development" && (
-        <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-sm">
-          <strong>Debug:</strong> Letter page for "{letter}" ({displayLetter})
-          <br />
-          <strong>Items count:</strong> {items.length}
-          <br />
-          {items.length > 0 && (
-            <>
-              <strong>First item:</strong> {items[0].term}
-              <br />
-              <strong>Last item:</strong> {items[items.length - 1].term}
-            </>
-          )}
         </div>
       )}
 
