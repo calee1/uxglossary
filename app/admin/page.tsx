@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { LogOut, Settings, Database, Users, BarChart3, Edit3 } from "lucide-react"
+import { LogOut, Settings, Edit3 } from "lucide-react"
 import { DiagnosticPanel } from "./diagnostic-panel"
 import { DownloadButton } from "./download-button"
 import { SetupWizard } from "./setup-wizard"
@@ -71,60 +71,6 @@ export default function AdminPage() {
       default:
         return (
           <>
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center">
-                    <Database className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Terms</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">500+</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center">
-                    <BarChart3 className="h-8 w-8 text-green-600 dark:text-green-400" />
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Categories</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">26</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center">
-                    <Users className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Recent Updates</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">12</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center">
-                    <Settings className="h-8 w-8 text-orange-600 dark:text-orange-400" />
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Status</p>
-                      <p className="text-2xl font-bold text-green-600 dark:text-green-400">Active</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* GitHub Integration Diagnostics */}
-            <DiagnosticPanel />
-
             {/* Action Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               {/* Content Management */}
@@ -193,6 +139,9 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* GitHub Integration Diagnostics */}
+            <DiagnosticPanel />
 
             {/* Recent Activity */}
             <Card>
