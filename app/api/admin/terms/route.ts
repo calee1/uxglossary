@@ -1,7 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { cookies } from "next/headers"
-import fs from "fs"
-import path from "path"
 
 // Check authentication
 function isAuthenticated(): boolean {
@@ -63,44 +61,78 @@ function itemToCSVLine(item: GlossaryItem): string {
   return [item.letter, escapeCSVValue(item.term), escapeCSVValue(item.definition), item.acronym || ""].join(",")
 }
 
-// Helper function to load all terms
-function loadAllTerms(): GlossaryItem[] {
-  const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
+// Helper function to load terms from GitHub
+async function loadTermsFromGitHub(): Promise<{ terms: GlossaryItem[]; sha?: string }> {
+  const githubToken = process.env.GITHUB_TOKEN
+  const githubRepo = process.env.GITHUB_REPO
+  const githubBranch = process.env.GITHUB_BRANCH || "main"
 
-  if (!fs.existsSync(csvPath)) {
-    return []
+  if (!githubToken || !githubRepo) {
+    throw new Error("GitHub configuration missing")
   }
 
-  const csvContent = fs.readFileSync(csvPath, "utf-8")
-  const lines = csvContent.trim().split("\n")
-  const terms: GlossaryItem[] = []
+  try {
+    // Get the current file from GitHub
+    const response = await fetch(
+      `https://api.github.com/repos/${githubRepo}/contents/data/glossary.csv?ref=${githubBranch}`,
+      {
+        headers: {
+          Authorization: `Bearer ${githubToken}`,
+          "User-Agent": "UX-Glossary-Admin",
+          Accept: "application/vnd.github.v3+json",
+        },
+      },
+    )
 
-  // Skip header
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim()
-    if (!line) continue
-
-    try {
-      const values = parseCSVLine(line)
-      if (values.length >= 3) {
-        terms.push({
-          letter: values[0],
-          term: values[1],
-          definition: values[2],
-          acronym: values[3] || undefined,
-        })
+    if (!response.ok) {
+      if (response.status === 404) {
+        // File doesn't exist yet, return empty
+        return { terms: [] }
       }
-    } catch (error) {
-      console.error(`Error parsing line ${i}:`, error)
+      throw new Error(`GitHub API error: ${response.status}`)
     }
-  }
 
-  return terms
+    const fileData = await response.json()
+    const csvContent = Buffer.from(fileData.content, "base64").toString("utf-8")
+    const lines = csvContent.trim().split("\n")
+    const terms: GlossaryItem[] = []
+
+    // Skip header
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim()
+      if (!line) continue
+
+      try {
+        const values = parseCSVLine(line)
+        if (values.length >= 3) {
+          terms.push({
+            letter: values[0],
+            term: values[1],
+            definition: values[2],
+            acronym: values[3] || undefined,
+          })
+        }
+      } catch (error) {
+        console.error(`Error parsing line ${i}:`, error)
+      }
+    }
+
+    return { terms, sha: fileData.sha }
+  } catch (error) {
+    console.error("Error loading from GitHub:", error)
+    throw error
+  }
 }
 
-// Helper function to save all terms
-function saveAllTerms(terms: GlossaryItem[]): void {
-  const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
+// Helper function to save terms to GitHub
+async function saveTermsToGitHub(terms: GlossaryItem[], sha?: string): Promise<void> {
+  const githubToken = process.env.GITHUB_TOKEN
+  const githubRepo = process.env.GITHUB_REPO
+  const githubBranch = process.env.GITHUB_BRANCH || "main"
+
+  if (!githubToken || !githubRepo) {
+    throw new Error("GitHub configuration missing")
+  }
 
   // Sort terms by letter, then by term
   const sortedTerms = terms.sort((a, b) => {
@@ -116,14 +148,40 @@ function saveAllTerms(terms: GlossaryItem[]): void {
     csvContent += itemToCSVLine(term) + "\n"
   }
 
-  // Create backup
-  if (fs.existsSync(csvPath)) {
-    const backupPath = `${csvPath}.backup-${Date.now()}`
-    fs.copyFileSync(csvPath, backupPath)
+  // Prepare the commit data
+  const commitData: any = {
+    message: `Update glossary: ${new Date().toISOString()}`,
+    content: Buffer.from(csvContent).toString("base64"),
+    branch: githubBranch,
   }
 
-  // Write new content
-  fs.writeFileSync(csvPath, csvContent, "utf-8")
+  // Include SHA if updating existing file
+  if (sha) {
+    commitData.sha = sha
+  }
+
+  try {
+    const response = await fetch(`https://api.github.com/repos/${githubRepo}/contents/data/glossary.csv`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${githubToken}`,
+        "User-Agent": "UX-Glossary-Admin",
+        Accept: "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(commitData),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.text()
+      throw new Error(`GitHub API error: ${response.status} - ${errorData}`)
+    }
+
+    console.log("Successfully saved to GitHub")
+  } catch (error) {
+    console.error("Error saving to GitHub:", error)
+    throw error
+  }
 }
 
 // POST - Add new term
@@ -140,8 +198,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Term and definition are required" }, { status: 400 })
     }
 
-    // Load existing terms
-    const terms = loadAllTerms()
+    // Load existing terms from GitHub
+    const { terms, sha } = await loadTermsFromGitHub()
 
     // Check for duplicates
     const existingTerm = terms.find((t) => t.term.toLowerCase() === newTerm.term.toLowerCase())
@@ -158,13 +216,19 @@ export async function POST(request: NextRequest) {
     // Add new term
     terms.push(newTerm)
 
-    // Save to file
-    saveAllTerms(terms)
+    // Save to GitHub
+    await saveTermsToGitHub(terms, sha)
 
     return NextResponse.json({ success: true, term: newTerm })
   } catch (error) {
     console.error("Error adding term:", error)
-    return NextResponse.json({ error: "Failed to add term" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Failed to add term",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
   }
 }
 
@@ -177,41 +241,84 @@ export async function PUT(request: NextRequest) {
   try {
     const updatedTerm: GlossaryItem & { originalTerm?: string } = await request.json()
 
-    console.log("PUT request received:", updatedTerm)
+    console.log("=== PUT REQUEST DEBUG ===")
+    console.log("Received data:", JSON.stringify(updatedTerm, null, 2))
 
     // Validate required fields
     if (!updatedTerm.term || !updatedTerm.definition) {
+      console.log("Validation failed: missing term or definition")
       return NextResponse.json({ error: "Term and definition are required" }, { status: 400 })
     }
 
-    // Load existing terms
-    const terms = loadAllTerms()
-    console.log("Loaded terms count:", terms.length)
+    // Load existing terms from GitHub
+    const { terms, sha } = await loadTermsFromGitHub()
+    console.log("Total terms loaded from GitHub:", terms.length)
 
     // Find the term to update - use originalTerm if provided, otherwise use current term
     const searchTerm = updatedTerm.originalTerm || updatedTerm.term
-    const termIndex = terms.findIndex(
-      (t) =>
-        t.term.toLowerCase() === searchTerm.toLowerCase() ||
-        (t.term.toLowerCase() === updatedTerm.term.toLowerCase() && t.letter === updatedTerm.letter),
-    )
-
     console.log("Searching for term:", searchTerm)
-    console.log("Term index found:", termIndex)
+
+    // Try multiple search strategies
+    let termIndex = -1
+
+    // Strategy 1: Exact match with originalTerm
+    if (updatedTerm.originalTerm) {
+      termIndex = terms.findIndex((t) => t.term === updatedTerm.originalTerm)
+      console.log("Strategy 1 (exact originalTerm match):", termIndex)
+    }
+
+    // Strategy 2: Case-insensitive match with originalTerm
+    if (termIndex === -1 && updatedTerm.originalTerm) {
+      termIndex = terms.findIndex((t) => t.term.toLowerCase() === updatedTerm.originalTerm.toLowerCase())
+      console.log("Strategy 2 (case-insensitive originalTerm):", termIndex)
+    }
+
+    // Strategy 3: Exact match with current term
+    if (termIndex === -1) {
+      termIndex = terms.findIndex((t) => t.term === updatedTerm.term)
+      console.log("Strategy 3 (exact current term):", termIndex)
+    }
+
+    // Strategy 4: Case-insensitive match with current term
+    if (termIndex === -1) {
+      termIndex = terms.findIndex((t) => t.term.toLowerCase() === updatedTerm.term.toLowerCase())
+      console.log("Strategy 4 (case-insensitive current term):", termIndex)
+    }
+
+    console.log("Final term index found:", termIndex)
 
     if (termIndex === -1) {
-      console.log("Available terms:", terms.map((t) => `${t.letter}: ${t.term}`).slice(0, 10))
-      return NextResponse.json({ error: "Term not found" }, { status: 404 })
+      console.log("TERM NOT FOUND!")
+      console.log("Available terms matching letter", updatedTerm.letter, ":")
+      const matchingLetterTerms = terms.filter((t) => t.letter === updatedTerm.letter)
+      console.log(matchingLetterTerms.map((t) => `"${t.term}"`))
+
+      return NextResponse.json(
+        {
+          error: "Term not found",
+          debug: {
+            searchTerm,
+            availableTermsForLetter: matchingLetterTerms.map((t) => t.term),
+            totalTerms: terms.length,
+          },
+        },
+        { status: 404 },
+      )
     }
+
+    console.log("Found term at index", termIndex, ":", terms[termIndex])
 
     // Update the term (remove originalTerm from the saved data)
     const { originalTerm, ...termToSave } = updatedTerm
+    const oldTerm = { ...terms[termIndex] }
     terms[termIndex] = termToSave
 
-    console.log("Updated term:", terms[termIndex])
+    console.log("Old term:", oldTerm)
+    console.log("New term:", terms[termIndex])
 
-    // Save to file
-    saveAllTerms(terms)
+    // Save to GitHub
+    await saveTermsToGitHub(terms, sha)
+    console.log("Terms saved successfully to GitHub")
 
     return NextResponse.json({ success: true, term: termToSave })
   } catch (error) {
@@ -239,8 +346,8 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Term name is required" }, { status: 400 })
     }
 
-    // Load existing terms
-    const terms = loadAllTerms()
+    // Load existing terms from GitHub
+    const { terms, sha } = await loadTermsFromGitHub()
 
     // Find and remove the term
     const termIndex = terms.findIndex((t) => t.term.toLowerCase() === termName.toLowerCase())
@@ -252,12 +359,18 @@ export async function DELETE(request: NextRequest) {
     const deletedTerm = terms[termIndex]
     terms.splice(termIndex, 1)
 
-    // Save to file
-    saveAllTerms(terms)
+    // Save to GitHub
+    await saveTermsToGitHub(terms, sha)
 
     return NextResponse.json({ success: true, deletedTerm })
   } catch (error) {
     console.error("Error deleting term:", error)
-    return NextResponse.json({ error: "Failed to delete term" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Failed to delete term",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
   }
 }
