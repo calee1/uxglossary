@@ -5,7 +5,13 @@ import { ThemeToggle } from "@/components/theme-toggle"
 async function loadGlossaryDataSafe() {
   try {
     const { loadGlossaryData } = await import("@/lib/csv-parser.server")
-    return await loadGlossaryData()
+    const data = await loadGlossaryData()
+    console.log("Homepage: Loaded data with keys:", Object.keys(data))
+    console.log(
+      "Homepage: Total terms:",
+      Object.values(data).reduce((sum, items) => sum + items.length, 0),
+    )
+    return data
   } catch (error) {
     console.error("Failed to load glossary data:", error)
     return {}
@@ -51,10 +57,24 @@ export default async function HomePage() {
 
       <SearchBox />
 
+      {/* Temporary debug info */}
+      {process.env.NODE_ENV === "development" && (
+        <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-sm">
+          <strong>Debug:</strong> Found {totalTerms} terms across {Object.keys(glossaryItems).length} letters
+          <br />
+          <Link href="/api/debug-data" className="text-blue-600 hover:underline">
+            View raw data
+          </Link>
+        </div>
+      )}
+
       {!hasGlossaryItems && (
-        <div className="p-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg mb-8">
-          <h3 className="text-yellow-800 dark:text-yellow-200 font-medium text-lg mb-2">Loading...</h3>
-          <p className="text-yellow-700 dark:text-yellow-300">The glossary is loading. Please wait a moment.</p>
+        <div className="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-8">
+          <h3 className="text-red-800 dark:text-red-200 font-medium text-lg mb-2">No Data Found</h3>
+          <p className="text-red-700 dark:text-red-300">The glossary data could not be loaded.</p>
+          <Link href="/api/debug-data" className="text-blue-600 hover:underline">
+            Check debug data
+          </Link>
         </div>
       )}
 

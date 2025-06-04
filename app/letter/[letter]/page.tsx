@@ -12,7 +12,9 @@ interface LetterPageProps {
 async function loadGlossaryDataSafe() {
   try {
     const { loadGlossaryData } = await import("@/lib/csv-parser.server")
-    return await loadGlossaryData()
+    const data = await loadGlossaryData()
+    console.log("Letter page: Loaded data with keys:", Object.keys(data))
+    return data
   } catch (error) {
     console.error("Failed to load glossary data:", error)
     return {}
@@ -31,6 +33,8 @@ export default async function LetterPage({ params }: LetterPageProps) {
 
   const glossaryItems = await loadGlossaryDataSafe()
   const items = glossaryItems[letter] || []
+
+  console.log(`Letter page for "${letter}": Found ${items.length} items`)
 
   return (
     <main className="max-w-4xl mx-auto p-6 border border-gray-200 dark:border-gray-700 rounded-lg my-8 bg-white dark:bg-gray-800">
@@ -67,6 +71,19 @@ export default async function LetterPage({ params }: LetterPageProps) {
           {items.length} {items.length === 1 ? "term" : "terms"}
         </p>
       </div>
+
+      {/* Temporary debug info */}
+      {process.env.NODE_ENV === "development" && items.length === 0 && (
+        <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-sm">
+          <strong>Debug:</strong> No items found for letter "{letter}"
+          <br />
+          Available letters: {Object.keys(glossaryItems).join(", ")}
+          <br />
+          <Link href="/api/debug-data" className="text-blue-600 hover:underline">
+            Check raw data
+          </Link>
+        </div>
+      )}
 
       <LetterPageContent items={items} letter={letter} allItems={glossaryItems} />
 
