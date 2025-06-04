@@ -9,15 +9,16 @@ interface LetterPageProps {
   }
 }
 
-// Modify the loadGlossaryDataSafe function to be more robust
-
 async function loadGlossaryDataSafe() {
   try {
     console.log("Letter page: Starting to load glossary data...")
     const { loadGlossaryData } = await import("@/lib/csv-parser.server")
     console.log("Letter page: Import successful, calling function...")
     const data = await loadGlossaryData()
-    console.log("Letter page: Function completed, data keys:", Object.keys(data))
+    console.log("Letter page: Function completed")
+    console.log("Letter page: Data keys:", Object.keys(data))
+    console.log("Letter page: A count:", data["A"]?.length || 0)
+    console.log("Letter page: B count:", data["B"]?.length || 0)
     console.log(
       "Letter page: Total terms:",
       Object.values(data).reduce((sum, items) => sum + items.length, 0),
@@ -25,12 +26,13 @@ async function loadGlossaryDataSafe() {
     return data
   } catch (error) {
     console.error("Letter page: Failed to load glossary data:", error)
+    console.error("Letter page: Error stack:", error instanceof Error ? error.stack : "No stack")
     return {}
   }
 }
 
 export default async function LetterPage({ params }: LetterPageProps) {
-  console.log("Letter page params:", params)
+  console.log("Letter page rendering with params:", params)
 
   const letter = params.letter === "0-9" ? "0" : params.letter.toUpperCase()
   const displayLetter = params.letter === "0-9" ? "0-9" : params.letter.toUpperCase()
@@ -44,13 +46,12 @@ export default async function LetterPage({ params }: LetterPageProps) {
     notFound()
   }
 
+  console.log("Letter page: About to load glossary data...")
   const glossaryItems = await loadGlossaryDataSafe()
-  const items = glossaryItems[letter] || []
+  console.log("Letter page: Glossary data loaded, keys:", Object.keys(glossaryItems))
 
+  const items = glossaryItems[letter] || []
   console.log(`Letter page for "${letter}": Found ${items.length} items`)
-  console.log("Available letters in data:", Object.keys(glossaryItems))
-  console.log("Looking for letter:", letter)
-  console.log("Items for this letter:", items.slice(0, 3))
 
   return (
     <main className="max-w-4xl mx-auto p-6 border border-gray-200 dark:border-gray-700 rounded-lg my-8 bg-white dark:bg-gray-800">
@@ -100,6 +101,9 @@ export default async function LetterPage({ params }: LetterPageProps) {
         <br />
         <strong>Items Found:</strong> {items.length}
         <br />
+        <strong>Total Items in Data:</strong>{" "}
+        {Object.values(glossaryItems).reduce((sum, items) => sum + items.length, 0)}
+        <br />
         {Object.keys(glossaryItems).length > 0 && (
           <>
             <strong>Sample from A:</strong> {glossaryItems["A"]?.[0]?.term || "No A data"}
@@ -107,18 +111,25 @@ export default async function LetterPage({ params }: LetterPageProps) {
             <strong>Sample from B:</strong> {glossaryItems["B"]?.[0]?.term || "No B data"}
           </>
         )}
+        <br />
+        <Link href="/api/simple-test" className="text-blue-600 hover:underline">
+          Test API (working)
+        </Link>
+        {" | "}
+        <Link href="/api/direct-letter/a" className="text-blue-600 hover:underline">
+          Direct API (working)
+        </Link>
       </div>
 
-      {items.length === 0 && (
+      {items.length === 0 && Object.keys(glossaryItems).length === 0 && (
         <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-sm">
-          <strong>No Items Found:</strong>
+          <strong>No Data Loaded:</strong>
           <br />
-          Looking for letter: "{letter}"
+          The glossary data is completely empty. This suggests an issue with the CSV parser when called from the page
+          component.
           <br />
-          Available letters: {Object.keys(glossaryItems).join(", ")}
-          <br />
-          <Link href="/api/debug-data" className="text-blue-600 hover:underline">
-            Check raw data
+          <Link href="/api/simple-test" className="text-blue-600 hover:underline">
+            Check API test (this works)
           </Link>
         </div>
       )}
