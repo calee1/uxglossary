@@ -46,101 +46,86 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
     const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
     console.log("CSV path:", csvPath)
 
-    // Check if file exists
-    const fileExists = fs.existsSync(csvPath)
-    console.log("File exists:", fileExists)
-
-    if (!fileExists) {
-      console.log("CSV file not found, returning empty object")
+    if (!fs.existsSync(csvPath)) {
+      console.log("CSV file not found")
       return {}
     }
 
-    // Read file
     const csvContent = fs.readFileSync(csvPath, "utf-8")
-    console.log("CSV content length:", csvContent.length)
-    console.log("First 200 chars:", csvContent.substring(0, 200))
-
     const lines = csvContent.trim().split("\n")
     console.log("Total lines:", lines.length)
+    console.log("Header:", lines[0])
 
     if (lines.length < 2) {
-      console.log("CSV file has no data rows")
+      console.log("No data rows found")
       return {}
     }
 
-    // Show header
-    console.log("Header line:", lines[0])
-
     const items: GlossaryItem[] = []
-    let successfulParses = 0
-    let failedParses = 0
 
-    // Process each line
+    // Process each data line (skip header at index 0)
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim()
-      if (!line) {
-        console.log(`Line ${i}: empty, skipping`)
-        continue
-      }
+      if (!line) continue
 
       try {
         const values = parseCSVLine(line)
-        console.log(`Line ${i}: parsed ${values.length} values:`, values.slice(0, 3))
 
+        // Your CSV has 4 columns: letter,term,definition,acronym
         if (values.length >= 3) {
           const item: GlossaryItem = {
             letter: values[0] || "",
             term: values[1] || "",
             definition: values[2] || "",
-            acronym: values[3] || undefined,
-            seeAlso: values[4] || undefined,
+            acronym: values[3] || undefined, // 4th column
+            // seeAlso is not in your CSV, so leave undefined
           }
+
+          // Clean up empty strings
+          if (item.acronym === "") item.acronym = undefined
 
           // Validate essential fields
           if (item.letter && item.term && item.definition) {
             items.push(item)
-            successfulParses++
 
+            // Log first few items for debugging
             if (i <= 5) {
-              // Log first few items
-              console.log(`Item ${successfulParses}:`, {
+              console.log(`Item ${i}:`, {
                 letter: item.letter,
                 term: item.term,
-                definition: item.definition.substring(0, 50) + "...",
+                definition: item.definition.substring(0, 30) + "...",
+                acronym: item.acronym,
               })
             }
           } else {
             console.log(`Line ${i}: missing essential fields`, {
-              hasLetter: !!item.letter,
-              hasTerm: !!item.term,
+              letter: item.letter,
+              term: item.term,
               hasDefinition: !!item.definition,
             })
-            failedParses++
           }
         } else {
-          console.log(`Line ${i}: insufficient columns (${values.length})`)
-          failedParses++
+          console.log(`Line ${i}: only ${values.length} columns, need at least 3`)
         }
       } catch (error) {
         console.error(`Error parsing line ${i}:`, error)
-        failedParses++
       }
     }
 
-    console.log(`Parsing complete: ${successfulParses} successful, ${failedParses} failed`)
+    console.log(`Successfully parsed ${items.length} items`)
 
     if (items.length === 0) {
-      console.log("No valid items parsed, returning empty object")
+      console.log("No valid items found")
       return {}
     }
 
     // Group by letter
     const grouped: Record<string, GlossaryItem[]> = {}
 
-    items.forEach((item, index) => {
+    items.forEach((item) => {
       let letter = item.letter.toUpperCase()
 
-      // Handle numeric terms
+      // Handle numeric terms - if term starts with number, group under "0"
       if (/^\d/.test(item.term)) {
         letter = "0"
       }
@@ -149,14 +134,9 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
         grouped[letter] = []
       }
       grouped[letter].push(item)
-
-      if (index < 5) {
-        // Log first few groupings
-        console.log(`Grouping item ${index + 1}: "${item.term}" -> letter "${letter}"`)
-      }
     })
 
-    // Sort within each group
+    // Sort items within each letter group
     Object.keys(grouped).forEach((letter) => {
       grouped[letter].sort((a, b) => a.term.localeCompare(b.term))
     })
@@ -165,13 +145,12 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
       .map(([letter, items]) => `${letter}:${items.length}`)
       .join(", ")
     console.log("Final grouping:", summary)
-    console.log("=== loadGlossaryData END ===")
+    console.log("=== loadGlossaryData SUCCESS ===")
 
     return grouped
   } catch (error) {
     console.error("=== loadGlossaryData ERROR ===")
-    console.error("Error in loadGlossaryData:", error)
-    console.error("Stack:", error instanceof Error ? error.stack : "No stack")
+    console.error("Error:", error)
     console.log("=== loadGlossaryData ERROR END ===")
     return {}
   }
@@ -196,7 +175,6 @@ export async function searchGlossaryItems(query: string): Promise<GlossaryItem[]
     (item) =>
       item.term.toLowerCase().includes(lowerQuery) ||
       item.definition.toLowerCase().includes(lowerQuery) ||
-      (item.acronym && item.acronym.toLowerCase().includes(lowerQuery)) ||
-      (item.seeAlso && item.seeAlso.toLowerCase().includes(lowerQuery)),
+      (item.acronym && item.acronym.toLowerCase().includes(lowerQuery)),
   )
 }
