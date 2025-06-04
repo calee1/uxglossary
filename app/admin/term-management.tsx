@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -12,8 +12,61 @@ interface GlossaryItem {
   term: string
   definition: string
   acronym?: string
-  seeAlso?: string
 }
+
+// Move TermForm outside the main component to prevent recreation on each render
+const TermForm = ({
+  term,
+  onChange,
+  onSave,
+  onCancel,
+  title,
+}: {
+  term: GlossaryItem
+  onChange: (field: keyof GlossaryItem, value: string) => void
+  onSave: () => void
+  onCancel: () => void
+  title: string
+}) => (
+  <Card className="mb-4">
+    <CardHeader>
+      <CardTitle className="text-lg">{title}</CardTitle>
+    </CardHeader>
+    <CardContent className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium mb-1">Term *</label>
+        <Input value={term.term} onChange={(e) => onChange("term", e.target.value)} placeholder="Enter term name" />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Definition *</label>
+        <Textarea
+          value={term.definition}
+          onChange={(e) => onChange("definition", e.target.value)}
+          placeholder="Enter definition"
+          rows={3}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Acronym (optional)</label>
+        <Input
+          value={term.acronym || ""}
+          onChange={(e) => onChange("acronym", e.target.value)}
+          placeholder="e.g., UX, API, CSS"
+        />
+      </div>
+      <div className="flex gap-2">
+        <Button onClick={onSave} disabled={!term.term.trim() || !term.definition.trim()}>
+          <Save className="h-4 w-4 mr-2" />
+          Save
+        </Button>
+        <Button variant="outline" onClick={onCancel}>
+          <X className="h-4 w-4 mr-2" />
+          Cancel
+        </Button>
+      </div>
+    </CardContent>
+  </Card>
+)
 
 export function TermManagement() {
   const [terms, setTerms] = useState<GlossaryItem[]>([])
@@ -75,7 +128,6 @@ export function TermManagement() {
         term: newTerm.term.trim(),
         definition: newTerm.definition.trim(),
         acronym: newTerm.acronym?.trim() || undefined,
-        seeAlso: newTerm.seeAlso?.trim() || undefined,
       }
 
       const response = await fetch("/api/admin/terms", {
@@ -140,58 +192,23 @@ export function TermManagement() {
     }
   }
 
-  const TermForm = ({
-    term,
-    onChange,
-    onSave,
-    onCancel,
-    title,
-  }: {
-    term: GlossaryItem
-    onChange: (field: keyof GlossaryItem, value: string) => void
-    onSave: () => void
-    onCancel: () => void
-    title: string
-  }) => (
-    <Card className="mb-4">
-      <CardHeader>
-        <CardTitle className="text-lg">{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Term *</label>
-          <Input value={term.term} onChange={(e) => onChange("term", e.target.value)} placeholder="Enter term name" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Definition *</label>
-          <Textarea
-            value={term.definition}
-            onChange={(e) => onChange("definition", e.target.value)}
-            placeholder="Enter definition"
-            rows={3}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Acronym (optional)</label>
-          <Input
-            value={term.acronym || ""}
-            onChange={(e) => onChange("acronym", e.target.value)}
-            placeholder="e.g., UX, API, CSS"
-          />
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={onSave} disabled={!term.term.trim() || !term.definition.trim()}>
-            <Save className="h-4 w-4 mr-2" />
-            Save
-          </Button>
-          <Button variant="outline" onClick={onCancel}>
-            <X className="h-4 w-4 mr-2" />
-            Cancel
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  )
+  // Use useCallback to prevent recreation of onChange handlers
+  const handleNewTermChange = useCallback((field: keyof GlossaryItem, value: string) => {
+    setNewTerm((prev) => ({ ...prev, [field]: value }))
+  }, [])
+
+  const handleEditTermChange = useCallback((field: keyof GlossaryItem, value: string) => {
+    setEditingTerm((prev) => (prev ? { ...prev, [field]: value } : null))
+  }, [])
+
+  const handleCancelAdd = useCallback(() => {
+    setShowAddForm(false)
+    setNewTerm({ letter: "", term: "", definition: "", acronym: "" })
+  }, [])
+
+  const handleCancelEdit = useCallback(() => {
+    setEditingTerm(null)
+  }, [])
 
   if (isLoading) {
     return (
@@ -220,13 +237,11 @@ export function TermManagement() {
       {/* Add Form */}
       {showAddForm && (
         <TermForm
+          key="add-form"
           term={newTerm}
-          onChange={(field, value) => setNewTerm({ ...newTerm, [field]: value })}
+          onChange={handleNewTermChange}
           onSave={handleAddTerm}
-          onCancel={() => {
-            setShowAddForm(false)
-            setNewTerm({ letter: "", term: "", definition: "", acronym: "" })
-          }}
+          onCancel={handleCancelAdd}
           title="Add New Term"
         />
       )}
@@ -234,10 +249,11 @@ export function TermManagement() {
       {/* Edit Form */}
       {editingTerm && (
         <TermForm
+          key={`edit-form-${editingTerm.term}`}
           term={editingTerm}
-          onChange={(field, value) => setEditingTerm({ ...editingTerm, [field]: value })}
+          onChange={handleEditTermChange}
           onSave={handleEditTerm}
-          onCancel={() => setEditingTerm(null)}
+          onCancel={handleCancelEdit}
           title="Edit Term"
         />
       )}
