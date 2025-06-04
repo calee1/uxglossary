@@ -1,34 +1,8 @@
 import Link from "next/link"
-import { SearchBox } from "@/components/search-box"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { HomeClient } from "./home-client"
 
-async function loadGlossaryDataSafe() {
-  try {
-    console.log("Homepage: Starting to load glossary data...")
-    const { loadGlossaryData } = await import("@/lib/csv-parser.server")
-    console.log("Homepage: Import successful, calling function...")
-    const data = await loadGlossaryData()
-    console.log("Homepage: Function completed, data keys:", Object.keys(data))
-    console.log(
-      "Homepage: Total terms:",
-      Object.values(data).reduce((sum, items) => sum + items.length, 0),
-    )
-    return data
-  } catch (error) {
-    console.error("Homepage: Failed to load glossary data:", error)
-    return {}
-  }
-}
-
-export default async function HomePage() {
-  console.log("Homepage: Component rendering...")
-  const glossaryItems = await loadGlossaryDataSafe()
-  const hasGlossaryItems = Object.keys(glossaryItems).length > 0
-  const alphabet = ["0-9", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))]
-  const totalTerms = Object.values(glossaryItems).reduce((total, items) => total + items.length, 0)
-
-  console.log("Homepage: Final state - hasGlossaryItems:", hasGlossaryItems, "totalTerms:", totalTerms)
-
+export default function HomePage() {
   return (
     <main className="max-w-4xl mx-auto p-6 border border-gray-200 dark:border-gray-700 rounded-lg my-8 bg-white dark:bg-gray-800">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
@@ -56,108 +30,7 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <div className="text-center mb-8">
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">Browse my comprehensive AI-assisted UX glossary</p>
-      </div>
-
-      <SearchBox />
-
-      {/* Always show debug info for now */}
-      <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-sm">
-        <strong>Debug:</strong> Found {totalTerms} terms across {Object.keys(glossaryItems).length} letters
-        <br />
-        <strong>Has data:</strong> {hasGlossaryItems ? "Yes" : "No"}
-        <br />
-        <Link href="/api/test-load" className="text-blue-600 hover:underline">
-          Test data loading
-        </Link>
-        {" | "}
-        <Link href="/api/debug-data" className="text-blue-600 hover:underline">
-          View raw data
-        </Link>
-      </div>
-
-      {hasGlossaryItems && (
-        <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-sm">
-          <strong>Data Verification:</strong>
-          <ul className="mt-2">
-            <li>
-              <strong>Letters:</strong> {Object.keys(glossaryItems).join(", ")}
-            </li>
-            <li>
-              <strong>First A term:</strong> {glossaryItems["A"]?.[0]?.term || "None"}
-            </li>
-            <li>
-              <strong>First B term:</strong> {glossaryItems["B"]?.[0]?.term || "None"}
-            </li>
-            <li>
-              <strong>First C term:</strong> {glossaryItems["C"]?.[0]?.term || "None"}
-            </li>
-          </ul>
-        </div>
-      )}
-
-      {!hasGlossaryItems && (
-        <div className="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-8">
-          <h3 className="text-red-800 dark:text-red-200 font-medium text-lg mb-2">No Data Found</h3>
-          <p className="text-red-700 dark:text-red-300">The glossary data could not be loaded.</p>
-          <Link href="/api/test-load" className="text-blue-600 hover:underline">
-            Test data loading
-          </Link>
-        </div>
-      )}
-
-      <div className="grid grid-cols-6 md:grid-cols-9 gap-4 justify-center my-8">
-        {alphabet.map((letter) => {
-          // For checking if content exists, use "0" for "0-9"
-          const dataKey = letter === "0-9" ? "0" : letter
-          const hasContent = glossaryItems[dataKey] && glossaryItems[dataKey].length > 0
-
-          return (
-            <Link
-              key={letter}
-              href={hasContent ? `/letter/${letter.toLowerCase()}` : "#"}
-              className={`
-                text-center p-4 border-2 rounded-lg transition-all duration-200
-                ${
-                  hasContent
-                    ? "border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/30"
-                    : "border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
-                }
-              `}
-            >
-              <div className="text-2xl font-bold">{letter}</div>
-              {hasContent && (
-                <div className="text-xs mt-1">
-                  {glossaryItems[dataKey].length} {glossaryItems[dataKey].length === 1 ? "term" : "terms"}
-                </div>
-              )}
-            </Link>
-          )
-        })}
-      </div>
-
-      <div className="mt-12 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Glossary Statistics</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-          <div className="p-2">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {Object.keys(glossaryItems).length}
-            </div>
-            <div className="text-gray-600 dark:text-gray-300">Letters with content</div>
-          </div>
-          <div className="p-2">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{totalTerms}</div>
-            <div className="text-gray-600 dark:text-gray-300">Total terms</div>
-          </div>
-          <div className="p-2">
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {Math.round(totalTerms / Math.max(1, Object.keys(glossaryItems).length))}
-            </div>
-            <div className="text-gray-600 dark:text-gray-300">Average terms per letter</div>
-          </div>
-        </div>
-      </div>
+      <HomeClient />
     </main>
   )
 }
