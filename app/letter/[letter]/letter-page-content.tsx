@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import Link from "next/link"
 import { LetterSearch } from "@/components/letter-search"
 import { HighlightedText } from "@/components/highlighted-text"
 
@@ -10,7 +9,6 @@ interface GlossaryItem {
   term: string
   definition: string
   acronym?: string
-  seeAlso?: string
 }
 
 interface LetterPageContentProps {
@@ -50,40 +48,6 @@ export function LetterPageContent({ items, letter, allItems = {} }: LetterPageCo
       }
     }
     return null
-  }
-
-  // Function to render see-also links
-  const renderSeeAlsoLinks = (seeAlso: string) => {
-    const terms = seeAlso
-      .split(",")
-      .map((term) => term.trim())
-      .filter(Boolean)
-
-    return terms.map((term, index) => {
-      const termLocation = findTermInGlossary(term)
-
-      if (termLocation) {
-        return (
-          <span key={term}>
-            <Link
-              href={`/letter/${termLocation.letter}#${termLocation.slug}`}
-              className="text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              {term}
-            </Link>
-            {index < terms.length - 1 && ", "}
-          </span>
-        )
-      } else {
-        // If term doesn't exist, render as plain text
-        return (
-          <span key={term} className="text-gray-600 dark:text-gray-400">
-            {term}
-            {index < terms.length - 1 && ", "}
-          </span>
-        )
-      }
-    })
   }
 
   if (!items || items.length === 0) {
@@ -132,14 +96,6 @@ export function LetterPageContent({ items, letter, allItems = {} }: LetterPageCo
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                 <HighlightedText text={item.definition} searchTerm={searchTerm} />
               </p>
-
-              {item.seeAlso && (
-                <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">See also:</span> {renderSeeAlsoLinks(item.seeAlso)}
-                  </p>
-                </div>
-              )}
             </div>
           )
         })}

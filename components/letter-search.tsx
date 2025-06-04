@@ -10,7 +10,6 @@ interface GlossaryItem {
   term: string
   definition: string
   acronym?: string
-  seeAlso?: string
 }
 
 interface LetterSearchProps {
@@ -35,8 +34,7 @@ export function LetterSearch({ items = [], onFilteredItemsChange }: LetterSearch
       (item) =>
         item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.definition.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (item.acronym && item.acronym.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (item.seeAlso && item.seeAlso.toLowerCase().includes(searchTerm.toLowerCase())),
+        (item.acronym && item.acronym.toLowerCase().includes(searchTerm.toLowerCase())),
     )
   }, [items, searchTerm])
 

@@ -27,7 +27,6 @@ export function TermManagement() {
     term: "",
     definition: "",
     acronym: "",
-    seeAlso: "",
   })
 
   useEffect(() => {
@@ -88,7 +87,7 @@ export function TermManagement() {
       if (response.ok) {
         await loadTerms()
         setShowAddForm(false)
-        setNewTerm({ letter: "", term: "", definition: "", acronym: "", seeAlso: "" })
+        setNewTerm({ letter: "", term: "", definition: "", acronym: "" })
       } else {
         alert("Failed to add term")
       }
@@ -180,14 +179,6 @@ export function TermManagement() {
             placeholder="e.g., UX, API, CSS"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">See Also (optional)</label>
-          <Input
-            value={term.seeAlso || ""}
-            onChange={(e) => onChange("seeAlso", e.target.value)}
-            placeholder="Related terms, separated by commas"
-          />
-        </div>
         <div className="flex gap-2">
           <Button onClick={onSave} disabled={!term.term.trim() || !term.definition.trim()}>
             <Save className="h-4 w-4 mr-2" />
@@ -234,7 +225,7 @@ export function TermManagement() {
           onSave={handleAddTerm}
           onCancel={() => {
             setShowAddForm(false)
-            setNewTerm({ letter: "", term: "", definition: "", acronym: "", seeAlso: "" })
+            setNewTerm({ letter: "", term: "", definition: "", acronym: "" })
           }}
           title="Add New Term"
         />

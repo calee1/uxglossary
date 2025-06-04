@@ -8,7 +8,6 @@ interface GlossaryItem {
   term: string
   definition: string
   acronym?: string
-  seeAlso?: string
 }
 
 interface LetterPageClientProps {

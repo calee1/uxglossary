@@ -20,7 +20,6 @@ interface GlossaryItem {
   term: string
   definition: string
   acronym?: string
-  seeAlso?: string
 }
 
 // Helper function to parse CSV
