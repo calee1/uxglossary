@@ -40,33 +40,52 @@ function parseCSVLine(line: string): string[] {
 }
 
 export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
+  console.log("=== loadGlossaryData START ===")
+
   try {
     const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
+    console.log("CSV path:", csvPath)
 
-    if (!fs.existsSync(csvPath)) {
-      console.log("CSV file not found at:", csvPath)
+    // Check if file exists
+    const fileExists = fs.existsSync(csvPath)
+    console.log("File exists:", fileExists)
+
+    if (!fileExists) {
+      console.log("CSV file not found, returning empty object")
       return {}
     }
 
+    // Read file
     const csvContent = fs.readFileSync(csvPath, "utf-8")
-    const lines = csvContent.trim().split("\n")
+    console.log("CSV content length:", csvContent.length)
+    console.log("First 200 chars:", csvContent.substring(0, 200))
 
-    console.log(`CSV has ${lines.length} lines`)
+    const lines = csvContent.trim().split("\n")
+    console.log("Total lines:", lines.length)
 
     if (lines.length < 2) {
-      console.log("CSV file is empty or has no data rows")
+      console.log("CSV file has no data rows")
       return {}
     }
 
-    const items: GlossaryItem[] = []
+    // Show header
+    console.log("Header line:", lines[0])
 
-    // Skip header row (index 0)
+    const items: GlossaryItem[] = []
+    let successfulParses = 0
+    let failedParses = 0
+
+    // Process each line
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim()
-      if (!line) continue
+      if (!line) {
+        console.log(`Line ${i}: empty, skipping`)
+        continue
+      }
 
       try {
         const values = parseCSVLine(line)
+        console.log(`Line ${i}: parsed ${values.length} values:`, values.slice(0, 3))
 
         if (values.length >= 3) {
           const item: GlossaryItem = {
@@ -77,22 +96,48 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
             seeAlso: values[4] || undefined,
           }
 
-          // Only add if we have the essential fields
+          // Validate essential fields
           if (item.letter && item.term && item.definition) {
             items.push(item)
+            successfulParses++
+
+            if (i <= 5) {
+              // Log first few items
+              console.log(`Item ${successfulParses}:`, {
+                letter: item.letter,
+                term: item.term,
+                definition: item.definition.substring(0, 50) + "...",
+              })
+            }
+          } else {
+            console.log(`Line ${i}: missing essential fields`, {
+              hasLetter: !!item.letter,
+              hasTerm: !!item.term,
+              hasDefinition: !!item.definition,
+            })
+            failedParses++
           }
+        } else {
+          console.log(`Line ${i}: insufficient columns (${values.length})`)
+          failedParses++
         }
       } catch (error) {
         console.error(`Error parsing line ${i}:`, error)
+        failedParses++
       }
     }
 
-    console.log(`Parsed ${items.length} items from CSV`)
+    console.log(`Parsing complete: ${successfulParses} successful, ${failedParses} failed`)
+
+    if (items.length === 0) {
+      console.log("No valid items parsed, returning empty object")
+      return {}
+    }
 
     // Group by letter
     const grouped: Record<string, GlossaryItem[]> = {}
 
-    items.forEach((item) => {
+    items.forEach((item, index) => {
       let letter = item.letter.toUpperCase()
 
       // Handle numeric terms
@@ -104,6 +149,11 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
         grouped[letter] = []
       }
       grouped[letter].push(item)
+
+      if (index < 5) {
+        // Log first few groupings
+        console.log(`Grouping item ${index + 1}: "${item.term}" -> letter "${letter}"`)
+      }
     })
 
     // Sort within each group
@@ -111,16 +161,18 @@ export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>
       grouped[letter].sort((a, b) => a.term.localeCompare(b.term))
     })
 
-    console.log(
-      "Final grouping:",
-      Object.keys(grouped)
-        .map((k) => `${k}: ${grouped[k].length}`)
-        .join(", "),
-    )
+    const summary = Object.entries(grouped)
+      .map(([letter, items]) => `${letter}:${items.length}`)
+      .join(", ")
+    console.log("Final grouping:", summary)
+    console.log("=== loadGlossaryData END ===")
 
     return grouped
   } catch (error) {
+    console.error("=== loadGlossaryData ERROR ===")
     console.error("Error in loadGlossaryData:", error)
+    console.error("Stack:", error instanceof Error ? error.stack : "No stack")
+    console.log("=== loadGlossaryData ERROR END ===")
     return {}
   }
 }
