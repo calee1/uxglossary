@@ -23,7 +23,7 @@ A,"Affordance","The perceived and actual properties of an object that determine 
 A,"Agile","An iterative approach to project management and software development that emphasizes flexibility and collaboration",
 A,"Agile Development","A software development methodology that promotes adaptive planning and evolutionary development",
 A,"Agile UX","The integration of user experience design practices within agile development methodologies",
-A,"Alert","A UI component that displays important information or warnings to users",
+A,"Alert","An inline UI component that displays important information or warnings to users within a page, typically shifting content down when it appears",
 A,"Alert Dialog","Typically a simple modal dialog, with only Primary and Cancel buttons.",
 A,"Alias","An alternative name or shortcut for a file, folder, or command",
 A,"Aliasing","The visual distortion that occurs when high-resolution images are displayed at lower resolutions",
