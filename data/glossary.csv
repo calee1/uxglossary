@@ -1,4 +1,5 @@
 letter,"term","definition",acronym
+0,"2-colorable Graph","Graph whose vertices can be colored using only two colors (e.g., red and blue) in such a way that no two adjacent vertices have the same color",Bipartite Graph
 0,"4-color printing","Printing in CMYK or full-color",
 A,"A/B Testing","A method of comparing two versions of a webpage or app to determine which performs better",
 A,"Above-the-fold","The portion of a webpage that is visible without scrolling, derived from newspaper terminology",
