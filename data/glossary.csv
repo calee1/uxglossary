@@ -709,7 +709,7 @@ T,"Triad Colors","A color scheme using three colors evenly spaced around the col
 T,"Tribalism","The tendency for people to form groups and favor their own group",
 T,"Truncate","To shorten text or data by cutting off characters at a specified length",
 T,"Typography","The art and technique of arranging type to make written language readable",
-U,"UI Component","A reusable element of a user interface",
+U,"UI Component","Collection of UI elements in a user interface, like a form",
 U,"UI Design","Focuses on the visual and interactive elements of a digital product, like a website or app, that users interact with",
 U,"UI Element","An individual part of a user interface like a button",
 U,"UI Kit","A collection of pre-designed user interface components",
