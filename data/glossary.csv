@@ -568,7 +568,6 @@ P,"Pull Request","A method of submitting code changes for review before merging"
 Q,"Qualitative User Research","Research that focuses on understanding user behaviors and motivations",
 Q,"Qualtrics","A platform for creating and distributing surveys and collecting data",
 Q,"Quantitative User Research","Research that focuses on measuring and quantifying user behaviors",
-R,"RACI","A matrix that defines roles and responsibilities: Responsible, Accountable, Consulted, Informed",RACI
 R,"Radio Button","A UI control that allows users to select one option from a group",
 R,"Radio Group","A collection of radio buttons where only one can be selected",
 R,"Rainstorming","A brainstorming technique that focuses on generating ideas without criticism",
@@ -594,6 +593,7 @@ R,"Research Plan","A document outlining the objectives and methods for a researc
 R,"Research Strategy","A high-level approach to conducting research",
 R,"Resizable","Elements that can be adjusted in size by users",
 R,"Response Time","The time it takes for a system to respond to user input",
+R,"Responsible, Accountable, Consulted, Informed","A matrix that defines roles and responsibilities",RACI
 R,"Responsive Breakpoints","Specific screen widths where responsive designs change their layout to accommodate different devices",
 R,"Responsive Design","Design that adapts to different screen sizes and devices",
 R,"Retention","The ability to keep users engaged with a product over time",
