@@ -372,7 +372,6 @@ H,"Home Page","The main or introductory page of a website",
 H,"Hover","The state when a cursor is positioned over an interactive element",
 H,"How Might We","A question format used in design thinking to frame problems as opportunities",HMW
 H,"HSB","Hue, Saturation, Brightness color model",HSB
-H,"HTML","HyperText Markup Language - the standard markup language for web pages",HTML
 H,"Hue","The pure color without tint or shade",
 H,"Human Factors","The study of how humans interact with systems and environments",
 H,"Human-centered Design","A design approach that prioritizes human needs and capabilities",HCD
@@ -380,6 +379,7 @@ H,"Human-computer Interaction","The study of how people interact with computers 
 H,"Hybrid Mobile Application","An app that combines native and web technologies",
 H,"Hyperlink","A clickable link that connects to another webpage or resource",
 H,"Hypertext","Text that contains links to other text or media",
+H,"HyperText Markup Language","The standard markup language for web pages",HTML
 H,"HyperText Markup Language","The standard markup language for web pages",HTML
 H,"HyperText Transfer Protocol","The foundation of data communication on the web",HTTP
 I,"I-beam Cursor","A text cursor that appears as a vertical line for text editing",
