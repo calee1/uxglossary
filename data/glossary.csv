@@ -24,6 +24,7 @@ A,"Agile","An iterative approach to project management and software development 
 A,"Agile Development","A software development methodology that promotes adaptive planning and evolutionary development",
 A,"Agile UX","The integration of user experience design practices within agile development methodologies",
 A,"Alert","A UI component that displays important information or warnings to users",
+A,"Alert Dialog","Typically a simple modal dialog, with only Primary and Cancel buttons.",
 A,"Alias","An alternative name or shortcut for a file, folder, or command",
 A,"Aliasing","The visual distortion that occurs when high-resolution images are displayed at lower resolutions",
 A,"Alignment","The arrangement of elements along a common line or edge to create visual order",
