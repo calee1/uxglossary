@@ -403,6 +403,7 @@ I,"Information Design","The practice of presenting information in ways that fost
 I,"Information Scent","Cues that help users predict what they'll find if they follow a link",
 I,"Initial Case","Capitalization where only the first letter of the first word is capitalized",
 I,"Inline","Elements that flow with text content rather than starting on a new line",
+I,"Inline Frame","In HTML, it's a container that allows you to embed another HTML page, document, or even video within the current one",iFrame
 I,"Innovation","The process of creating new ideas, products, or methods",
 I,"Intentional Friction","Deliberately adding steps to slow down user actions for safety or consideration",
 I,"Interaction","The communication between a user and a system",
