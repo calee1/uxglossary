@@ -664,10 +664,10 @@ S,"Style Guide","A document that outlines design standards and guidelines",
 S,"Subscription Revenue Model","A business model where customers pay recurring fees",
 S,"Summative Testing","Testing conducted after development to evaluate final performance",
 S,"Survey","A research method using questionnaires to collect data from users",
-S,"SUS","System Usability Scale, a standardized questionnaire for measuring usability",SUS
 S,"Switch","A UI control that toggles between two states",
 S,"SWOT Analysis","A strategic planning technique: Strengths, Weaknesses, Opportunities, Threats",SWOT
 S,"Syntactically Awesome Style Sheets","A preprocessor scripting language that is interpreted or compiled into CSS",SASS
+S,"System Usability Scale","A standardized questionnaire for measuring usability",SUS
 T,"Tab","A UI element that allows users to switch between different views or sections",
 T,"Table","A structured arrangement of data in rows and columns",
 T,"Table Footer","The bottom section of a table, often containing summary information",
