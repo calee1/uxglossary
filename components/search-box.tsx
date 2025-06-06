@@ -69,22 +69,22 @@ export function SearchBox() {
   }
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto mb-6 sm:mb-8">
+    <div className="relative w-full max-w-2xl mx-auto mb-4 sm:mb-6 md:mb-8">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 sm:h-5 sm:w-5" />
         <Input
           type="text"
           placeholder="Search terms and definitions..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-10 pr-20 py-3 text-base"
+          className="pl-9 sm:pl-12 pr-16 sm:pr-20 py-2 sm:py-3 text-sm sm:text-base border-2 focus:border-blue-500 dark:focus:border-blue-400"
         />
         {query && (
           <Button
             variant="ghost"
             size="sm"
             onClick={handleClear}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs sm:text-sm px-2 sm:px-3"
           >
             Clear
           </Button>
@@ -92,37 +92,39 @@ export function SearchBox() {
       </div>
 
       {showResults && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-96 overflow-y-auto z-50">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-80 sm:max-h-96 overflow-y-auto z-50">
           {isLoading ? (
-            <div className="p-4 text-center text-gray-500">Searching...</div>
+            <div className="p-3 sm:p-4 text-center text-gray-500 text-sm sm:text-base">Searching...</div>
           ) : results.length > 0 ? (
-            <div className="p-2">
+            <div className="p-1 sm:p-2">
               {results.slice(0, 10).map((item, index) => (
                 <Link
                   key={index}
                   href={`/letter/${item.letter === "0" ? "0-9" : item.letter.toLowerCase()}#${createTermSlug(item.term)}`}
-                  className="block p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors"
+                  className="block p-2 sm:p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors"
                   onClick={() => setShowResults(false)}
                 >
-                  <div className="font-medium text-gray-900 dark:text-white">
+                  <div className="font-medium text-gray-900 dark:text-white text-sm sm:text-base">
                     <HighlightedText text={item.term} searchTerm={query} />
                     {item.acronym && (
-                      <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">({item.acronym})</span>
+                      <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">({item.acronym})</span>
                     )}
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
+                  <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
                     <HighlightedText text={item.definition} searchTerm={query} />
                   </div>
                 </Link>
               ))}
               {results.length > 10 && (
-                <div className="p-3 text-center text-sm text-gray-500 border-t border-gray-200 dark:border-gray-600">
+                <div className="p-2 sm:p-3 text-center text-xs sm:text-sm text-gray-500 border-t border-gray-200 dark:border-gray-600">
                   Showing first 10 of {results.length} results
                 </div>
               )}
             </div>
           ) : (
-            <div className="p-4 text-center text-gray-500">No results found for "{query}"</div>
+            <div className="p-3 sm:p-4 text-center text-gray-500 text-sm sm:text-base">
+              No results found for "{query}"
+            </div>
           )}
         </div>
       )}

@@ -60,20 +60,20 @@ export function HomeClient() {
 
   if (loading) {
     return (
-      <div className="text-center py-12">
-        <div className="text-lg text-gray-600 dark:text-gray-300">Loading glossary data...</div>
+      <div className="text-center py-8 sm:py-12">
+        <div className="text-base sm:text-lg text-gray-600 dark:text-gray-300">Loading glossary data...</div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <div className="text-lg text-red-600 dark:text-red-400">Error loading glossary</div>
+      <div className="text-center py-8 sm:py-12">
+        <div className="text-base sm:text-lg text-red-600 dark:text-red-400 mb-4">Error loading glossary</div>
         <div className="mt-4">
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
+            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm sm:text-base"
           >
             Try Again
           </button>
@@ -84,13 +84,16 @@ export function HomeClient() {
 
   return (
     <>
-      <div className="text-center mb-8">
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">Browse my comprehensive AI-assisted UX glossary</p>
+      <div className="text-center mb-6 sm:mb-8">
+        <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-4 sm:mb-6">
+          Browse my comprehensive AI-assisted UX glossary
+        </p>
       </div>
 
       <SearchBox />
 
-      <div className="grid grid-cols-6 md:grid-cols-9 gap-4 justify-center my-8">
+      {/* Mobile-optimized alphabet grid */}
+      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 gap-2 sm:gap-4 justify-center my-6 sm:my-8">
         {alphabet.map((letter) => {
           // For checking if content exists, use "0" for "0-9"
           const dataKey = letter === "0-9" ? "0" : letter
@@ -101,17 +104,17 @@ export function HomeClient() {
               key={letter}
               href={hasContent ? `/letter/${letter.toLowerCase()}` : "#"}
               className={`
-                text-center p-4 border-2 rounded-lg transition-all duration-200
+                text-center p-2 sm:p-4 border-2 rounded-lg transition-all duration-200 min-h-[60px] sm:min-h-[80px] flex flex-col justify-center
                 ${
                   hasContent
-                    ? "border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                    ? "border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 active:bg-blue-200 dark:active:bg-blue-900/40"
                     : "border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                 }
               `}
             >
-              <div className="text-2xl font-bold">{letter}</div>
+              <div className="text-lg sm:text-2xl font-bold">{letter}</div>
               {hasContent && (
-                <div className="text-xs mt-1">
+                <div className="text-xs mt-1 leading-tight">
                   {glossaryItems[dataKey].length} {glossaryItems[dataKey].length === 1 ? "term" : "terms"}
                 </div>
               )}
@@ -120,29 +123,30 @@ export function HomeClient() {
         })}
       </div>
 
-      <div className="mt-12 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <div className="flex justify-between items-start mb-4">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Glossary Statistics</h2>
+      {/* Mobile-optimized statistics */}
+      <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-2">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Glossary Statistics</h2>
           {lastUpdated && (
-            <p className="text-gray-500 dark:text-gray-400 italic text-sm">Last updated: {lastUpdated}</p>
+            <p className="text-gray-500 dark:text-gray-400 italic text-xs sm:text-sm">Last updated: {lastUpdated}</p>
           )}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-          <div className="p-2">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center">
+          <div className="p-3 sm:p-2">
+            <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
               {Object.keys(glossaryItems).length}
             </div>
-            <div className="text-gray-600 dark:text-gray-300">Letters with content</div>
+            <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Letters with content</div>
           </div>
-          <div className="p-2">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{totalTerms}</div>
-            <div className="text-gray-600 dark:text-gray-300">Total terms</div>
+          <div className="p-3 sm:p-2">
+            <div className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">{totalTerms}</div>
+            <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Total terms</div>
           </div>
-          <div className="p-2">
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+          <div className="p-3 sm:p-2">
+            <div className="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400">
               {Math.round(totalTerms / Math.max(1, Object.keys(glossaryItems).length))}
             </div>
-            <div className="text-gray-600 dark:text-gray-300">Average terms per letter</div>
+            <div className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Average terms per letter</div>
           </div>
         </div>
       </div>

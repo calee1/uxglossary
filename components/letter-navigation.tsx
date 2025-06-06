@@ -25,14 +25,14 @@ export function LetterNavigation({ currentLetter }: LetterNavigationProps) {
   }
 
   return (
-    <div className="flex justify-between items-center py-6">
+    <div className="flex justify-between items-center py-4 sm:py-6">
       <div className="flex-1">
         {prevLetter && (
           <Link
             href={`/letter/${getLetterUrl(prevLetter)}`}
-            className="inline-flex items-center gap-2 px-4 py-2 text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+            className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 active:bg-blue-100 dark:active:bg-blue-900/30 rounded-lg transition-colors text-sm sm:text-base"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
             <span className="font-medium">{prevLetter}</span>
           </Link>
         )}
@@ -44,10 +44,10 @@ export function LetterNavigation({ currentLetter }: LetterNavigationProps) {
         {nextLetter && (
           <Link
             href={`/letter/${getLetterUrl(nextLetter)}`}
-            className="inline-flex items-center gap-2 px-4 py-2 text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+            className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 active:bg-blue-100 dark:active:bg-blue-900/30 rounded-lg transition-colors text-sm sm:text-base"
           >
             <span className="font-medium">{nextLetter}</span>
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
           </Link>
         )}
       </div>
