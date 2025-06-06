@@ -7,7 +7,7 @@ export async function GET(request: Request, { params }: { params: { letter: stri
 
     console.log("Glossary letter API: Loading items for letter:", letter)
 
-    const { loadGlossaryData } = await import("@/lib/csv-parser.server")
+    const { loadGlossaryData } = await import("@/lib/glossary-data")
     const allData = await loadGlossaryData()
     const items = allData[letter] || []
 

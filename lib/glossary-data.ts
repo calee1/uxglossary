@@ -41,7 +41,7 @@ function parseCSVLine(line: string): string[] {
   })
 }
 
-function parseCSV(csvContent: string): GlossaryItem[] {
+export function parseCSV(csvContent: string): GlossaryItem[] {
   const lines = csvContent.trim().split("\n")
   const items: GlossaryItem[] = []
 
@@ -66,7 +66,7 @@ function parseCSV(csvContent: string): GlossaryItem[] {
   return items
 }
 
-async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
+export async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
   try {
     const csvPath = path.resolve(process.cwd(), "data", "glossary.csv")
     if (!fs.existsSync(csvPath)) {
@@ -95,12 +95,12 @@ async function loadGlossaryData(): Promise<Record<string, GlossaryItem[]>> {
   }
 }
 
-async function getGlossaryItems(): Promise<GlossaryItem[]> {
+export async function getGlossaryItems(): Promise<GlossaryItem[]> {
   const groupedData = await loadGlossaryData()
   return Object.values(groupedData).flat()
 }
 
-async function searchGlossaryItems(query: string): Promise<GlossaryItem[]> {
+export async function searchGlossaryItems(query: string): Promise<GlossaryItem[]> {
   const allItems = await getGlossaryItems()
   const lowerQuery = query.toLowerCase()
   return allItems.filter(
@@ -111,19 +111,13 @@ async function searchGlossaryItems(query: string): Promise<GlossaryItem[]> {
   )
 }
 
-async function getGlossaryItemsByLetter(letter: string): Promise<GlossaryItem[]> {
+export async function getGlossaryItemsByLetter(letter: string): Promise<GlossaryItem[]> {
   try {
     const allData = await loadGlossaryData()
     const lookupLetter = letter === "0-9" ? "0" : letter.toUpperCase()
     return allData[lookupLetter] || []
   } catch (error) {
+    console.error("Error in getGlossaryItemsByLetter:", error)
     return []
   }
 }
-
-// Export all functions explicitly
-export { parseCSV }
-export { loadGlossaryData }
-export { getGlossaryItems }
-export { searchGlossaryItems }
-export { getGlossaryItemsByLetter }

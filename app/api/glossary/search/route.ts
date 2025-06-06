@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Query parameter 'q' is required" }, { status: 400 })
     }
 
-    const { searchGlossaryItems } = await import("@/lib/csv-parser.server")
+    const { searchGlossaryItems } = await import("@/lib/glossary-data")
     const results = await searchGlossaryItems(query)
     return NextResponse.json(results)
   } catch (error) {
