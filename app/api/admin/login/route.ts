@@ -8,7 +8,9 @@ export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json()
 
-    console.log("Login attempt with password:", password ? "***" : "empty")
+    console.log("Login attempt received")
+    console.log("Password provided:", password ? "***" : "empty")
+    console.log("Expected password:", ADMIN_PASSWORD ? "***" : "empty")
 
     if (password === ADMIN_PASSWORD) {
       console.log("Password correct, setting auth cookie")
@@ -25,9 +27,12 @@ export async function POST(request: NextRequest) {
         path: "/",
       })
 
+      console.log("Cookie set successfully")
       return response
     } else {
       console.log("Password incorrect")
+      console.log("Provided:", password)
+      console.log("Expected:", ADMIN_PASSWORD)
       return NextResponse.json({ error: "Invalid password" }, { status: 401 })
     }
   } catch (error) {

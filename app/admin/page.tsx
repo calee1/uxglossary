@@ -27,10 +27,19 @@ export default function AdminPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch("/api/admin/check-auth")
+      console.log("Checking authentication...")
+      const response = await fetch("/api/admin/check-auth", {
+        credentials: "include", // Important: include cookies
+      })
+
+      console.log("Auth check response status:", response.status)
+
       if (response.ok) {
+        const data = await response.json()
+        console.log("Auth check response data:", data)
         setIsAuthenticated(true)
       } else {
+        console.log("Auth check failed, redirecting to login")
         router.push("/admin/login")
       }
     } catch (error) {
@@ -43,11 +52,17 @@ export default function AdminPage() {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/admin/logout", { method: "POST" })
-      localStorage.removeItem("adminAuth")
+      console.log("Logging out...")
+      await fetch("/api/admin/logout", {
+        method: "POST",
+        credentials: "include",
+      })
+      console.log("Logout successful, redirecting to login")
       router.push("/admin/login")
     } catch (error) {
       console.error("Logout failed:", error)
+      // Force redirect even if logout fails
+      router.push("/admin/login")
     }
   }
 
@@ -60,7 +75,14 @@ export default function AdminPage() {
   }
 
   if (!isAuthenticated) {
-    return null
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="text-lg text-gray-600 dark:text-gray-300 mb-4">Authentication required</div>
+          <Button onClick={() => router.push("/admin/login")}>Go to Login</Button>
+        </div>
+      </div>
+    )
   }
 
   const renderContent = () => {

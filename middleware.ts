@@ -7,10 +7,16 @@ export function middleware(request: NextRequest) {
     // Check if the user is authenticated
     const adminAuth = request.cookies.get("admin_auth")?.value
 
+    console.log("Middleware: Checking admin auth for", request.nextUrl.pathname)
+    console.log("Middleware: Cookie value:", adminAuth)
+
     // If not authenticated, redirect to login
-    if (!adminAuth) {
+    if (!adminAuth || adminAuth !== "true") {
+      console.log("Middleware: Redirecting to login")
       return NextResponse.redirect(new URL("/admin/login", request.url))
     }
+
+    console.log("Middleware: Authentication successful")
   }
 
   return NextResponse.next()
