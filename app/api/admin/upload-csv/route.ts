@@ -2,9 +2,9 @@ import { type NextRequest, NextResponse } from "next/server"
 import { cookies } from "next/headers"
 
 // Check authentication
-function isAuthenticated(): boolean {
+async function isAuthenticated(): Promise<boolean> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const authCookie = cookieStore.get("admin_auth")
     return authCookie?.value === "true"
   } catch (error) {
@@ -193,7 +193,7 @@ async function saveTermsToGitHub(terms: GlossaryItem[], sha?: string): Promise<v
 }
 
 export async function POST(request: NextRequest) {
-  if (!isAuthenticated()) {
+  if (!await isAuthenticated()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
