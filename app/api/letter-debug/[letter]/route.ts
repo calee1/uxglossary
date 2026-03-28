@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server"
 
-export async function GET(request: Request, { params }: { params: { letter: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ letter: string }> }) {
+  const { letter: letterParam } = await params
   try {
-    const letterParam = params.letter
     const letter = letterParam === "0-9" ? "0" : letterParam.toUpperCase()
 
     console.log("Letter debug API called with:", letterParam, "->", letter)
@@ -25,7 +25,7 @@ export async function GET(request: Request, { params }: { params: { letter: stri
       sampleFromB: data["B"]?.slice(0, 2).map((item) => item.term) || [],
     })
   } catch (error) {
-    console.error(`Letter debug API error for ${params.letter}:`, error)
+    console.error(`Letter debug API error for ${letterParam}:`, error)
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : "Unknown error",

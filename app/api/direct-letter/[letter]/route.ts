@@ -9,9 +9,9 @@ interface GlossaryItem {
   acronym?: string
 }
 
-export async function GET(request: Request, { params }: { params: { letter: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ letter: string }> }) {
+  const { letter: letterParam } = await params
   try {
-    const letterParam = params.letter
     const letter = letterParam === "0-9" ? "0" : letterParam.toUpperCase()
 
     console.log("Direct letter API called with:", letterParam, "->", letter)
@@ -94,7 +94,7 @@ export async function GET(request: Request, { params }: { params: { letter: stri
       },
     })
   } catch (error) {
-    console.error(`Direct letter API error for ${params.letter}:`, error)
+    console.error(`Direct letter API error for ${letterParam}:`, error)
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : "Unknown error",

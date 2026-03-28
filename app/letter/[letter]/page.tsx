@@ -7,14 +7,15 @@ import { getGlossaryItemsByLetter } from "@/lib/glossary-data"
 import type { Metadata } from "next"
 
 interface LetterPageProps {
-  params: {
+  params: Promise<{
     letter: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: LetterPageProps): Promise<Metadata> {
-  const letter = params.letter === "0-9" ? "0" : params.letter.toUpperCase()
-  const displayLetter = params.letter === "0-9" ? "Numbers" : letter
+  const { letter: paramLetter } = await params
+  const letter = paramLetter === "0-9" ? "0" : paramLetter.toUpperCase()
+  const displayLetter = paramLetter === "0-9" ? "Numbers" : letter
 
   try {
     const letterItems = await getGlossaryItemsByLetter(letter)
@@ -30,14 +31,14 @@ export async function generateMetadata({ params }: LetterPageProps): Promise<Met
       openGraph: {
         title: `${displayLetter} - UX Terms & Definitions | UX Glossary`,
         description: `Explore ${termCount} UX terms starting with ${displayLetter}. Including: ${sampleTerms}${termCount > 5 ? " and more" : ""}.`,
-        url: `https://uxglossary.vercel.app/letter/${params.letter}`,
+        url: `https://uxglossary.vercel.app/letter/${paramLetter}`,
       },
       twitter: {
         title: `${displayLetter} - UX Terms & Definitions | UX Glossary`,
         description: `Explore ${termCount} UX terms starting with ${displayLetter}. Including: ${sampleTerms}${termCount > 5 ? " and more" : ""}.`,
       },
       alternates: {
-        canonical: `https://uxglossary.vercel.app/letter/${params.letter}`,
+        canonical: `https://uxglossary.vercel.app/letter/${paramLetter}`,
       },
     }
   } catch (error) {
@@ -56,7 +57,8 @@ export async function generateStaticParams() {
 }
 
 export default async function LetterPage({ params }: LetterPageProps) {
-  const letter = params.letter === "0-9" ? "0" : params.letter.toUpperCase()
+  const { letter: paramLetter } = await params
+  const letter = paramLetter === "0-9" ? "0" : paramLetter.toUpperCase()
   const alphabet = ["0", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))]
 
   if (!alphabet.includes(letter)) {
@@ -78,9 +80,9 @@ export default async function LetterPage({ params }: LetterPageProps) {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "CollectionPage",
-            name: `UX Terms Starting with ${params.letter === "0-9" ? "Numbers" : letter}`,
-            description: `Collection of UX terms and definitions starting with ${params.letter === "0-9" ? "numbers" : letter}`,
-            url: `https://uxglossary.vercel.app/letter/${params.letter}`,
+            name: `UX Terms Starting with ${paramLetter === "0-9" ? "Numbers" : letter}`,
+            description: `Collection of UX terms and definitions starting with ${paramLetter === "0-9" ? "numbers" : letter}`,
+            url: `https://uxglossary.vercel.app/letter/${paramLetter}`,
             isPartOf: {
               "@type": "WebSite",
               name: "UX Glossary",
@@ -127,11 +129,11 @@ export default async function LetterPage({ params }: LetterPageProps) {
           </div>
         </div>
 
-        <LetterNavigation currentLetter={params.letter} />
+        <LetterNavigation currentLetter={paramLetter} />
 
-        <LetterPageClient letter={params.letter} />
+        <LetterPageClient letter={paramLetter} />
 
-        <LetterNavigation currentLetter={params.letter} />
+        <LetterNavigation currentLetter={paramLetter} />
 
         <div className="mt-8 sm:mt-12 text-center">
           <Link
