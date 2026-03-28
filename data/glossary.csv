@@ -51,6 +51,7 @@ A,"API Design","Creating user-friendly application programming interfaces that a
 A,"Applet","A small application designed to perform a specific function within a larger program",
 A,"Application","A software program designed to perform specific tasks for users",
 A,"Application Programming Interface","A set of rules and protocols that allows different software programs to communicate and exchange data",API
+A,"Archetype","An abstract representation of a user type that summarizes behaviors",
 A,"Artificial General Intelligence","AI that matches or exceeds human cognitive abilities across all domains",AGI
 A,"Artificial Intelligence","Computer systems that can perform tasks typically requiring human intelligence",AI
 A,"Artificial Intelligence Optimization","The process of improving AI systems for better performance and efficiency",AIO
