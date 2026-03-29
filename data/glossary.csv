@@ -223,6 +223,7 @@ C,"Content Inventory","A comprehensive list of all content assets in a product o
 C,"Content Management","The process of creating, editing, and maintaining digital content",
 C,"Content Management System","Software that allows users to create and manage digital content",CMS
 C,"Content Strategy","The planning and governance of useful, usable content",
+C,"Context Length","Context window is how much history or text an Ai model can process at once. Context length is a synonym for context window, but it also refers to the current number of tokens in use. For example, a prompt could have a context length of 3,000 tokens even if the model has a context window of 128,000 tokens.",Context Window
 C,"Context Menu","A menu that appears when users right-click or long-press on an element",
 C,"Context of Use","The circumstances and environment in which a product is used",
 C,"Context Shifting","The mental effort required when switching between different tasks or interfaces",
