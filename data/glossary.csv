@@ -347,6 +347,7 @@ F,"Feature Parity","Having the same features across different versions or platfo
 F,"Feature Release","The deployment of new functionality to users",
 F,"Fidelity","The level of detail and functionality in a prototype or design",
 F,"Figma","A collaborative design tool for creating user interfaces and prototypes",
+F,"Figma MCP Server","Helps designers and developers explore, create, modify and implement Figma designs quickly and accurately using an agentic tool like Claude Code.",
 F,"Filtering Data","The process of showing only data that meets specific criteria",
 F,"First-click Test","A usability test that measures where users click first on a page",
 F,"First-time User Experience","The initial experience and onboarding process that new users have when first using a product",FTUE
