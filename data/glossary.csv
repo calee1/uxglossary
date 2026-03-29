@@ -371,6 +371,7 @@ F,"Focus Group","A research method involving guided discussions with a group of 
 F,"Focus Order","The sequence in which elements receive keyboard focus",
 F,"Focus States","Visual indicators that show which element currently has keyboard focus for accessibility and navigation",
 F,"Font","A set of characters with a specific typeface, size, and style",
+F,"Font Family","A typeface with multiple weights, that each have a font, together make up a font family.",
 F,"Footer","The bottom section of a webpage or document",
 F,"Form","A collection of input fields for gathering user information",
 F,"Formative Testing","Testing conducted during development to improve the design",
