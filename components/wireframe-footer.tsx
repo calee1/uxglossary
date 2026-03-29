@@ -17,7 +17,7 @@ export function WireframeFooter() {
             <a href="https://calee.me" target="_blank" rel="noopener noreferrer" className="hover:underline">
               calee
             </a>{" "}
-            2025
+            {new Date().getFullYear()}
           </span>
         </div>
         <div className="flex items-center gap-1 sm:gap-1.5">
