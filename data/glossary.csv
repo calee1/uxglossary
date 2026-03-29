@@ -381,6 +381,7 @@ G,"Gradient","A gradual transition between two or more colors",
 G,"Graphic Design","The art of visual communication through typography, imagery, and layout",
 G,"Graphical User Interface","A visual way for users to interact with computers",GUI
 G,"Graphics Interchange Format","Pronounced /ɡɪf/ A bitmap graphic image format supporting animation",GIF
+G,"Graphics Processing Unit","An electronic circuit designed to manipulate and alter computer memory to accelerate the creation of images, video, and complex mathematical calculations. Unlike CPUs, GPUs use thousands of smaller, specialized cores to process in parallel, making them highly efficient for gaming, AI training, and 3D rendering.",GPU
 G,"Grid","A structure of intersecting lines used to organize content and layout",
 G,"Groupthink","A psychological and sociological phenomenon in which members of a group will conform to majority opinion to maintain group harmony rather than stating their own opinions",
 G,"Guerrilla Usability Testing","A rapid informal method of gathering user feedback by conducting impromptu testing sessions with individuals in public spaces or online using minimal planning and materials.",
