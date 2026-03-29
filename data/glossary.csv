@@ -1,5 +1,5 @@
 letter,"term","definition",acronym
- ,"CSD Matrix","A framework for outlining what everyone involved in a project knows (Certainties), hypothesizes (Suppositions), and does not know yet (Doubts). Used to build shared understanding across a project team.",Certainties Suppositions Doubts
+,"CSD Matrix","A framework for outlining what everyone involved in a project knows (Certainties), hypothesizes (Suppositions), and does not know yet (Doubts). Used to build shared understanding across a project team.",Certainties Suppositions Doubts
 0,"2-colorable Graph","Graph whose vertices can be colored using only two colors (e.g., red and blue) in such a way that no two adjacent vertices have the same color",Bipartite Graph
 0,"4-color Printing","Printing in CMYK or full-color",
 A,"A/B Testing","A method of comparing two versions of a webpage or app to determine which performs better",
@@ -84,6 +84,7 @@ B,"Banner","A prominent display area typically used for advertising or important
 B,"Banner Blindness","The tendency of users to ignore banner-like information on websites",
 B,"Base Color","The primary color from which other colors in a palette are derived",
 B,"Beacon","A small piece of code that tracks user behavior and sends data to analytics servers",
+B,"Behavioral Methods","A class of research methods that collect data reflecting users' actions and behaviors. Unlike attitudinal methods behavioral methods are based on what users do rather than what they say. Examples include usability testing and analytics.",
 B,"Bells and Whistles","Extra features or embellishments that may not be essential to core functionality",
 B,"Below-the-fold","The portion of a webpage that requires scrolling to view",
 B,"Benchmark","A standard or reference point used for comparison in performance evaluation",
