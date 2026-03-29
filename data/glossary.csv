@@ -157,6 +157,7 @@ C,"Centered","Text or element alignment where content is positioned in the middl
 C,"Chain-of-thought Reasoning","Prompting an Ai models to ""think step by step"" makes it generate step-by-step explanations before arriving at an answer. This helps guide it toward better solutions.",
 C,"Character Count","The total number of characters, including spaces, in a text field",
 C,"Chatbot","An Ai program designed to simulate conversation with human users",
+C,"ChatGPT","OpenAI's conversational chatbot which launched in 2022 and popularized Ai chatbots. It gave the public an easy way to experience the power of an Ai model for the first time.",
 C,"Checkbox","An input control that allows users to select one or more options",
 C,"Chief Experience Officer","A C-suite executive responsible for the entire customer journey, focusing on enhancing customer satisfaction, loyalty, and brand perception across all touchpoints.",CXO
 C,"Chip","A compact UI element that represents an input, attribute, or action",
