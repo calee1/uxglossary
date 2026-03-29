@@ -154,6 +154,7 @@ C,"Case Study","A detailed analysis of a particular project, situation, or user"
 C,"Case-sensitivity","The distinction between uppercase and lowercase letters in text processing",
 C,"Categorical Metric","A measurement that groups data into distinct categories",
 C,"Centered","Text or element alignment where content is positioned in the middle",
+C,"Chain-of-thought Reasoning","Prompting an Ai models to ""think step by step"" makes it generate step-by-step explanations before arriving at an answer. This helps guide it toward better solutions.",
 C,"Character Count","The total number of characters, including spaces, in a text field",
 C,"Chatbot","An Ai program designed to simulate conversation with human users",
 C,"Checkbox","An input control that allows users to select one or more options",
