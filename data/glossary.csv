@@ -27,6 +27,7 @@ A,"Agile","An iterative approach to project management and software development 
 A,"Agile Development","A software development methodology that promotes adaptive planning and evolutionary development",
 A,"Agile UX","The integration of user experience design practices within agile development methodologies",
 A,"Ai Agent","An Ai system designed to autonomously perceive its environment, make decisions, and take actions toward achieving specific goals.",
+A,"Ai Model","A program trained on massive datasets using algorithms to recognize patterns, make predictions, or generate content. For example, GPT is an Ai model family, and GPT-4 is an Ai model.",
 A,"Alert","An inline UI component that displays important information or warnings to users within a page, typically shifting content down when it appears",
 A,"Alert Dialog","Typically a simple modal dialog, with only Primary and Cancel buttons.",
 A,"Alias","An alternative name or shortcut for a file, folder, or command",
