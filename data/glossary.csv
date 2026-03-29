@@ -410,7 +410,7 @@ H,"Header","The top section of a webpage or document containing navigation and b
 H,"Headline","A prominent text element that introduces or summarizes content",
 H,"Headline 1","The main heading tag in HTML, typically the most important heading on a page and required for accessibility. Headline tags run from H1 to H6",H1
 H,"Heatmap","A visual representation showing where users click, scroll, or focus attention",
-H,"Hero","A large, prominent section at the top of a webpage featuring key content",
+H,"Hero","A large, prominent section at the top of a webpage featuring key content like an image or a banner.",
 H,"Heuristic Evaluation","A usability evaluation method using established usability principles",
 H,"Heuristics","General principles or rules of thumb for solving problems",
 H,"Hexadecimal","A base-16 number system commonly used to represent colors in web design",HEX
