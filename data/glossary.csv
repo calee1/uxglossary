@@ -532,7 +532,7 @@ M,"Multi-variant Testing","Testing multiple versions of elements simultaneously"
 M,"UI Mode","A setting within an interface that affects how user input is interpreted; one action can lead to different outcomes depending on the mode",
 N,"Native Mobile","Applications built specifically for a particular mobile platform",
 N,"Natural Language Interface","An interface that allows users to interact using everyday language",
-N,"Natural Language Processing","AI technology that helps computers understand human language",NLP
+N,"Natural Language Processing","The process through which Ai is taught to understand the rules and syntax of language, programmed to develop complex algorithms to represent those rules, and then made to use those algorithms to carry out specific tasks, like language generation, translation, and summarization.",NLP
 N,"Navigation","The system that allows users to move through a website or application",
 N,"Near Field Communication","Short-range wireless technology for data exchange",NFC
 N,"Negative Space","Empty or white space around and between design elements",
