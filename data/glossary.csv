@@ -195,6 +195,7 @@ C,"Component State","The various conditions a UI component can be in, such as ho
 C,"Component Variants","Different versions of a UI component for different use cases",
 C,"Compound Colors","Colors created by mixing multiple base colors",
 C,"Concatenate","The process of joining two or more strings or data elements together end-to-end to form a single combined element",
+C,"Concept Map","A useful visual representations of information with can take the form of a chart, table, flowchart, Venn Diagram, or timeline.",
 C,"Concept Testing","Evaluating ideas or concepts with users before full development",
 C,"Confidence Interval","A range of values that likely contains the true population parameter",CI
 C,"Confidence Level","The probability that a confidence interval contains the true parameter",
