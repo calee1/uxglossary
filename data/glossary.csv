@@ -265,6 +265,7 @@ D,"Dataset","A collection of related data organized for analysis",
 D,"Date Picker","A UI component that allows users to select dates from a calendar",
 D,"Decision Fatigue","The deteriorating quality of decisions after making many choices",
 D,"Decision Matrix","A tool for evaluating options based on multiple criteria",
+D,"Deep Learning","Ai models are trained on massive datasets which it can read and comprehend autonomously, with little help from humans. This is used to form a deep learning neural network (a complex, many-layered, weighted algorithm modeled after the human brain).",
 D,"Definition of Done","Agile criteria that must be met for work to be considered complete",DoD
 D,"Definition of Ready","Agile criteria that must be met before work can begin",DoR
 D,"Demographics","Statistical characteristics of a population",
