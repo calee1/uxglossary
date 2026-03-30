@@ -146,6 +146,7 @@ B,"Business-to-Business","Referring to transactions between companies",B2B
 B,"Business-to-Consumer","Referring to transactions between companies and individual customers",B2C
 B,"Business-to-Government","Referring to transactions between companies and government entities",B2G
 B,"Button","An interactive element that users can click to trigger an action",
+B,"Button Group","A Ui element that displays a group of connected buttons laid out in a horizontal row.",segmented button
 B,"Byte","A unit of digital information consisting of 8 bits",
 C,"Cache","Temporary storage that keeps frequently accessed data for quick retrieval",
 C,"Call to Action","A prompt that encourages users to take a specific action",CTA
