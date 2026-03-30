@@ -598,7 +598,7 @@ P,"Phishing","Fraudulent attempts to obtain sensitive information by impersonati
 P,"Photoshop","Adobe's raster graphics editing software",
 P,"Pill","A UI element with rounded ends, often used for tags or buttons",
 P,"Pilot Test","A small-scale preliminary study to test research methods",
-P,"Pixel","The smallest unit of a digital image",
+P,"Pixel","The smallest unit of a digital image",px
 P,"Points","A standard measurement in typography for length, leading, font size, or other units. A point represents a square group of pixels and differs depending on the resolution of an image or display. Points are traditionally the measurement unit used in print design. A point is .35 millimeters (1/72 inch) on a printed page.",pt
 P,"Popover","A small overlay that appears when users interact with an element",
 P,"Popup","A window that appears on top of the main interface",
