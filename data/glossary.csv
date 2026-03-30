@@ -513,6 +513,7 @@ L,"Line Break","A point where text wraps to the next line",
 L,"Link","A clickable element that navigates to another page or resource",
 L,"Listbox","A UI control that displays a list of options for selection",
 L,"Load Time","The amount of time it takes for a page or application to fully load",
+L,"Loading Spinner","A type of progress indicator used to signify that a process is ongoing.",wait animation
 L,"Localization","Adapting a product for a specific region or language",L10N
 L,"Log Files","Records of events that occur in a system or application",
 L,"Logo","A graphic symbol that represents a company or brand",
