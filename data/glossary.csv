@@ -441,6 +441,7 @@ H,"Hypertext","Text that contains links to other text or media",
 H,"HyperText Markup Language","The standard markup language for web pages",HTML
 H,"HyperText Transfer Protocol","The foundation of data communication on the web",HTTP
 I,"I-beam Cursor","A text cursor that appears as a vertical line for text editing",
+I,"Icon","A small graphic element that is used in user interfaces to visually communicate objects, actions, or ideas, often depicting common objects (e.g., a trash can, a pen, a magnifier glass).",
 I,"Iconography","The use of visual symbols to represent ideas or functions",
 I,"Ideation","The process of generating creative ideas and solutions",
 I,"Illustration","Visual artwork used to explain, decorate, or enhance content",
