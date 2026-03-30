@@ -772,6 +772,7 @@ S,"SWOT Analysis","A strategic planning technique: Strengths, Weaknesses, Opport
 S,"Syntactically Awesome Style Sheets","A preprocessor scripting language that is interpreted or compiled into CSS",SASS
 S,"System Usability Scale","A standardized questionnaire for measuring usability",SUS
 T,"Tab","A UI element that allows users to switch between different views or sections",
+T,"Tab Group","A navigation component grouping tabs to allows users to quickly switch between top-level sections, providing persistent, one-tap access to different areas of an application while maintaining the navigation state of each section.",tab bar
 T,"Table","A structured arrangement of data in rows and columns",
 T,"Table Footer","The bottom section of a table, often containing summary information",
 T,"Tablet","A portable computer with a touchscreen interface",
