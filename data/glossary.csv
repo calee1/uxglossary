@@ -673,6 +673,7 @@ R,"Responsible, Accountable, Consulted, Informed","A matrix that defines roles a
 R,"Responsive Breakpoints","Specific screen widths where responsive designs change their layout to accommodate different devices",
 R,"Responsive Design","Design that adapts to different screen sizes and devices",
 R,"Retention","The ability to keep users engaged with a product over time",
+R,"Retina Display","A marketing term introduced by Apple in 2010 for high-resolution screens with pixel densities so high (typically 300+ PPI) that the human eye cannot distinguish individual pixels at normal viewing distances.",
 R,"Return on Investment","A metric used to measure the profitability of an investment relative to its cost",ROI
 R,"Reverse Prototype","A prototype that demonstrates what not to do",
 R,"RGBA","Red, Green, Blue color model, with optional Alpha channel for transparency",RGB
