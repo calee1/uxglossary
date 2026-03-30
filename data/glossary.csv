@@ -505,6 +505,7 @@ L,"Legibility","In typography, legibility is the measure of how easily an indivi
 L,"LESS","A dynamic preprocessor style sheet language that can be compiled into CSS and run on the client or server",
 L,"Letter Case","The distinction between smaller letters like lowercase and larger letters like uppercase or capital letters. Most typeface sets have letters in both, while a typeface like Bangers is set in just uppercase letters.",
 L,"Letter Spacing","The space between characters in a line or block of text. Adjusting this can significantly impact the visual density of text, thereby influencing legibility and readability. Also known as character spacing.",
+L,"Lightbox","A UI element that displays content in a centered overlay, dimming the main page to reduce distractions, providing a focused viewing experience for content - often images and videos with navigation for galleries - while keeping users on the same page.",
 L,"Likert Scale","A rating scale used in surveys to measure attitudes or opinions",
 L,"Line Break","A point where text wraps to the next line",
 L,"Link","A clickable element that navigates to another page or resource",
