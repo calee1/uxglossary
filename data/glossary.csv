@@ -323,6 +323,7 @@ D,"Double Diamond","A design process model with four phases: discover, define, d
 D,"Drag and Drop","A UI interaction where users move objects by dragging them",
 D,"Drag Handle","A visual indicator that shows where users can grab to drag an element",
 D,"Drawer","A panel that slides in from the edge of the screen",
+D,"Dual Listbox","A pair of list boxes that work together enabling multiple options to be selected and reordered.",
 E,"Ebb and Flow","A phrase used to describe a natural rhythm of change where things repeatedly increase and decrease, rise and fall, or fluctuate",
 E,"Ecosystem","An interconnected network of hardware, software, services, and users that function together to create value, often revolving around a central platform or vendor.",
 E,"Edge Case","An unusual or extreme situation that occurs at the boundary of normal parameters",
