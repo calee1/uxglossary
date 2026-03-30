@@ -845,6 +845,7 @@ V,"Vlog","A blog that contains video content",
 V,"Voice of Customer","Direct feedback and insights from customers about their experiences",VOC
 V,"Voice User Interface","An interface that allows users to interact through voice commands",VUI
 W,"Waterfall","A sequential development methodology where each phase must be completed before the next",
+W,"Watermark","An identifier embedded onto digital content like videos, images, or electronic documents. They can be visible, like a semi-transparent overlay, or invisible to users.",
 W,"Wayfinding","The process of using spatial and environmental information to navigate",
 W,"WCAG","Web Content Accessibility Guidelines, standards for web accessibility",WCAG
 W,"Wearable Technology","Electronic devices that can be worn on the body",
