@@ -793,7 +793,7 @@ T,"Toast","A brief message that appears temporarily to provide feedback",
 T,"Toggle Button","A button that switches between two states when clicked",
 T,"Toggle Group","A set of toggle buttons where multiple can be selected",
 T,"Toggle Switch","A UI control that switches between on and off states",
-T,"Tooltip","A small popup that provides additional information about an element",
+T,"Tooltip","A small overlay that provides additional information about an element and typically appears and disappears automatically when a user hovers on an element.",
 T,"Total Addressable Market","The total market demand for a product or service",TAM
 T,"Tree Testing","A usability technique for evaluating the findability of topics in a website",
 T,"Triad Colors","A color scheme using three colors evenly spaced around the color wheel",
