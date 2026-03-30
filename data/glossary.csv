@@ -793,7 +793,7 @@ T,"Tilt","The ability of a stylus (pen) to sense its angle and use that informat
 T,"Time on Task","The amount of time users spend completing a specific task",
 T,"Time Picker","A UI component for selecting time values",
 T,"Time to Value","The time it takes for users to realize value from a product",TTV
-T,"Toast","A brief message that appears temporarily to provide feedback",
+T,"Toast","A brief message that appears temporarily to provide feedback.",snackbar
 T,"Toggle Button","A button that switches between two states when clicked",
 T,"Toggle Group","A set of toggle buttons where multiple can be selected",
 T,"Toggle Switch","A UI control that switches between on and off states",
