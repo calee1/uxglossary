@@ -599,6 +599,7 @@ P,"Photoshop","Adobe's raster graphics editing software",
 P,"Pill","A UI element with rounded ends, often used for tags or buttons",
 P,"Pilot Test","A small-scale preliminary study to test research methods",
 P,"Pixel","The smallest unit of a digital image",px
+P,"Pixelation","Occurs most frequently in images with a low number of pixels per inch (PPI), also known as the resolution of an image, but also happens if there’s a low bit-per-pixel rate (the amount of data representing in the pixel).",
 P,"Points","A standard measurement in typography for length, leading, font size, or other units. A point represents a square group of pixels and differs depending on the resolution of an image or display. Points are traditionally the measurement unit used in print design. A point is .35 millimeters (1/72 inch) on a printed page.",pt
 P,"Popover","A small overlay that appears when users interact with an element",
 P,"Popup","A window that appears on top of the main interface",
