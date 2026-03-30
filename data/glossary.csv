@@ -549,6 +549,7 @@ M,"Mixpanel","Product analytics platform that helps businesses understand how us
 M,"Mobile Web","Websites optimized for viewing on mobile devices",
 M,"Mobile-first Design","A design approach that starts with mobile devices and scales up",
 M,"Mockup","A static representation of a design showing visual elements",
+M,"Modal","A modal element is one that creates a mode - blocking interaction with the main application until the modal element is interacted with. It is often used for warnings or crucial tasks with dialog windows or pop ups.",
 M,"Modal Dialog","Requires immediate attention, used for critical information or required actions, demanding immediate attention",
 M,"Model Context Protocol","An open, client-server standard that lets AI applications connect to external data, tools, and local resources - enabling Ai agents to perform tasks like reading files, querying databases, or executing code.",MCP
 M,"Moderated Testing","Usability testing conducted with a facilitator present to guide participants and ask questions",
