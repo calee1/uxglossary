@@ -774,7 +774,7 @@ T,"Technical Debt","The cost of additional work caused by choosing quick solutio
 T,"Terabyte","A unit of digital information equal to 1,024 gigabytes",TB
 T,"Test Marketing","Testing a product with a limited audience before full launch",
 T,"Text Area","A multi-line input field for entering longer text",
-T,"Text Box","A single-line input field for entering text",
+T,"Text Box","A single-line input field for entering text.",textbox
 T,"Theming","The process of applying consistent visual styles across an interface",
 T,"Think-aloud Protocol","A usability testing method where participants verbalize their thoughts and decision-making process while using a product",
 T,"Third Party Sign In","Authentication using credentials from another service",
