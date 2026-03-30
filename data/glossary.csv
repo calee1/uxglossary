@@ -870,7 +870,7 @@ W,"Whiteboarding","Using a whiteboard to brainstorm, plan, or explain ideas",
 W,"Widget","A small application or component that performs a specific function",
 W,"Wireflow","A design deliverable that combines wireframes with a flowchart showing both the interface layout and the navigational paths between screens.",
 W,"Wireframe","A basic structural blueprint showing the layout of a webpage or app",
-W,"Wizard","A step-by-step interface that guides users through a complex process",
+W,"Wizard","A step-by-step interface that guides users through a complex process",stepper
 W,"Wizard-of-Oz Testing","Testing where a human secretly provides responses that appear to come from a computer",
 W,"Word Cloud","A visual representation of text where word size indicates frequency or importance",
 W,"Wordmark","A  specific type of logo that contains the name of the company, product, or organization in a graphic style. Also known as a logotype.",
