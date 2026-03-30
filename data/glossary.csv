@@ -459,6 +459,7 @@ I,"Initial Case","Capitalization where only the first letter of the first word i
 I,"Inline","Elements that flow with text content rather than starting on a new line",
 I,"Inline Frame","In HTML, it's a container that allows you to embed another HTML page, document, or even video within the current one",iFrame
 I,"Innovation","The process of creating new ideas, products, or methods",
+I,"Input Control","Any UI component that allows users to input information into a system. Examples include textboxes, checkboxes, radio buttons, sliders, toggles, and pickers.",
 I,"Intentional Friction","Deliberately adding steps to slow down user actions for safety or consideration",
 I,"Interaction","The communication between a user and a system",
 I,"Interaction Design","The design of interactive products and services",IxD
