@@ -710,6 +710,7 @@ S,"Screen Flow","The sequence of screens users navigate through in an applicatio
 S,"Screen Reader","Assistive technology that reads screen content aloud for users with visual impairments",
 S,"Screener","A survey used to identify qualified research participants",
 S,"Scroll Area","A region where content can be scrolled to view additional information",
+S,"Scrollbar","An element used to indicate and control the portion of a container or page that is visible on the screen. A typical scrollbar consists of a track (the area the scrollbar slides within) and a handle, which can be dragged to scroll through the content.",
 S,"Scrolling","Moving through content that extends beyond the visible area",
 S,"Scrum","An agile framework for managing product development",
 S,"Search","The function that allows users to find specific content or information",
