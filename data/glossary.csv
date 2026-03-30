@@ -1,6 +1,7 @@
 letter,"term","definition",acronym
 ,"CSD Matrix","A framework for outlining what everyone involved in a project knows (Certainties), hypothesizes (Suppositions), and does not know yet (Doubts). Used to build shared understanding across a project team.",Certainties Suppositions Doubts
 0,"2-colorable Graph","Graph whose vertices can be colored using only two colors (e.g., red and blue) in such a way that no two adjacent vertices have the same color",Bipartite Graph
+0,"2D-Matrix","A special input control used to simultaneously modify multiple related parameters by drawing a complex curve (such as luminance and RGB curves in photo-editing applications) that are typically modified together.",
 0,"4-color Printing","Printing in CMYK or full-color",
 A,"A/B Testing","A method of comparing two versions of a webpage or app to determine which performs better",
 A,"Above-the-fold","The portion of a webpage that is visible without scrolling, derived from newspaper terminology",
