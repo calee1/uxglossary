@@ -774,6 +774,7 @@ T,"Tab","A UI element that allows users to switch between different views or sec
 T,"Tab Group","A navigation component grouping tabs to allows users to quickly switch between top-level sections, providing persistent, one-tap access to different areas of an application while maintaining the navigation state of each section.",tab bar
 T,"Table","A structured arrangement of data in rows and columns",
 T,"Table Footer","The bottom section of a table, often containing summary information",
+T,"Table picker","A complex input control that allows users to select one or more items from a structured tabular dataset rather than a simple dropdown list.",Data grid Picker
 T,"Tablet","A portable computer with a touchscreen interface",
 T,"Tabular Numbers","Numbers designed to align vertically in tables and lists",
 T,"Tag","A label that categorizes or describes content",
